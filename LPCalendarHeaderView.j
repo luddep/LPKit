@@ -1,0 +1,199 @@
+/*
+ * LPCalendarHeaderView.j
+ *
+ * Created by Ludwig Pettersson on September 21, 2009.
+ * Copyright 2009, Your Company All rights reserved.
+ */
+ 
+_monthNames = [@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"];
+_dayNamesShort = [@"mon", @"tue", @"wed", @"thu", @"fri", @"sat", @"sun"];
+_dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
+
+@implementation LPCalendarHeaderView : CPControl
+{
+    CPTextField title;
+    id prevButton @accessors(readonly);
+    id nextButton @accessors(readonly);
+    CPArray dayLabels;
+    
+    BOOL weekStartsOnMonday @accessors;
+}
+
++ (CPString)themeClass
+{
+    return @"lp-calendar-header-view";
+}
+
++ (id)themeAttributes
+{
+    return [CPDictionary dictionaryWithObjects:[nil]
+                                       forKeys:[@"background-color"]];
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if(self = [super initWithFrame:aFrame])
+    {
+        [self setValue:[CPColor colorWithHexString:@"eee"] forThemeAttribute:@"background-color" inState:CPThemeStateNormal];
+        
+        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"font" inState:CPThemeStateNormal];
+        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"text-color" inState:CPThemeStateNormal];
+        [self setValue:[CPColor whiteColor] forThemeAttribute:@"text-shadow-color" inState:CPThemeStateNormal];
+        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"text-shadow-offset" inState:CPThemeStateNormal];
+        [self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment" inState:CPThemeStateNormal];
+        
+        title = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
+        [title setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin];
+        [self addSubview:title];
+        
+        prevButton = [[LPCalendarHeaderPreviousButton alloc] initWithFrame:CGRectMake(6, 9, 0, 0)];
+        [prevButton sizeToFit];
+        [self addSubview:prevButton];
+        
+        nextButton = [[LPCalendarHeaderNextButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX([self bounds]) - 21, 9, 0, 0)];
+        [nextButton sizeToFit];
+        [self addSubview:nextButton];
+        
+        dayLabels = [CPArray array];
+        
+        for (var i = 0; i < [_dayNamesShort count]; i++)
+        {
+            var label = [LPCalendarLabel labelWithTitle:[_dayNamesShort objectAtIndex:i]];
+            [dayLabels addObject:label];
+            [self addSubview:label];
+        }
+        
+        [self setBackgroundColor:[CPColor lightGrayColor]];
+        
+        [self setNeedsLayout];
+    }
+    return self;
+}
+
+- (void)setDate:(CPDate)aDate
+{
+    [title setStringValue:[CPString stringWithFormat:@"%s %i", _monthNames[aDate.getUTCMonth()], aDate.getUTCFullYear()]];
+    [title sizeToFit];
+    [title setCenter:CGPointMake(CGRectGetMidX([self bounds]), 16)];
+}
+
+- (void)setWeekStartsOnMonday:(BOOL)shouldWeekStartOnMonday
+{
+    weekStartsOnMonday = shouldWeekStartOnMonday;
+    
+    var dayNames = (shouldWeekStartOnMonday) ? _dayNamesShort : _dayNamesShortUS;
+    
+    for (var i = 0; i < [dayLabels count]; i++)
+        [[dayLabels objectAtIndex:i] setTitle:[dayNames objectAtIndex:i]];
+
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews
+{
+    var labelWidth = CGRectGetWidth([self bounds]) / [dayLabels count],
+        labelHeight = CGRectGetHeight([[[self subviews] objectAtIndex:3] bounds]);
+
+    for (var i = 0; i < [dayLabels count]; i++)
+        [[dayLabels objectAtIndex:i] setFrame:CGRectMake(i * labelWidth, CGRectGetHeight([self bounds]) - labelHeight, labelWidth, labelHeight)];
+    
+    [self setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
+    [title setFont:[self currentValueForThemeAttribute:@"font"]];
+    [title setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
+    [title setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
+    [title setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
+}
+
+@end
+
+@implementation LPCalendarLabel : CPTextField
+{
+}
+
++ labelWithTitle:(CPString)aTitle
+{
+    var label = [[LPCalendarLabel alloc] initWithFrame:CGRectMakeZero()];
+    [label setTitle:aTitle];
+    return label;
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        [self setValue:[CPFont systemFontOfSize:9.0] forThemeAttribute:@"font"];
+        [self setValue:[CPColor colorWithHexString:@"777"] forThemeAttribute:@"text-color"];
+        [self setValue:[CPColor colorWithWhite:1 alpha:0.7] forThemeAttribute:@"text-shadow-color"];
+        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"text-shadow-offset"];
+        [self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
+    }
+    return self;
+}
+
+- (void)setTitle:(CPString)aTitle
+{
+    [self setStringValue:aTitle];
+    [self sizeToFit];
+}
+
+@end
+
+
+@implementation LPCalendarHeaderButton : CPButton 
+{
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        [self setValue:CGSizeMake(15.0, 15.0) forThemeAttribute:@"min-size"];
+        [self setValue:CGSizeMake(15.0, 15.0) forThemeAttribute:@"max-size"];
+    }
+    return self;
+}
+
+@end
+
+
+@implementation LPCalendarHeaderPreviousButton : LPCalendarHeaderButton 
+{
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        var bezelColor = [CPColor colorWithPatternImage:[[CPThreePartImage alloc] initWithImageSlices:
+                    [
+                        [[CPImage alloc] initWithContentsOfFile:[[CPBundle bundleForClass:[self class]] pathForResource:@"LPCalendarView/previous.png"] size:CGSizeMake(15.0, 15.0)], nil, nil
+                    ]
+                isVertical:NO]];
+        
+        [self setValue:bezelColor forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
+    }
+    return self;
+}
+
+@end
+
+@implementation LPCalendarHeaderNextButton : LPCalendarHeaderButton 
+{
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        var bezelColor = [CPColor colorWithPatternImage:[[CPThreePartImage alloc] initWithImageSlices:
+                    [
+                        [[CPImage alloc] initWithContentsOfFile:[[CPBundle bundleForClass:[self class]] pathForResource:@"LPCalendarView/next.png"] size:CGSizeMake(15.0, 15.0)], nil, nil
+                    ]
+                isVertical:NO]];
+        
+        [self setValue:bezelColor forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
+    }
+    return self;
+}
+
+@end
