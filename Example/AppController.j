@@ -3,7 +3,6 @@
  * LPKit
  *
  * Created by Ludwig Pettersson on October 12, 2009.
- * Copyright 2009, Your Company All rights reserved.
  */
 
 @import <Foundation/CPObject.j>
