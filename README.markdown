@@ -16,6 +16,8 @@ LPCalendarView is a calendar view based on the iPhone calendar app, with the sam
 **IMPORTANT:** Calendar view currently does not have a default theme, but an example ThemeDescriptors.j can be found in Examples/.
 When compiling your theme, make sure to symlink LPKit to the Frameworks folder of the objj narwhal package. (Located at **/usr/local/share/narwhal/packages/objj/lib/Frameworks** in my case)
 
+**NOTE:** The sliding isn't yet 100% totally awesome, and there will be improvements, eventually.
+
 ## Sparkline
 
 ![calendar view](http://dl.getdropbox.com/u/24582/github/LPKit/sparkline.png)
