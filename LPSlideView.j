@@ -140,8 +140,8 @@ LPSlideViewNegativeDirection = 4;
     
     isSliding = YES;
     
-    if(_delegate && [_delegate respondsToSelector:@selector(slideViewWillMove)])
-        [_delegate slideViewWillMove];
+    if(_delegate && [_delegate respondsToSelector:@selector(slideView:willMoveToView:)])
+        [_delegate slideView:self willMoveToView:aView];
     
     var viewIndex = [[self subviews] indexOfObject:aView],
         currentViewIndex = [[self subviews] indexOfObject:currentView],
@@ -218,16 +218,23 @@ LPSlideViewNegativeDirection = 4;
     currentView = aView;
 }
 
-- (void)animationDidEnd:(CPAnimation)anAnimation
+- (void)animationDidEnd
 {
+    if(_delegate && [_delegate respondsToSelector:@selector(slideView:didMoveToView:)])
+        [_delegate slideView:self didMoveToView:currentView];
+
     [previousView setHidden:YES];
     isSliding = NO;
 }
 
+- (void)animationDidEnd:(CPAnimation)anAnimation
+{
+    [self animationDidEnd];
+}
+
 - (void)animationDidStop:(CPAnimation)anAnimation
 {
-    [previousView setHidden:YES];
-    isSliding = NO;
+    [self animationDidEnd];
 }
 
 @end
