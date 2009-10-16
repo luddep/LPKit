@@ -1,6 +1,8 @@
 # LPKit
 A collection of different generic views & utilities for [Cappuccino](http://cappuccino.org/), extracted from the up-coming cappuccino port of [Observer](http://observerapp.com/).
 
+A running example app will be up, soon.
+
 # What's inside
 
 ## Slide view
