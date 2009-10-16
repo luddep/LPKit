@@ -3,20 +3,18 @@ A collection of different generic views & utilities for [Cappuccino](http://capp
 
 # What's inside
 
-## Views
-
-### Slide view
+## Slide view
 
 LPSlideVie lets you slide between different subviews. Only one subview will be visible, and the sliding only shows the relevant subviews - no matter how many other views might be between them.
 
-### Calendar view
+## Calendar view
 
 LPCalendarView is a calendar view based on the iPhone calendar app, with the same sliding when changing months. Currently supports selecting days & weeks, also marking a special day as highlighted - such as the current day or week.
 
 **IMPORTANT:** Calendar view currently does not have a default theme, but an example ThemeDescriptors.j can be found in Examples/.
 When compiling your theme, make sure to symlink LPKit to the Frameworks folder of the objj narwhal package. (Located at **/usr/local/share/narwhal/packages/objj/lib/Frameworks** in my case)
 
-### Sparkline
+## Sparkline
 
 A simple sparkline chart, comparable to the Google Chart sparklines - but using CoreGraphics rather than an image.
 
