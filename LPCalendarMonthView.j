@@ -69,6 +69,8 @@ var _startAndEndOfWeekCache = {};
     BOOL weekStartsOnMonday @accessors;
     
     id _delegate @accessors(property=delegate);
+    
+    LPCalendarView calendarView @accessors;
 }
 
 + (CPString)themeClass
@@ -82,21 +84,23 @@ var _startAndEndOfWeekCache = {};
                                        forKeys:[@"grid-color"]];
 }
 
-- (void)initWithFrame:(CGRect)aFrame
+- (void)initWithFrame:(CGRect)aFrame calendarView:(LPCalendarView)aCalendarView
 {
     if (self = [super initWithFrame:aFrame])
     {
+        calendarView = aCalendarView;
+        
         selectionLengthType = LPCalendarDayLength;
         selection = [CPArray array];
         
         weekStartsOnMonday = YES;
         
-        [self setValue:[CPColor colorWithWhite:0.8 alpha:1] forThemeAttribute:@"grid-color" inState:CPThemeStateNormal];
+        //[self setValue:[CPColor colorWithWhite:0.8 alpha:1] forThemeAttribute:@"grid-color" inState:CPThemeStateNormal];
         
         // Create tiles
         for (var i = 0; i < 42; i++)
-            [self addSubview:[LPCalendarDayView dayView]];
-
+            [self addSubview:[LPCalendarDayView dayViewWithCalendarView:aCalendarView]];
+            
         [self setNeedsLayout];
     }
     return self;
@@ -403,7 +407,7 @@ var _startAndEndOfWeekCache = {};
 	    height = CGRectGetHeight(bounds),
 	    tileSize = [self tileSize];
 	
-	CGContextSetFillColor(context, [self currentValueForThemeAttribute:@"grid-color"]);
+	CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
     
     // Horizontal lines
     for (var i = 0; i < 6; i++)
@@ -424,6 +428,8 @@ var _startAndEndOfWeekCache = {};
     BOOL isFillerTile @accessors;
     BOOL isSelected @accessors(setter=setSelected:);
     BOOL isHighlighted @accessors(setter=setHighlighted:);
+    
+    LPCalendarView calendarView @accessors;
 }
 
 + (CPString)themeClass
@@ -437,9 +443,11 @@ var _startAndEndOfWeekCache = {};
                                        forKeys:[@"background-color", @"bezel-color"]];
 }
 
-+ (id)dayView
++ (id)dayViewWithCalendarView:(LPCalendarView)aCalendarView
 {
-    return [[self alloc] initWithFrame:CGRectMakeZero()];
+    var dayView = [[self alloc] initWithFrame:CGRectMakeZero()];
+    [dayView setCalendarView:aCalendarView];
+    return dayView;
 }
 
 - (void)initWithFrame:(CGRect)aFrame
@@ -450,34 +458,6 @@ var _startAndEndOfWeekCache = {};
         
         textField = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
         [textField setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-        
-        // Normal
-        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"font" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"text-color" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithWhite:1 alpha:0.8] forThemeAttribute:@"text-shadow-color" inState:CPThemeStateNormal];
-        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"text-shadow-offset" inState:CPThemeStateNormal];
-    
-        [self setValue:[CPColor clearColor] forThemeAttribute:@"bezel-color" inState:CPThemeStateNormal];
-    
-        // Highlighted (The highlighted day, default is the current day)
-        [self setValue:[CPColor colorWithHexString:@"a0c1ed"] forThemeAttribute:@"bezel-color" inState:CPThemeStateHighlighted];        
-        [self setValue:[CPColor colorWithHexString:@"555"] forThemeAttribute:@"text-color" inState:CPThemeStateHighlighted];
-        
-        // Selected
-        [self setValue:[CPColor colorWithHexString:@"fff"] forThemeAttribute:@"text-color" inState:CPThemeStateSelected];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"text-shadow-color" inState:CPThemeStateSelected];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.2] forThemeAttribute:@"bezel-color" inState:CPThemeStateSelected];
-    
-        // Selected & Highlighted (The highlighted day, default is the current day)
-        [self setValue:[CPColor colorWithHexString:@"719edb"] forThemeAttribute:@"bezel-color" inState:CPThemeStateHighlighted | CPThemeStateSelected];
-    
-        // Disabled
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.3] forThemeAttribute:@"text-color" inState:CPThemeStateDisabled];
-        
-        // Disabled & Selected (Next and previous month tiles)
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.25] forThemeAttribute:@"bezel-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"text-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
-        [self setValue:[CPColor clearColor] forThemeAttribute:@"text-shadow-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
     
         //[self setIsFillerTile:NO];
         [self addSubview:textField];
@@ -528,12 +508,12 @@ var _startAndEndOfWeekCache = {};
 
 - (void)layoutSubviews
 {
-    [self setBackgroundColor:[self currentValueForThemeAttribute:@"bezel-color"]]
+    [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:[self themeState]]]
     
-    [textField setFont:[self currentValueForThemeAttribute:@"font"]];
-    [textField setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
-    [textField setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
-    [textField setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
+    [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:[self themeState]]];
+    [textField setTextColor:[calendarView valueForThemeAttribute:@"tile-text-color" inState:[self themeState]]];
+    [textField setTextShadowColor:[calendarView valueForThemeAttribute:@"tile-text-shadow-color" inState:[self themeState]]];
+    [textField setTextShadowOffset:[calendarView valueForThemeAttribute:@"tile-text-shadow-offset" inState:[self themeState]]];
 }
 
 @end

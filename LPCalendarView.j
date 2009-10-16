@@ -55,8 +55,10 @@
 
 + (id)themeAttributes
 {
-    return [CPDictionary dictionaryWithObjects:[nil]
-                                       forKeys:[@"background-color"]];
+    return [CPDictionary dictionaryWithObjects:[nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+                                       forKeys:[@"background-color", @"grid-color",
+                                                @"tile-font", @"tile-text-color", @"tile-text-shadow-color", @"tile-text-shadow-offset", @"tile-bezel-color",
+                                                @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment"]];
 }
 
 - (void)initWithFrame:(CGRect)aFrame
@@ -64,7 +66,52 @@
     if (self = [super initWithFrame:aFrame])
     {
         fullSelection = [nil, nil];
-        [self setValue:[CPColor colorWithHexString:@"ddd"] forThemeAttribute:@"background-color" inState:CPThemeStateNormal];
+        
+        //[self setValue:[CPColor colorWithHexString:@"ddd"] forThemeAttribute:@"background-color" inState:CPThemeStateNormal];
+        
+        /*
+            Header view
+        *
+        
+        [self setValue:[CPColor colorWithHexString:@"eee"] forThemeAttribute:@"header-background-color" inState:CPThemeStateNormal];
+        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"header-font" inState:CPThemeStateNormal];
+        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"header-text-color" inState:CPThemeStateNormal];
+        [self setValue:[CPColor whiteColor] forThemeAttribute:@"header-text-shadow-color" inState:CPThemeStateNormal];
+        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"header-text-shadow-offset" inState:CPThemeStateNormal];
+        [self setValue:CPCenterTextAlignment forThemeAttribute:@"header-alignment" inState:CPThemeStateNormal];
+        
+        /*
+            DayView
+        *
+        
+        // Normal
+        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"tile-font" inState:CPThemeStateNormal];
+        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateNormal];
+        [self setValue:[CPColor colorWithWhite:1 alpha:0.8] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateNormal];
+        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"tile-text-shadow-offset" inState:CPThemeStateNormal];
+    
+        [self setValue:[CPColor clearColor] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateNormal];
+    
+        // Highlighted (The highlighted day, default is the current day)
+        [self setValue:[CPColor colorWithHexString:@"a0c1ed"] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateHighlighted];        
+        [self setValue:[CPColor colorWithHexString:@"555"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateHighlighted];
+        
+        // Selected
+        [self setValue:[CPColor colorWithHexString:@"fff"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateSelected];
+        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateSelected];
+        [self setValue:[CPColor colorWithWhite:0 alpha:0.2] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateSelected];
+    
+        // Selected & Highlighted (The highlighted day, default is the current day)
+        [self setValue:[CPColor colorWithHexString:@"719edb"] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateHighlighted | CPThemeStateSelected];
+    
+        // Disabled
+        [self setValue:[CPColor colorWithWhite:0 alpha:0.3] forThemeAttribute:@"tile-text-color" inState:CPThemeStateDisabled];
+        
+        // Disabled & Selected (Next and previous month tiles)
+        [self setValue:[CPColor colorWithWhite:0 alpha:0.25] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
+        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"tile-text-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
+        [self setValue:[CPColor clearColor] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
+        */
         
         var bounds = [self bounds];
         
@@ -89,11 +136,11 @@
 {
     if (!currentMonthView)
     {
-        firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds]];
+        firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [firstMonthView setDelegate:self];
         [slideView addSubview:firstMonthView];
         
-        secondMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds]];
+        secondMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [secondMonthView setDelegate:self];
         [slideView addSubview:secondMonthView];
         

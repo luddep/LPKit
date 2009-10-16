@@ -57,13 +57,6 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
 {
     if(self = [super initWithFrame:aFrame])
     {
-        [self setValue:[CPColor colorWithHexString:@"eee"] forThemeAttribute:@"background-color" inState:CPThemeStateNormal];
-        
-        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"font" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"text-color" inState:CPThemeStateNormal];
-        [self setValue:[CPColor whiteColor] forThemeAttribute:@"text-shadow-color" inState:CPThemeStateNormal];
-        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"text-shadow-offset" inState:CPThemeStateNormal];
-        [self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment" inState:CPThemeStateNormal];
         
         title = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
         [title setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin];
@@ -120,11 +113,14 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
     for (var i = 0; i < [dayLabels count]; i++)
         [[dayLabels objectAtIndex:i] setFrame:CGRectMake(i * labelWidth, CGRectGetHeight([self bounds]) - labelHeight, labelWidth, labelHeight)];
     
-    [self setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
-    [title setFont:[self currentValueForThemeAttribute:@"font"]];
-    [title setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
-    [title setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
-    [title setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
+    
+    var superview = [self superview];
+    
+    [self setBackgroundColor:[superview valueForThemeAttribute:@"header-background-color" inState:[self themeState]]];
+    [title setFont:[superview valueForThemeAttribute:@"header-font" inState:[self themeState]]];
+    [title setTextColor:[superview valueForThemeAttribute:@"header-text-color" inState:[self themeState]]];
+    [title setTextShadowColor:[superview valueForThemeAttribute:@"header-text-shadow-color" inState:[self themeState]]];
+    [title setTextShadowOffset:[superview valueForThemeAttribute:@"header-text-shadow-offset" inState:[self themeState]]];
 }
 
 @end
