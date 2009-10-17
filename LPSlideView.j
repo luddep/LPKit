@@ -45,7 +45,7 @@ LPSlideViewNegativeDirection = 4;
 - (id)initWithDuration:(float)aDuration animationCurve:(id)anAnimationCurve
 {
     if (self = [super initWithDuration:aDuration animationCurve:anAnimationCurve])
-    {
+    {   
         views = [CPArray array];
         properties = [CPArray array];
     }
@@ -64,6 +64,8 @@ LPSlideViewNegativeDirection = 4;
 - (void)setCurrentProgress:(float)progress
 {
 	[super setCurrentProgress:progress];
+	
+	progress = [self currentValue];
  
 	for (var i = 0; i < views.length; i++)
 	{
@@ -92,7 +94,7 @@ LPSlideViewNegativeDirection = 4;
     id currentView;
     id previousView;
     
-    float animationDuration;
+    float animationDuration @accessors;
     id animationCurve @accessors;
     BOOL isSliding @accessors(readonly);
     
