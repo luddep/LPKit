@@ -11,7 +11,7 @@ Place the entire LPKit folder in your Frameworks folder, or any directory that y
 
 ## Slide view
 
-LPSlideVie lets you slide between different subviews. Only one subview will be visible, and the sliding only shows the relevant subviews - no matter how many other views might be between them.
+LPSlideView lets you slide between different subviews. Only one subview will be visible, and the sliding only shows the relevant subviews - no matter how many other views might be between them.
 
 ## Calendar view
 
