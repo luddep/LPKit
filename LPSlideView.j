@@ -65,6 +65,7 @@ LPSlideViewNegativeDirection = 4;
 {
 	[super setCurrentProgress:progress];
 	
+	// Get the progress with respect to the animationCurve
 	progress = [self currentValue];
  
 	for (var i = 0; i < views.length; i++)

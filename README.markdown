@@ -3,6 +3,10 @@ A collection of different generic views & utilities for [Cappuccino](http://capp
 
 A running example app will be up, soon.
 
+## Installation
+
+Place the entire LPKit folder in your Frameworks folder, or any directory that you add using `OBJJ_INCLUDE_PATHS`.
+
 # What's inside
 
 ## Slide view
