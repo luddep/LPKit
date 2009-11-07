@@ -34,4 +34,20 @@ A simple sparkline chart, comparable to the Google Chart sparklines - but using 
 
 ### LPEmail
 
-A simple object which lets you validate emails, for now. **NOTE:** the current regexp is broken, needs to be replaced with one that     actually works.
+A simple object which lets you validate emails, for now. **NOTE:** the current regexp is broken, needs to be replaced with one that actually works.
+
+### LPURLPostRequest
+
+A wrapper around `CPURLRequest` to make working with post requests a bit simpler.
+Rather than manually settings the HTTPBody & Content-Type, you pass it a javascript object with key value pairs of strings which you want to send as a POST request.
+
+Example:
+
+    var request = [LPURLPostRequest requestWithURL:[CPURL URLWithString:@"/my-url/"]],
+        content = {
+                      'name': 'Lorem ipsum',
+                      'age': '18'
+                  };
+    
+    [request setContent:content]
+    [CPURLConnection connectionWithRequest:request delegate:self];
