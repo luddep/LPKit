@@ -81,6 +81,8 @@
         [animation setDelegate:self];
         [animation startAnimation];
     }
+    else
+        [knob setFrameOrigin:knobEndOrigin];
 }
 
 - (void)mouseDown:(CPEvent)anEvent
