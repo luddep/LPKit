@@ -29,7 +29,7 @@
  */
 
 @import <AppKit/CPControl.j>
-@import <LPKit/LPSlideView.j>
+@import <LPKit/LPViewAnimation.j>
 
 
 @implementation LPSwitch : CPControl
@@ -45,18 +45,49 @@
     
     float animationDuration;
     id animationCurve;
+    
+    CPView offBackgroundView;
+    CPView onBackgroundView;
+    
+    CPTextField offLabel;
+    CPTextField onLabel;
+}
+
++ (CPString)themeClass
+{
+    return @"lp-switch";
+}
+
++ (id)themeAttributes
+{
+    return [CPDictionary dictionaryWithObjects:[nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]
+                                       forKeys:[@"off-background-color", @"on-background-color", @"knob-background-color", @"knob-size", @"label-offset",
+                                                @"off-label-font", @"off-label-text-color", @"off-label-text-shadow-color", @"off-label-text-shadow-offset",
+                                                @"on-label-font", @"on-label-text-color", @"on-label-text-shadow-color", @"on-label-text-shadow-offset"]];
 }
 
 - (void)initWithFrame:(CGRect)aFrame
 {
-    if (self = [super initWithFrame:CGRectMakeZero()])
+    if (self = [super initWithFrame:aFrame])
     {
-        [self setFrameOrigin:CGPointMake(CGRectGetMinX(aFrame), CGRectGetMinY(aFrame))];
-        [self setFrameSize:CGSizeMake(50,20)];
         [self setBackgroundColor:[CPColor greenColor]];
+        
+        offBackgroundView = [[CPView alloc] initWithFrame:[self bounds]];
+        [offBackgroundView setHitTests:NO];
+        [self addSubview:offBackgroundView];
+        
+        onBackgroundView = [[CPView alloc] initWithFrame:CGRectMake(0,0,0,CGRectGetHeight([self bounds]))];
+        [onBackgroundView setHitTests:NO];
+        [self addSubview:onBackgroundView];
         
         knob = [[LPSwitchKnob alloc] initWithFrame:CGRectMake(0,0,20,20)];
         [self addSubview:knob];
+        
+        offLabel = [CPTextField labelWithTitle:@"Off"];
+        [self addSubview:offLabel];
+        
+        onLabel = [CPTextField labelWithTitle:@"On"];
+        [self addSubview:onLabel];
         
         animationDuration = 0.2;
         animationCurve = CPAnimationEaseOut;
@@ -72,17 +103,29 @@
     [self sendAction:_action to:_target];
     
     var knobMinY = CGRectGetMinY([knob frame]),
-        knobEndOrigin = CGPointMake((on) ? [knob maxX] : [knob minX], knobMinY) 
+        knobEndFrame = CGRectMake((on) ? [knob maxX] : [knob minX], knobMinY, CGRectGetWidth([knob frame]), CGRectGetHeight([knob frame])),
+        onBackgroundEndFrame = CGRectMake(0,0, CGRectGetMinX(knobEndFrame) + CGRectGetMidX([knob bounds]), CGRectGetHeight([onBackgroundView bounds])),
+        labelOffset = [self currentValueForThemeAttribute:@"label-offset"],
+        offLabelEndFrame = CGRectMake(CGRectGetMaxX(knobEndFrame) + labelOffset.width, labelOffset.height,
+                                      CGRectGetWidth([offLabel bounds]), CGRectGetHeight([offLabel bounds])),
+        onLabelEndFrame = CGRectMake(CGRectGetMinX(knobEndFrame) - labelOffset.width - CGRectGetWidth([onLabel bounds]), labelOffset.height,
+                                     CGRectGetWidth([onLabel bounds]), CGRectGetHeight([onLabel bounds]));
     
     if (shouldAnimate)
     {
-        var animation = [[LPSlideViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
-        [animation addView:knob start:[knob frame].origin end:knobEndOrigin];
-        [animation setDelegate:self];
+        var animation = [[LPViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
+        [animation addView:knob start:nil end:knobEndFrame];
+        [animation addView:onBackgroundView start:nil end:onBackgroundEndFrame];
+        [animation addView:offLabel start:nil end:offLabelEndFrame];
+        [animation addView:onLabel start:nil end:onLabelEndFrame];
         [animation startAnimation];
     }
     else
-        [knob setFrameOrigin:knobEndOrigin];
+    {
+        [knob setFrame:knobEndFrame];
+        [onBackgroundView setFrame:onBackgroundEndFrame];
+        [offLabel setFrame:offLabelEndFrame]
+    }
 }
 
 - (void)mouseDown:(CPEvent)anEvent
@@ -91,6 +134,14 @@
     knobDragStartPoint = [knob frame].origin;
     
     isDragging = NO;
+    
+    // If the drag started on top of the know, we highlight it
+    var startPointX = [knob convertPoint:dragStartPoint fromView:self].x;
+    if (startPointX > 0 && startPointX < CGRectGetWidth([knob bounds]))
+    {
+        [knob setHighlighted:YES];
+        [self setNeedsLayout];
+    } 
 }
 
 - (void)mouseDragged:(CPEvent)anEvent
@@ -101,21 +152,55 @@
     var point = [self convertPoint:[anEvent locationInWindow] fromView:nil],
         knobX = knobDragStartPoint.x + (point.x - dragStartPoint.x),
         knobMinX = [knob minX],
-        knobMaxX = [knob maxX];
+        knobMaxX = [knob maxX],
+        height = CGRectGetHeight([self bounds]);
     
     // Limit X
     if (knobX < knobMinX)
         knobX = knobMinX;
     else if(knobX > knobMaxX)
         knobX = knobMaxX;
+        
+    // Resize background views
+    [onBackgroundView setFrameSize:CGSizeMake(knobX + CGRectGetMidX([knob bounds]), height)];
     
     // Re-position knob
     [knob setFrameOrigin:CGPointMake(knobX, CGRectGetMinY([knob frame]))];
+    
+    [self setNeedsLayout];
 }
 
 - (void)mouseUp:(CPEvent)anEvent
 {
     [self setOn:(isDragging) ? CGRectGetMidX([self bounds]) < CGRectGetMidX([knob frame]) : !on animated:YES];
+    
+    [knob setHighlighted:NO];
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews
+{
+    [offBackgroundView setBackgroundColor:[self currentValueForThemeAttribute:@"off-background-color"]];
+    [onBackgroundView setBackgroundColor:[self currentValueForThemeAttribute:@"on-background-color"]];
+    [knob setBackgroundColor:[self valueForThemeAttribute:@"knob-background-color" inState:[knob themeState]]];
+    [knob setFrameSize:[self currentValueForThemeAttribute:@"knob-size"]];
+    
+    var labelOffset = [self currentValueForThemeAttribute:@"label-offset"];
+    
+    [offLabel setFont:[self currentValueForThemeAttribute:@"off-label-font"]];
+    [offLabel setTextColor:[self currentValueForThemeAttribute:@"off-label-text-color"]];
+    [offLabel setTextShadowColor:[self currentValueForThemeAttribute:@"off-label-text-shadow-color"]];
+    [offLabel setTextShadowOffset:[self currentValueForThemeAttribute:@"off-label-text-shadow-offset"]];
+    [offLabel setFrameOrigin:CGPointMake(CGRectGetMaxX([knob frame]) + labelOffset.width, labelOffset.height)];
+    [offLabel sizeToFit];
+    
+    [onLabel setFont:[self currentValueForThemeAttribute:@"on-label-font"]];
+    [onLabel setTextColor:[self currentValueForThemeAttribute:@"on-label-text-color"]];
+    [onLabel setTextShadowColor:[self currentValueForThemeAttribute:@"on-label-text-shadow-color"]];
+    [onLabel setTextShadowOffset:[self currentValueForThemeAttribute:@"on-label-text-shadow-offset"]];
+    [onLabel sizeToFit];
+    
+    [onLabel setFrameOrigin:CGPointMake(CGRectGetMinX([knob frame]) - labelOffset.width - CGRectGetWidth([onLabel bounds]), CGRectGetMinY([offLabel frame]))];
 }
 
 @end
@@ -129,9 +214,19 @@
     if (self = [super initWithFrame:aFrame])
     {
         [self setHitTests:NO];
-        [self setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.3]];
+        [self setBackgroundColor:[CPColor colorWithHexString:@"333"]];
     }
     return self;
+}
+
+- (void)setHighlighted:(BOOL)shouldBeHighlighted
+{
+    isHighlighted = shouldBeHighlighted;
+
+    if (shouldBeHighlighted)
+        [self setThemeState:CPThemeStateHighlighted];
+    else
+        [self unsetThemeState:CPThemeStateHighlighted];
 }
 
 - (unsigned int)minX

@@ -67,8 +67,6 @@
 		    start = property['start'],
 			end = property['end'];
 		
-		console.log('i')
-		
 		[views[i] setFrame:CGRectMake((progress * (end.origin.x - start.origin.x)) + start.origin.x, (progress * (end.origin.y - start.origin.y)) + start.origin.y,
 		                              (progress * (end.size.width - start.size.width)) + start.size.width, (progress * (end.size.height - start.size.height)) + start.size.height)];
 	}
