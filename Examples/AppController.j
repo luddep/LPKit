@@ -9,11 +9,13 @@
 @import <LPKit/LPSlideView.j>
 @import <LPKit/LPCalendarView.j>
 @import <LPKit/LPSparkLine.j>
+@import <LPKit/LPSwitch.j>
 
 @implementation AppController : CPObject
 {
     LPSlideView slideView;
     CPTextField calendarSelectionLabel;
+    CPTextField switchStatusLabel;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -21,11 +23,13 @@
     var theWindow = [[CPWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask],
         contentView = [theWindow contentView];
 
+/*
+
     /*
     
         LPSlideView
     
-    */
+    *
 
     var slideViewLabel = [CPTextField labelWithTitle:@"LPSlideView"];
     [slideViewLabel setFrameOrigin:CGPointMake(100, 70)];
@@ -65,7 +69,7 @@
     
         LPCalendarView
     
-    */
+    *
 
     var slideViewLabel = [CPTextField labelWithTitle:@"LPCalendarView"];
     [slideViewLabel setFrameOrigin:CGPointMake(400, 70)];
@@ -76,19 +80,19 @@
     [calendarView setDelegate:self];
     [contentView addSubview:calendarView];
     
-    calendarSelectionLabel = [CPTextField labelWithTitle:@""];
+    calendarSelectionLabel = [CPTextField textFieldWithStringValue:@"" placeholder:@"selection" width:300];
     [calendarSelectionLabel setFrameOrigin:CGPointMake(400,270)]
     [contentView addSubview:calendarSelectionLabel];
 
     /*
     
-        LPCalendarView
+        LPSparkLine
     
-    */
+    *
 
-    var slideViewLabel = [CPTextField labelWithTitle:@"LPSparkLine"];
-    [slideViewLabel setFrameOrigin:CGPointMake(680, 70)];
-    [contentView addSubview:slideViewLabel];
+    var sparkLineLabel = [CPTextField labelWithTitle:@"LPSparkLine"];
+    [sparkLineLabel setFrameOrigin:CGPointMake(680, 70)];
+    [contentView addSubview:sparkLineLabel];
     
     var sparkLine = [[LPSparkLine alloc] initWithFrame:CGRectMake(680, 100, 100, 30)];
     [sparkLine setLineWeight:2.0];
@@ -97,10 +101,31 @@
     [sparkLine setData:[10,25,30,42,10,30,22,70,30,21,44,21,77,55,88,54]];
     [contentView addSubview:sparkLine];
 
+
+    /*
+    
+        LPSwitch
+    
+    */
+
+    var switchLabel = [CPTextField labelWithTitle:@"LPSwitch"];
+    [switchLabel setFrameOrigin:CGPointMake(100, 340)];
+    [contentView addSubview:switchLabel];
+    
+    var aSwitch = [[LPSwitch alloc] initWithFrame:CGRectMake(100,380,0,0)];
+    [aSwitch setTarget:self];
+    [aSwitch setAction:@selector(switchDidChange:)];
+    [contentView addSubview:aSwitch];
+    
+    switchStatusLabel = [CPTextField labelWithTitle:@"off"];
+    [switchStatusLabel setFrameOrigin:CGPointMake(100,410)];
+    [contentView addSubview:switchStatusLabel];
+
     /*
         --
     */
     
+    //[theWindow setAcceptsMouseMovedEvents:YES];
     [theWindow orderFront:self];
 
     // Uncomment the following line to turn on the standard menu bar.
@@ -114,10 +139,15 @@
     [slideView slideToView:[[slideView subviews] objectAtIndex:index]];
 }
 
--(void)calendarView:(LPCalendarView)aCalendarView didMakeSelection:(CPDate)aStartDate end:(CPDate)anEndDate
+- (void)calendarView:(LPCalendarView)aCalendarView didMakeSelection:(CPDate)aStartDate end:(CPDate)anEndDate
 {
-    [calendarSelectionLabel setStringValue:[CPString stringWithFormat:@"Selected: %s", aStartDate]];
-    [calendarSelectionLabel sizeToFit];
+    [calendarSelectionLabel setStringValue:[CPString stringWithFormat:@"Selected: %s", aStartDate.toUTCString()]];
+}
+
+- (void)switchDidChange:(id)sender
+{
+    [switchStatusLabel setStringValue:([sender isOn]) ? @"on" : @"off"];
+    [switchStatusLabel sizeToFit];
 }
 
 @end

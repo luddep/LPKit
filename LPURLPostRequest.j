@@ -2,7 +2,7 @@
  * LPURLPostRequest.j
  * LPKit
  *
- * Created by Ludwig Pettersson on May 20, 2009.
+ * Created by Ludwig Pettersson on November 7, 2009.
  * 
  * The MIT License
  * 
