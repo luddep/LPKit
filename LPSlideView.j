@@ -162,7 +162,7 @@ LPSlideViewNegativeDirection = 4;
     
     var width = CGRectGetWidth([aView bounds]),
         height = CGRectGetHeight([aView bounds]),
-        animation = [[LPAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
+        animation = [[LPViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
     [animation addView:aView start:CGRectMake(showViewStart.x, showViewStart.y, width, height) end:CGRectMake(0,0, width, height)];
     [animation addView:currentView start:nil end:CGRectMake(hideViewEnd.x, hideViewEnd.y, width, height)];
     [animation setDelegate:self];
