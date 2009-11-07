@@ -27,66 +27,15 @@
  * THE SOFTWARE.
  * 
  */
- @import <AppKit/CPView.j>
+
+@import <AppKit/CPView.j>
+@import <LPKit/LPViewAnimation.j>
 
 
 LPSlideViewHorizontalDirection = 0;
 LPSlideViewVerticalDirection = 1;
 LPSlideViewPositiveDirection = 3;
 LPSlideViewNegativeDirection = 4;
-
-
-@implementation LPSlideViewAnimation : CPAnimation
-{
-    CPArray views;
-    CPArray properties;
-}
-
-- (id)initWithDuration:(float)aDuration animationCurve:(id)anAnimationCurve
-{
-    if (self = [super initWithDuration:aDuration animationCurve:anAnimationCurve])
-    {   
-        views = [CPArray array];
-        properties = [CPArray array];
-    }
-    return self;
-}
-
-- (void)addView:(id)aView start:(CGPoint)aStart end:(CGPoint)anEnd
-{
-    if (!aStart)
-        aStart = [aView frame].origin;
-    
-    [views addObject:aView];
-    [properties addObject:{'start': aStart, 'end': anEnd}];
-}
-
-- (void)setCurrentProgress:(float)progress
-{
-	[super setCurrentProgress:progress];
-	
-	// Get the progress with respect to the animationCurve
-	progress = [self currentValue];
- 
-	for (var i = 0; i < views.length; i++)
-	{
-		var property = properties[i],
-		    start = property['start'],
-			end = property['end'];
-			
-		[views[i] setFrameOrigin:CGPointMake((progress * (end.x - start.x)) + start.x, (progress * (end.y - start.y)) + start.y)];
-	}
-}
-
-- (void)startAnimation
-{
-    for (var i = 0; i < views.length; i++)
-        [views[i] setFrameOrigin:properties[i]['start']];
-    
-    [super startAnimation];
-}
-
-@end
 
 
 @implementation LPSlideView : CPView
@@ -211,9 +160,11 @@ LPSlideViewNegativeDirection = 4;
         }
     }
     
-    var animation = [[LPSlideViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
-    [animation addView:aView start:showViewStart end:CGPointMake(0,0)];
-    [animation addView:currentView start:nil end:hideViewEnd];
+    var width = CGRectGetWidth([aView bounds]),
+        height = CGRectGetHeight([aView bounds]),
+        animation = [[LPAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
+    [animation addView:aView start:CGRectMake(showViewStart.x, showViewStart.y, width, height) end:CGRectMake(0,0, width, height)];
+    [animation addView:currentView start:nil end:CGRectMake(hideViewEnd.x, hideViewEnd.y, width, height)];
     [animation setDelegate:self];
     [animation startAnimation];
     
