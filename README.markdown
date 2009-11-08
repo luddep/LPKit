@@ -1,7 +1,7 @@
 # LPKit
 A collection of different generic views & utilities for [Cappuccino](http://cappuccino.org/), extracted from the up-coming cappuccino port of [Observer](http://observerapp.com/).
 
-An Example app is available at https://github.com/luddep/LPKit-Examples, and a live demo is running at http://luddep.se/static/LPKit-Examples/
+A demo is available at <http://luddep.se/static/LPKit-Examples/>, with the source code in the [LPKit-Examples repository](https://github.com/luddep/LPKit-Examples).
 
 ## Installation
 
@@ -19,16 +19,19 @@ LPSlideView lets you slide between different subviews. Only one subview will be 
 
 LPCalendarView is a calendar view based on the iPhone calendar app, with the same sliding when changing months. Currently supports selecting days & weeks, also marking a special day as highlighted - such as the current day or week.
 
-**IMPORTANT:** Calendar view currently does not have a default theme, but an example ThemeDescriptors.j can be found in Examples/.
-When compiling your theme, make sure to symlink LPKit to the Frameworks folder of the objj narwhal package. (Located at **/usr/local/share/narwhal/packages/objj/lib/Frameworks** in my case)
-
-**NOTE:** The sliding isn't yet 100% totally awesome, and there will be improvements, eventually.
+**NOTE:** The animation isn't yet 100% totally awesome, and there will be improvements, eventually.
 
 ## Sparkline
 
-![calendar view](http://dl.getdropbox.com/u/24582/github/LPKit/sparkline.png)
+![sparkline](http://dl.getdropbox.com/u/24582/github/LPKit/sparkline.png)
 
 A simple sparkline chart, comparable to the Google Chart sparklines - but using CoreGraphics rather than an image.
+
+## Switch control
+
+![switch control](http://dl.getdropbox.com/u/24582/github/LPKit/switch.png)
+
+A port of the UISwitch from the iPhone SDK, with the same behavior and feel.
 
 ## Utilities
 
@@ -51,3 +54,8 @@ Example:
     
     [request setContent:content]
     [CPURLConnection connectionWithRequest:request delegate:self];
+    
+# Themes
+
+LPKit makes heavy use of the theme API in Cappuccino.
+An example on how to use themes with LPKit is available in in the [LPKit-Examples repository](https://github.com/luddep/LPKit-Examples) which has a demo theme with an Aristo inspired look.
