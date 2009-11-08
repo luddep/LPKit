@@ -1,7 +1,7 @@
 # LPKit
 A collection of different generic views & utilities for [Cappuccino](http://cappuccino.org/), extracted from the up-coming cappuccino port of [Observer](http://observerapp.com/).
 
-A running example app will be up, soon.
+An Example app is available at https://github.com/luddep/LPKit-Examples, and a live demo is running at http://luddep.se/static/LPKit-Examples/
 
 ## Installation
 

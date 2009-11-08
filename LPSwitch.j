@@ -91,6 +91,8 @@
         
         animationDuration = 0.2;
         animationCurve = CPAnimationEaseOut;
+        
+        [self setNeedsLayout];
     }
     return self;
 }
@@ -214,7 +216,7 @@
     if (self = [super initWithFrame:aFrame])
     {
         [self setHitTests:NO];
-        [self setBackgroundColor:[CPColor colorWithHexString:@"333"]];
+        //[self setBackgroundColor:[CPColor colorWithHexString:@"333"]];
     }
     return self;
 }
