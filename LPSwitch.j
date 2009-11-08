@@ -69,9 +69,7 @@
 - (void)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
-    {
-        [self setBackgroundColor:[CPColor greenColor]];
-        
+    {   
         offBackgroundView = [[CPView alloc] initWithFrame:[self bounds]];
         [offBackgroundView setHitTests:NO];
         [self addSubview:offBackgroundView];
@@ -107,7 +105,7 @@
     var knobMinY = CGRectGetMinY([knob frame]),
         knobEndFrame = CGRectMake((on) ? [knob maxX] : [knob minX], knobMinY, CGRectGetWidth([knob frame]), CGRectGetHeight([knob frame])),
         onBackgroundEndFrame = CGRectMake(0,0, CGRectGetMinX(knobEndFrame) + CGRectGetMidX([knob bounds]), CGRectGetHeight([onBackgroundView bounds])),
-        labelOffset = [self currentValueForThemeAttribute:@"label-offset"],
+        labelOffset = [self labelOffset],
         offLabelEndFrame = CGRectMake(CGRectGetMaxX(knobEndFrame) + labelOffset.width, labelOffset.height,
                                       CGRectGetWidth([offLabel bounds]), CGRectGetHeight([offLabel bounds])),
         onLabelEndFrame = CGRectMake(CGRectGetMinX(knobEndFrame) - labelOffset.width - CGRectGetWidth([onLabel bounds]), labelOffset.height,
@@ -180,6 +178,13 @@
     [self setNeedsLayout];
 }
 
+- (CGSize)labelOffset
+{
+    // Provide a default size so that we can use switches even without themes.
+    var labelOffset = [self currentValueForThemeAttribute:@"label-offset"];
+    return (labelOffset) ? labelOffset : CGSizeMake(0,0);
+}
+
 - (void)layoutSubviews
 {
     [offBackgroundView setBackgroundColor:[self currentValueForThemeAttribute:@"off-background-color"]];
@@ -187,7 +192,7 @@
     [knob setBackgroundColor:[self valueForThemeAttribute:@"knob-background-color" inState:[knob themeState]]];
     [knob setFrameSize:[self currentValueForThemeAttribute:@"knob-size"]];
     
-    var labelOffset = [self currentValueForThemeAttribute:@"label-offset"];
+    var labelOffset = [self labelOffset];
     
     [offLabel setFont:[self currentValueForThemeAttribute:@"off-label-font"]];
     [offLabel setTextColor:[self currentValueForThemeAttribute:@"off-label-text-color"]];
