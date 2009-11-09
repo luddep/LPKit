@@ -71,6 +71,8 @@ var _startAndEndOfWeekCache = {};
     id _delegate @accessors(property=delegate);
     
     LPCalendarView calendarView @accessors;
+    
+    CPArray hiddenRows @accessors;
 }
 
 + (CPString)themeClass
@@ -95,6 +97,8 @@ var _startAndEndOfWeekCache = {};
         
         weekStartsOnMonday = YES;
         
+        hiddenRows = [];
+        
         //[self setValue:[CPColor colorWithWhite:0.8 alpha:1] forThemeAttribute:@"grid-color" inState:CPThemeStateNormal];
         
         // Create tiles
@@ -106,20 +110,29 @@ var _startAndEndOfWeekCache = {};
     return self;
 }
 
+- (void)setAllTilesAsFiller
+{
+    [self setDate:[CPDate distantFuture]];
+}
+
 - (void)setDate:(CPDate)aDate
 {
     // Make a copy of the date
-    date = new Date(aDate.getTime());
+    date = new Date(aDate);
     
-    // Reset the date to the first day of the month & midnight
-    date.setDate(1);
-    [date resetToMidnight];
+    if (![aDate isEqualToDate:[CPDate distantFuture]])
+    {
     
-    // There must be a better way to do this.
-    _firstDay = new Date((new Date(date)).setDate(1));
+        // Reset the date to the first day of the month & midnight
+        date.setDate(1);
+        [date resetToMidnight];
     
-    previousMonth = new Date(_firstDay.getTime() - 86400000);
-    nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
+        // There must be a better way to do this.
+        _firstDay = new Date((new Date(date)).setDate(1));
+    
+        previousMonth = new Date(_firstDay.getTime() - 86400000);
+        nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
+    }
     [self reloadData];
 }
 
@@ -190,7 +203,8 @@ var _startAndEndOfWeekCache = {};
     if (!date)
         return;
 
-    var currentMonth = date,
+    var entireMonthIsFiller = date.getTime() == [CPDate distantFuture].getTime(),
+        currentMonth = date,
         startOfMonthDay = [self startOfWeekForDate:currentMonth],
         daysInMonth = [currentMonth daysInMonth];
 
@@ -204,20 +218,28 @@ var _startAndEndOfWeekCache = {};
 
     for (var weekIndex = 0; weekIndex < 6; weekIndex++)
     {
+        var isHidden = [hiddenRows indexOfObject:weekIndex] > -1;
+        
         for (var dayIndex = 0; dayIndex < 7; dayIndex++)
         {
-            var dayTile = [tiles objectAtIndex:tileIndex],
+            var dayTile = tiles[tileIndex],
                 currentDate = new Date(currentDate.getTime() + 90000000);
             
             [currentDate resetToMidnight];
             
-            [dayTile setIsFillerTile:(currentDate.getMonth() != currentMonth.getMonth())];
+            [dayTile setHidden:isHidden];
+            
+            [dayTile setIsFillerTile:(entireMonthIsFiller) ? YES : currentDate.getMonth() != currentMonth.getMonth()];
             [dayTile setDate:currentDate];
-            [dayTile setHighlighted:[self dateIsWithinCurrentPeriod:currentDate]];
+            
+            if (!entireMonthIsFiller)
+                [dayTile setHighlighted:[self dateIsWithinCurrentPeriod:currentDate]];
             
             tileIndex += 1;
         }
     }
+    
+    hiddenRows = [];
 }
 
 - (void)tile

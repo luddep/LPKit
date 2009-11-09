@@ -67,52 +67,6 @@
     {
         fullSelection = [nil, nil];
         
-        //[self setValue:[CPColor colorWithHexString:@"ddd"] forThemeAttribute:@"background-color" inState:CPThemeStateNormal];
-        
-        /*
-            Header view
-        *
-        
-        [self setValue:[CPColor colorWithHexString:@"eee"] forThemeAttribute:@"header-background-color" inState:CPThemeStateNormal];
-        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"header-font" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"header-text-color" inState:CPThemeStateNormal];
-        [self setValue:[CPColor whiteColor] forThemeAttribute:@"header-text-shadow-color" inState:CPThemeStateNormal];
-        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"header-text-shadow-offset" inState:CPThemeStateNormal];
-        [self setValue:CPCenterTextAlignment forThemeAttribute:@"header-alignment" inState:CPThemeStateNormal];
-        
-        /*
-            DayView
-        *
-        
-        // Normal
-        [self setValue:[CPFont boldSystemFontOfSize:11.0] forThemeAttribute:@"tile-font" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithHexString:@"333"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateNormal];
-        [self setValue:[CPColor colorWithWhite:1 alpha:0.8] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateNormal];
-        [self setValue:CGSizeMake(1.0, 1.0) forThemeAttribute:@"tile-text-shadow-offset" inState:CPThemeStateNormal];
-    
-        [self setValue:[CPColor clearColor] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateNormal];
-    
-        // Highlighted (The highlighted day, default is the current day)
-        [self setValue:[CPColor colorWithHexString:@"a0c1ed"] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateHighlighted];        
-        [self setValue:[CPColor colorWithHexString:@"555"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateHighlighted];
-        
-        // Selected
-        [self setValue:[CPColor colorWithHexString:@"fff"] forThemeAttribute:@"tile-text-color" inState:CPThemeStateSelected];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateSelected];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.2] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateSelected];
-    
-        // Selected & Highlighted (The highlighted day, default is the current day)
-        [self setValue:[CPColor colorWithHexString:@"719edb"] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateHighlighted | CPThemeStateSelected];
-    
-        // Disabled
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.3] forThemeAttribute:@"tile-text-color" inState:CPThemeStateDisabled];
-        
-        // Disabled & Selected (Next and previous month tiles)
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.25] forThemeAttribute:@"tile-bezel-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
-        [self setValue:[CPColor colorWithWhite:0 alpha:0.4] forThemeAttribute:@"tile-text-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
-        [self setValue:[CPColor clearColor] forThemeAttribute:@"tile-text-shadow-color" inState:CPThemeStateSelected | CPThemeStateDisabled];
-        */
-        
         var bounds = [self bounds];
         
         headerView = [[LPCalendarHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(bounds), 40)];
@@ -127,6 +81,7 @@
         [slideView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable | CPViewMinYMargin];
         [slideView setDelegate:self];
         [slideView setAnimationCurve:CPAnimationEaseOut];
+        [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
     }
     return self;
@@ -178,13 +133,18 @@
     {
         direction = LPSlideViewPositiveDirection;
         startDelta = 0.335;
+        [slideFromView setHiddenRows:[0,1]];
     }
     // Moving to a later month
     else
     {
         direction = LPSlideViewNegativeDirection;
         startDelta = 0.34;
+        [slideFromView setHiddenRows:[4,5]];
     }
+    
+    // Set the previous months tiles as fillers, to make it look a bit better.
+    [slideFromView setAllTilesAsFiller];
     
     // new current view
     currentMonthView = slideToView;
