@@ -3,6 +3,8 @@ A collection of different generic views & utilities for [Cappuccino](http://capp
 
 A demo is available at <http://luddep.se/static/LPKit-Examples/>, with the source code in the [LPKit-Examples repository](https://github.com/luddep/LPKit-Examples).
 
+LPKit requires a version higher than 0.7.1 to run, which at the time of writing is only available as the master (or jake) trunk.
+
 ## Installation
 
 Place the entire LPKit folder in your Frameworks folder, or any directory that you add using `OBJJ_INCLUDE_PATHS`.
