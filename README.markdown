@@ -21,8 +21,6 @@ LPSlideView lets you slide between different subviews. Only one subview will be 
 
 LPCalendarView is a calendar view based on the iPhone calendar app, with the same sliding when changing months. Currently supports selecting days & weeks, also marking a special day as highlighted - such as the current day or week.
 
-**NOTE:** The animation isn't yet 100% totally awesome, and there will be improvements, eventually.
-
 ## Sparkline
 
 ![sparkline](http://dl.getdropbox.com/u/24582/github/LPKit/sparkline.png)
