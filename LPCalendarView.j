@@ -150,7 +150,10 @@
     currentMonthView = slideToView;
     
     [headerView setDate:aMonth];
-    [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
+    
+    setTimeout(function(){
+        [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
+    }, 1);
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)shouldAllowMultipleSelection
