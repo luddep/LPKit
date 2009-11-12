@@ -70,7 +70,7 @@ Example:
     [cookieController setValue:@"My value" forKey:@"MyOtherKey" expirationDate:[CPDate distantFuture]];
     
     // Get the value of the session
-    [cookieController valueForKey:@"MyKey"];
+    console.log('value for MyKey: ' + [cookieController valueForKey:@"MyKey"]);
 
 # Themes
 
