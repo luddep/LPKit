@@ -54,7 +54,24 @@ Example:
     
     [request setContent:content]
     [CPURLConnection connectionWithRequest:request delegate:self];
+
+### LPCookieController
+
+A utility class to work with document.cookie, without the tedious stuff.
+
+Example:
+
+    var cookieController = [LPCookieController sharedCookieController];
     
+    // Set a session, which will be deleted when the browser closes.
+    [cookieController setValue:@"My value" forKey:@"MyKey"];
+    
+    // Set a cookie which won't be flushed
+    [cookieController setValue:@"My value" forKey:@"MyOtherKey" expirationDate:[CPDate distantFuture]];
+    
+    // Get the value of the session
+    [cookieController valueForKey:@"MyKey"];
+
 # Themes
 
 LPKit makes heavy use of the theme API in Cappuccino.
