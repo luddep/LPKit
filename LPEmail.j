@@ -66,6 +66,11 @@ var emailPattern = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")
     return emailPattern.test(email);
 }
 
+- (BOOL)isEqualToEmail:(LPEmail)anEmail
+{
+    return [[self stringValue] isEqualToString:[anEmail stringValue]];
+}
+
 @end
 
 
