@@ -32,9 +32,7 @@
 @import "CPArray+Additions.j"
 
 @implementation LPSparkLine : CPView
-{ 
-	CALayer _rootLayer;
-	
+{
 	CPArray data @accessors;
 	CPColor lineColor;
 	float lineWeight;
@@ -56,20 +54,15 @@
 	    
 	    shadowColor = nil;
 	    shadowOffset = CGSizeMake(0,1);
-	    
-		[self setWantsLayer:YES];
-		_rootLayer = [CALayer layer];
-		[self setLayer:_rootLayer];
-        [_rootLayer setDelegate:self];
-		[_rootLayer setNeedsDisplay];
 	} 
 
 	return self; 
 } 
 
-- (void)drawLayer:(CALayer)layer inContext:(CGContext)context 
-{ 
-	var bounds = [layer bounds],
+- (void)drawRect:(CPRect)aRect
+{
+	var context = [[CPGraphicsContext currentContext] graphicsPort],
+	    bounds = [self bounds],
 	    height = CGRectGetHeight(bounds) - 2,
 	    tickWidth = CGRectGetWidth(bounds) / ([data count] - 1),
 	    maxValue = [data _LPmaxValue];
@@ -118,31 +111,74 @@
             isEmpty = NO;
     
     data = aData;
-    [_rootLayer setNeedsDisplay];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)setLineColor:(CPColor)aColor
 {
     lineColor = aColor;
-    [_rootLayer setNeedsDisplay];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)setLineWeight:(CPFloat)aFloat
 {
     lineWeight = aFloat;
-    [_rootLayer setNeedsDisplay];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)setShadowColor:(CPColor)aColor
 {
     shadowColor = aColor;
-    [_rootLayer setNeedsDisplay];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)setShadowOffset:(CGSize)aSize
 {
     shadowOffset = aSize;
-    [_rootLayer setNeedsDisplay];
+    [self setNeedsDisplay:YES];
 }
 
+@end
+
+
+var LPSparkLineDataKey         = @"LPSparkLineDataKey",
+    LPSparkLineLineColorKey    = @"LPSparkLineLineColorKey",
+    LPSparkLineLineWeightKey   = @"LPSparkLineLineWeightKey",
+    LPSparkLineShadowColorKey  = @"LPSparkLineShadowColorKey",
+    LPSparkLineShadowOffsetKey = @"LPSparkLineShadowOffsetKey",
+    LPSparkLineIsEmptyKey      = @"LPSparkLineIsEmptyKey";
+
+@implementation LPSparkLine (CPCoding)
+ 
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    if (self = [super initWithCoder:aCoder])
+    {
+        data = [aCoder decodeObjectForKey:LPSparkLineDataKey];
+        lineColor = [aCoder decodeObjectForKey:LPSparkLineLineColorKey];
+        lineWeight = [aCoder decodeFloatForKey:LPSparkLineLineWeightKey];
+        
+        shadowColor = [aCoder decodeObjectForKey:LPSparkLineShadowColorKey];
+        shadowOffset = [aCoder decodeSizeForKey:LPSparkLineShadowOffsetKey];
+        
+        isEmpty = ![aCoder containsValueForKey:LPSparkLineIsEmptyKey] || [aCoder decodeObjectForKey:LPSparkLineIsEmptyKey];
+    }
+    return self;
+}
+ 
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:data forKey:LPSparkLineDataKey];
+    [aCoder encodeObject:lineColor forKey:LPSparkLineLineColorKey];
+    [aCoder encodeFloat:lineWeight forKey:LPSparkLineLineWeightKey];
+    
+    
+    [aCoder encodeObject:shadowColor forKey:LPSparkLineShadowColorKey];
+    [aCoder encodeSize:shadowOffset forKey:LPSparkLineShadowOffsetKey];
+
+    [aCoder encodeBool:isEmpty forKey:LPSparkLineIsEmptyKey];
+}
+ 
 @end
