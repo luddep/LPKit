@@ -109,7 +109,7 @@
 
 - (void)availableMonthView
 {
-    return (![currentMonthView isEqual:firstMonthView]) ? firstMonthView : secondMonthView;
+    return ([firstMonthView isHidden]) ? firstMonthView : secondMonthView;
 }
 
 - (id)monthViewForMonth:(CPDate)aMonth
@@ -210,8 +210,11 @@
     if ([fullSelection count] <= 1)
         [fullSelection addObject:nil];
 
-    if ([_delegate respondsToSelector:@selector(calendarView:didMakeSelection:end:)])
-        [_delegate calendarView:self didMakeSelection:[fullSelection objectAtIndex:0] end:[fullSelection lastObject]];
+    // Keeps any delegate calls from locking up the UI
+    setTimeout(function(){
+        if ([_delegate respondsToSelector:@selector(calendarView:didMakeSelection:end:)])
+            [_delegate calendarView:self didMakeSelection:[fullSelection objectAtIndex:0] end:[fullSelection lastObject]];
+    }, 1);
 }
 
 @end
