@@ -109,7 +109,7 @@
 
 - (void)availableMonthView
 {
-    return ([firstMonthView isHidden]) ? firstMonthView : secondMonthView;
+    return (![currentMonthView isEqual:firstMonthView]) ? firstMonthView : secondMonthView;
 }
 
 - (id)monthViewForMonth:(CPDate)aMonth

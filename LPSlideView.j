@@ -99,8 +99,8 @@ LPSlideViewNegativeDirection = 4;
         currentViewIndex = [[self subviews] indexOfObject:currentView],
         size = [self frame].size;
     
-    if ([aView isHidden])
-        [aView setHidden:NO];
+    // Unhide the view
+    [aView setHidden:NO];
     
     var showViewStart = CGPointMake(0,0),
         hideViewEnd = CGPointMake(0,0);
@@ -163,6 +163,13 @@ LPSlideViewNegativeDirection = 4;
     var width = CGRectGetWidth([aView bounds]),
         height = CGRectGetHeight([aView bounds]),
         animation = [[LPViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
+    
+    //var showViewStartFrame = CGRectMake(showViewStart.x, showViewStart.y, width, height);
+    
+    // Set the initial placements
+    //[aView setFrame:showViewStartFrame];
+    
+    // Set up animation
     [animation addView:aView start:CGRectMake(showViewStart.x, showViewStart.y, width, height) end:CGRectMake(0,0, width, height)];
     [animation addView:currentView start:nil end:CGRectMake(hideViewEnd.x, hideViewEnd.y, width, height)];
     [animation setDelegate:self];

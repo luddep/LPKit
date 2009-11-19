@@ -28,6 +28,8 @@
  * 
  */
 
+var immutableDistantFuture = [CPDate distantFuture];
+
 @implementation CPDate (DaysInMonth)
 
 - (int)daysInMonth
@@ -120,7 +122,7 @@ var _startAndEndOfWeekCache = {};
     // Make a copy of the date
     date = new Date(aDate);
     
-    if (![aDate isEqualToDate:[CPDate distantFuture]])
+    if (![aDate isEqualToDate:immutableDistantFuture])
     {
     
         // Reset the date to the first day of the month & midnight
@@ -128,7 +130,8 @@ var _startAndEndOfWeekCache = {};
         [date resetToMidnight];
     
         // There must be a better way to do this.
-        _firstDay = new Date((new Date(date)).setDate(1));
+        _firstDay = new Date(date);
+        _firstDay.setDate(1);
     
         previousMonth = new Date(_firstDay.getTime() - 86400000);
         nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
@@ -203,7 +206,7 @@ var _startAndEndOfWeekCache = {};
     if (!date)
         return;
 
-    var entireMonthIsFiller = date.getTime() == [CPDate distantFuture].getTime(),
+    var entireMonthIsFiller = date.getTime() == immutableDistantFuture.getTime(),
         currentMonth = date,
         startOfMonthDay = [self startOfWeekForDate:currentMonth],
         daysInMonth = [currentMonth daysInMonth];
@@ -222,23 +225,28 @@ var _startAndEndOfWeekCache = {};
         
         for (var dayIndex = 0; dayIndex < 7; dayIndex++)
         {
-            var dayTile = tiles[tileIndex],
-                currentDate = new Date(currentDate.getTime() + 90000000);
+            var dayTile = tiles[tileIndex];
             
+            // Increment to next day
+            currentDate.setTime(currentDate.getTime() + 90000000);
             [currentDate resetToMidnight];
             
             [dayTile setHidden:isHidden];
             
-            [dayTile setIsFillerTile:(entireMonthIsFiller) ? YES : currentDate.getMonth() != currentMonth.getMonth()];
-            [dayTile setDate:currentDate];
+            if (!isHidden)
+            {
+                [dayTile setIsFillerTile:(entireMonthIsFiller) ? YES : currentDate.getMonth() != currentMonth.getMonth()];
+                [dayTile setDate:currentDate];
             
-            if (!entireMonthIsFiller)
-                [dayTile setHighlighted:[self dateIsWithinCurrentPeriod:currentDate]];
+                if (!entireMonthIsFiller)
+                    [dayTile setHighlighted:[self dateIsWithinCurrentPeriod:currentDate]];
+            }
             
             tileIndex += 1;
         }
     }
     
+    // TODO: Should hiddenrows really be reset here?
     hiddenRows = [];
 }
 
@@ -366,16 +374,16 @@ var _startAndEndOfWeekCache = {};
     {
         var startAndEnd = [self startAndEndOfWeekForDate:aStartDate];
         
-        aStartDate = [startAndEnd objectAtIndex:0];
-        anEndDate = [startAndEnd objectAtIndex:1];
+        aStartDate = startAndEnd[0];
+        anEndDate = startAndEnd[1];
     }
     
     // Replace hours / minutes / seconds
     var _dates = [aStartDate, anEndDate];
     for (var i = 0; i < 2; i++)
     {
-        if ([_dates objectAtIndex:i])
-            [[_dates objectAtIndex:i] resetToMidnight];
+        if (_dates[i])
+            [_dates[i] resetToMidnight];
     }
     
     // Swap the dates if startDate is bigger than endDate
@@ -391,11 +399,12 @@ var _startAndEndOfWeekCache = {};
     // Reset selection data
     [selection removeAllObjects];
     
-    var tiles = [self subviews];
+    var tiles = [self subviews],
+        tilesCount = [tiles count];
 
-    for (var i = 0; i < [tiles count]; i++)
+    for (var i = 0; i < tilesCount; i++)
     {
-        var tile = [tiles objectAtIndex:i],
+        var tile = tiles[i],
             tileDate = [tile date];
 
         [tileDate resetToMidnight];
@@ -477,6 +486,7 @@ var _startAndEndOfWeekCache = {};
     if (self = [super initWithFrame:aFrame])
     {
         [self setHitTests:NO];
+        date = [CPDate date];
         
         textField = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
         [textField setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
@@ -489,6 +499,9 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setSelected:(BOOL)shouldBeSelected
 {
+    if (isSelected == shouldBeSelected)
+        return;
+    
     isSelected = shouldBeSelected;
     
     if (shouldBeSelected)
@@ -499,6 +512,9 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setIsFillerTile:(BOOL)shouldBeFillerTile
 {
+    if (isFillerTile == shouldBeFillerTile)
+        return;
+    
     isFillerTile = shouldBeFillerTile;
     
     if (isFillerTile)
@@ -509,6 +525,9 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setHighlighted:(BOOL)shouldBeHighlighted
 {
+    if (isHighlighted == shouldBeHighlighted)
+        return;
+    
     isHighlighted = shouldBeHighlighted;
 
     if (shouldBeHighlighted)
@@ -519,8 +538,10 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setDate:(CPDate)aDate
 {
-    date = aDate;
+    // Update date
+    date.setTime(aDate.getTime());
     
+    // Update & Position the new label
     [textField setStringValue:[date.getDate() stringValue]];
     [textField sizeToFit];
     
