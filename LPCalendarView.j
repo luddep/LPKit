@@ -83,6 +83,8 @@
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
+        
+        [self setNeedsLayout];
     }
     return self;
 }
