@@ -84,7 +84,7 @@
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
-        
+                
         [self setNeedsLayout];
     }
     return self;
@@ -97,12 +97,12 @@
         firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [firstMonthView setDelegate:self];
         [slideView addSubview:firstMonthView];
-        
+
         secondMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [secondMonthView setDelegate:self];
         [slideView addSubview:secondMonthView];
-        
-        currentMonthView = firstMonthView;
+
+        currentMonthView = firstMonthView;        
     }
     [currentMonthView setDate:aMonth]
     [headerView setDate:aMonth];
