@@ -84,7 +84,10 @@
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
-                
+        
+        // Default to today's date.
+        [self setMonth:[CPDate date]];
+        
         [self setNeedsLayout];
     }
     return self;
