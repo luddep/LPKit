@@ -68,6 +68,7 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
         
         nextButton = [[LPCalendarHeaderNextButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX([self bounds]) - 21, 9, 0, 0)];
         [nextButton sizeToFit];
+        [nextButton setAutoresizingMask:CPViewMinXMargin];
         [self addSubview:nextButton];
         
         dayLabels = [CPArray array];
