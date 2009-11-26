@@ -61,7 +61,7 @@
                                                 @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment"]];
 }
 
-- (void)initWithFrame:(CGRect)aFrame
+- (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
     {
@@ -85,18 +85,6 @@
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
         
-        // Default to today's date.
-        [self setMonth:[CPDate date]];
-        
-        [self setNeedsLayout];
-    }
-    return self;
-}
-
-- (void)setMonth:(CPDate)aMonth
-{
-    if (!currentMonthView)
-    {
         firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [firstMonthView setDelegate:self];
         [slideView addSubview:firstMonthView];
@@ -106,7 +94,17 @@
         [slideView addSubview:secondMonthView];
 
         currentMonthView = firstMonthView;        
+
+        // Default to today's date.
+        [self setMonth:[CPDate date]];
+                
+        [self setNeedsLayout];
     }
+    return self;
+}
+
+- (void)setMonth:(CPDate)aMonth
+{
     [currentMonthView setDate:aMonth]
     [headerView setDate:aMonth];
 }
