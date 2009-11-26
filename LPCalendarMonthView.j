@@ -88,7 +88,7 @@ var _startAndEndOfWeekCache = {};
                                        forKeys:[@"grid-color"]];
 }
 
-- (void)initWithFrame:(CGRect)aFrame calendarView:(LPCalendarView)aCalendarView
+- (id)initWithFrame:(CGRect)aFrame calendarView:(LPCalendarView)aCalendarView
 {
     if (self = [super initWithFrame:aFrame])
     {
@@ -109,14 +109,18 @@ var _startAndEndOfWeekCache = {};
 
         [self setNeedsLayout];
 
+        // [self setNeedsDisplay:YES];
         /*
             Bugfix: if loaded from a CIB, the grid lines drawn by drawRect are not rendered until the first 
             resize because drawRect is not called. Strangely enough, calling [self setNeedsDisplay:YES] does
             not help either. The workaround is to force an initial call to display.
+            
+            Also, we must check for the absence of a _DOMElement since theme building won't work otherwise.
+            During theme building there are no _DOMElements and the build process would error out with a 
+            ReferenceError: Can't find variable: _DOMElement if display was called.
         */
-        // [self setNeedsDisplay:YES];      
-        [self display];
-        
+        if ('_DOMElement' in self)
+            [self display];  
     }
     return self;
 }
