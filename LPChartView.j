@@ -42,7 +42,7 @@ var labelViewHeight = 20,
     LPChartLabelView labelView;
     
     CPArray _data;
-    int maxValue;
+    int _maxValue;
     
     CPArray _framesSet;
     CGSize _currentSize;
