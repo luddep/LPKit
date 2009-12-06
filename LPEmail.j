@@ -63,7 +63,7 @@ var emailPattern = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")
 
 - (BOOL)isValidEmail
 {
-    return emailPattern.test(email);
+    return [LPEmail emailWithStringIsValid:email];
 }
 
 - (BOOL)isEqualToEmail:(LPEmail)anEmail
