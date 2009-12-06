@@ -56,6 +56,8 @@ var labelViewHeight = 20,
 
         labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(aFrame) - labelViewHeight, CGRectGetWidth(aFrame), labelViewHeight)];
         [self addSubview:labelView];
+        
+        _currentSize = CGSizeMake(0,0);
     }
     return self;
 }
@@ -217,9 +219,59 @@ var labelViewHeight = 20,
 @end
 
 
+var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
+    LPChartViewDrawViewKey      = @"LPChartViewDrawViewKey",
+    LPChartViewDisplayLabelsKey = @"LPChartViewDisplayLabelsKey",
+    LPChartViewLabelViewKey     = @"LPChartViewLabelViewKey",
+    LPChartViewDataKey          = @"LPChartViewDataKey",
+    LPChartViewMaxValueKey      = @"LPChartViewMaxValueKey",
+    LPChartViewFramesSetKey     = @"LPChartViewFramesSetKey",
+    LPChartViewCurrentSizeKey   = @"LPChartViewCurrentSizeKey";
+
+@implementation LPChartView (CPCoding)
+
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    if (self = [super initWithCoder:aCoder])
+    {
+        dataSource = [aCoder decodeObjectForKey:LPChartViewDataSourceKey];
+        drawView = [aCoder decodeObjectForKey:LPChartViewDrawViewKey];
+        
+        displayLabels = ![aCoder containsValueForKey:LPChartViewDisplayLabelsKey] || [aCoder decodeObjectForKey:LPChartViewDisplayLabelsKey];
+        labelView = [aCoder decodeObjectForKey:LPChartViewLabelViewKey];
+        
+        _data = [aCoder decodeObjectForKey:LPChartViewDataKey];
+        _maxValue = [aCoder decodeIntForKey:LPChartViewMaxValueKey];
+        
+        _framesSet = [aCoder decodeObjectForKey:LPChartViewFramesSetKey];
+        _currentSize = [aCoder decodeSizeForKey:LPChartViewCurrentSizeKey];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    
+    [aCoder encodeObject:dataSource forKey:LPChartViewDataSourceKey];
+    [aCoder encodeObject:drawView forKey:LPChartViewDrawViewKey];
+    
+    [aCoder encodeBool:displayLabels forKey:LPChartViewDisplayLabelsKey];
+    [aCoder encodeObject:labelView forKey:LPChartViewLabelViewKey];
+    
+    [aCoder encodeObject:_data forKey:LPChartViewDataKey];
+    [aCoder encodeInt:_maxValue forKey:LPChartViewMaxValueKey];
+    
+    [aCoder encodeObject:_framesSet forKey:LPChartViewFramesSetKey];
+    if (_currentSize)
+        [aCoder encodeSize:_currentSize forKey:LPChartViewCurrentSizeKey];
+}
+
+@end
+
+
 @implementation LPChartDrawView : CPView
 {
-    LPChartView chart;
 }
 
 - (void)init
@@ -231,14 +283,9 @@ var labelViewHeight = 20,
     return self;
 }
 
-- (void)viewWillMoveToSuperview:(id)aSuperview
-{
-    chart = aSuperview;
-}
-
 - (void)drawRect:(CGRect)aRect
 {
-    if (itemFrames = [chart itemFrames])
+    if (itemFrames = [[self superview] itemFrames])
     {
         var context = [[CPGraphicsContext currentContext] graphicsPort];
         [self drawSetWithFrames:itemFrames inContext:context];
@@ -284,7 +331,6 @@ var labelViewHeight = 20,
 @implementation LPChartLabelView : CPView
 {
     LPChartView chart;
-    BOOL _labelIsDirty;
 }
  
 - (id)initWithFrame:(CPRect)aFrame
@@ -299,22 +345,16 @@ var labelViewHeight = 20,
     return self;
 }
 
-- (void)viewWillMoveToSuperview:(id)aSuperview
-{
-    chart = aSuperview;
-} 
-
 - (void)reloadData
 {
     var subviews = [self subviews];
-
-    // Mark label as dirty
-    _labelIsDirty = YES;
 
     // Clear any previous labels
 	if (numberOfSubviews = subviews.length)
 		while (numberOfSubviews--)
 			[subviews[numberOfSubviews] removeFromSuperview];
+	
+	//var chart = [self superview];
 	
 	// Insert new subviews
 	if (itemFrames = [chart itemFrames][0])
@@ -330,6 +370,11 @@ var labelViewHeight = 20,
     [self setNeedsLayout];
 }
 
+- (void)viewDidMoveToSuperview
+{
+    chart = [self superview];
+}
+
 - (void)layoutSubviews
 {
     var subviews = [self subviews],
@@ -337,11 +382,11 @@ var labelViewHeight = 20,
         bounds = [self bounds],
         itemFrames = [chart itemFrames][0],
         drawViewPadding = CGRectGetMinX([[chart drawView] frame])
-    
+
     while (numberOfSubviews--)
     {
         var subview = subviews[numberOfSubviews];
-        
+    
         if (label = [chart horizontalLabelForIndex:[subview itemIndex]])
         {
             [subview setLabel:label];
@@ -350,6 +395,28 @@ var labelViewHeight = 20,
     }
 }
  
+@end
+
+
+var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
+
+@implementation LPChartLabelView (CPCoding)
+
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    if (self = [super initWithCoder:aCoder])
+    {
+        chart = [aCoder decodeIntForKey:LPChartLabelViewChartKey];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeInt:chart forKey:LPChartLabelViewChartKey];
+}
+
 @end
 
 
@@ -384,6 +451,28 @@ var labelViewHeight = 20,
         [self setStringValue:aLabel];
         [self sizeToFit];
     }
+}
+
+@end
+
+
+var LPChartLabelItemIndexKey = @"LPChartLabelItemIndexKey";
+
+@implementation LPChartLabel (CPCoding)
+
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    if (self = [super initWithCoder:aCoder])
+    {
+        _itemIndex = [aCoder decodeIntForKey:LPChartLabelItemIndexKey];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [super encodeWithCoder:aCoder];
+    [aCoder encodeInt:_itemIndex forKey:LPChartLabelItemIndexKey];
 }
 
 @end
