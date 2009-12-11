@@ -33,7 +33,7 @@
 - (int)_LPmaxValue
 {
     var max = 0;
-    for (var i=0; i<[self count]; i++)
+    for (var i = 0; i < [self count]; i++)
     {
         current = [self objectAtIndex:i];
         if (current > max)

@@ -32,10 +32,10 @@ var ENV = require("system").env,
     FILE = require("file"),
     task = require("jake").task,
     FileList = require("jake").FileList,
-    app = require("cappuccino/jake").app,
+    framework = require("cappuccino/jake").framework,
     configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug";
 
-app ("LPKit", function(task)
+framework ("LPKit", function(task)
 {
     task.setBuildIntermediatesPath(FILE.join("Build", "LPKit.build", configuration));
     task.setBuildPath(FILE.join("Build", configuration));
@@ -47,9 +47,9 @@ app ("LPKit", function(task)
     task.setEmail("luddep@gmail.com");
     task.setSummary("A collection of generic views, controls & utilities for Cappuccino.");
     task.setSources(new FileList("**/*.j"));
-    task.setResources(new FileList("Resources/*"));
-    //task.setIndexFilePath("index.html");
-    //task.setInfoPlistPath("Info.plist");
+    task.setResources(new FileList("Resources/**/*"));
+    task.setFlattensSources(true);
+    task.setInfoPlistPath("Info.plist");
 
     if (configuration === "Debug")
         task.setCompilerFlags("-DDEBUG -g");
