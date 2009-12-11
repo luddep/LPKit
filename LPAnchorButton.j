@@ -28,9 +28,9 @@
  * 
  */
 
-LPAnchorButtonNoUnderline = 0;
+LPAnchorButtonNoUnderline     = 0;
 LPAnchorButtonNormalUnderline = 1;
-LPAnchorButtonHoverUnderline = 2;
+LPAnchorButtonHoverUnderline  = 2;
 
 
 @implementation LPAnchorButton : CPButton
