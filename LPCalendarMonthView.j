@@ -106,8 +106,17 @@ var _startAndEndOfWeekCache = {};
         // Create tiles
         for (var i = 0; i < 42; i++)
             [self addSubview:[LPCalendarDayView dayViewWithCalendarView:aCalendarView]];
-            
+
         [self setNeedsLayout];
+
+        /*
+            Bugfix: if loaded from a CIB, the grid lines drawn by drawRect are not rendered until the first 
+            resize because drawRect is not called. Strangely enough, calling [self setNeedsDisplay:YES] does
+            not help either. The workaround is to force an initial call to display.
+        */
+        // [self setNeedsDisplay:YES];      
+        [self display];
+        
     }
     return self;
 }

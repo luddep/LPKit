@@ -61,7 +61,7 @@
                                                 @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment"]];
 }
 
-- (void)initWithFrame:(CGRect)aFrame
+- (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
     {
@@ -74,6 +74,7 @@
         [[headerView prevButton] setAction:@selector(didClickPrevButton:)];
         [[headerView nextButton] setTarget:self];
         [[headerView nextButton] setAction:@selector(didClickNextButton:)];
+        [headerView setAutoresizingMask:CPViewWidthSizable];
         [self addSubview:headerView];
         
         slideView = [[LPSlideView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([headerView bounds]), CGRectGetWidth(bounds), CGRectGetHeight(bounds) - CGRectGetHeight([headerView bounds]))];
@@ -84,6 +85,19 @@
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
         
+        firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
+        [firstMonthView setDelegate:self];
+        [slideView addSubview:firstMonthView];
+
+        secondMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
+        [secondMonthView setDelegate:self];
+        [slideView addSubview:secondMonthView];
+
+        currentMonthView = firstMonthView;        
+
+        // Default to today's date.
+        [self setMonth:[CPDate date]];
+                
         [self setNeedsLayout];
     }
     return self;
@@ -91,18 +105,6 @@
 
 - (void)setMonth:(CPDate)aMonth
 {
-    if (!currentMonthView)
-    {
-        firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
-        [firstMonthView setDelegate:self];
-        [slideView addSubview:firstMonthView];
-        
-        secondMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
-        [secondMonthView setDelegate:self];
-        [slideView addSubview:secondMonthView];
-        
-        currentMonthView = firstMonthView;
-    }
     [currentMonthView setDate:aMonth]
     [headerView setDate:aMonth];
 }
