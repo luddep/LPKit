@@ -45,6 +45,9 @@ LPAnchorButtonHoverUnderline  = 2;
         // Set default underline mask
         _underlineMask = LPAnchorButtonNormalUnderline | LPAnchorButtonHoverUnderline;
         
+        // Reset min-size
+        [self setValue:CGSizeMake(0,0) forThemeAttribute:@"min-size"];
+        
         // Remove bezels
         [self setBordered:NO];
     }
