@@ -27,19 +27,22 @@
  * THE SOFTWARE.
  * 
  */
-
+@import <AppKit/CPView.j>
 
 // TODO: These should be ivars, or more likely, theme settings.
 var labelViewHeight = 20,
     drawViewPadding = 5;
+
 
 @implementation LPChartView : CPView
 {
     id dataSource @accessors;
     id drawView @accessors;
     
-    BOOL displayLabels @accessors;
+    LPGridView gridView;
+    
     LPChartLabelView labelView;
+    BOOL displayLabels @accessors;
     
     CPArray _data;
     int _maxValue;
@@ -52,8 +55,10 @@ var labelViewHeight = 20,
 {
     if (self = [super initWithFrame:aFrame])
     {
-        //[self setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.1]];
-
+        gridView = [[LPChartGridView alloc] initWithFrame:CGRectMakeZero()];
+        [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
+        [self addSubview:gridView];
+        
         labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(aFrame) - labelViewHeight, CGRectGetWidth(aFrame), labelViewHeight)];
         [self addSubview:labelView];
         
@@ -70,9 +75,8 @@ var labelViewHeight = 20,
 
 - (void)setDrawView:(id)aDrawView
 {
-    
     if (!drawView)
-        [self addSubview:aDrawView];
+        [self addSubview:aDrawView positioned:CPWindowAbove relativeTo:gridView];
     else
         [self replaceSubview:drawView with:aDrawView];
     
@@ -82,11 +86,21 @@ var labelViewHeight = 20,
     // Resize the drawview to the correct size
     var drawViewFrame = CGRectInset([self bounds], drawViewPadding, drawViewPadding);
     
+    // Don't let it draw over the labelView
     if (labelView)
         drawViewFrame.size.height -= CGRectGetHeight([labelView bounds]);
     
+    // Update drawView frame & autoresizingmask
     [drawView setFrame:drawViewFrame];
+    [drawView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
     
+    // Make drawView 1px higher, so the bottom line can be seen
+    drawViewFrame.size.height += 1;
+    
+    // Update gridview as well
+    [gridView setFrame:drawViewFrame];
+    
+    // Re-draw
     [self reloadData];
 }
 
@@ -111,6 +125,11 @@ var labelViewHeight = 20,
     }
     
     displayLabels = shouldDisplayLabels;
+}
+
+- (void)setDisplayGrid:(BOOL)shouldDisplayGrid
+{
+    [gridView setHidden:!shouldDisplayGrid];
 }
 
 - (CPArray)itemFrames
@@ -149,6 +168,9 @@ var labelViewHeight = 20,
         
         _data.push(row);
     }
+    
+    // Update grid view
+    //[gridView setItemsLength:numberOfItems];
     
     // Update Label view
     [labelView reloadData];
@@ -221,6 +243,7 @@ var labelViewHeight = 20,
 
 var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     LPChartViewDrawViewKey      = @"LPChartViewDrawViewKey",
+    LPChartViewGridViewKey      = @"LPChartViewGridViewKey",
     LPChartViewDisplayLabelsKey = @"LPChartViewDisplayLabelsKey",
     LPChartViewLabelViewKey     = @"LPChartViewLabelViewKey",
     LPChartViewDataKey          = @"LPChartViewDataKey",
@@ -236,6 +259,8 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     {
         dataSource = [aCoder decodeObjectForKey:LPChartViewDataSourceKey];
         drawView = [aCoder decodeObjectForKey:LPChartViewDrawViewKey];
+        
+        gridView = [aCoder decodeObjectForKey:LPChartViewGridViewKey];
         
         displayLabels = ![aCoder containsValueForKey:LPChartViewDisplayLabelsKey] || [aCoder decodeObjectForKey:LPChartViewDisplayLabelsKey];
         labelView = [aCoder decodeObjectForKey:LPChartViewLabelViewKey];
@@ -256,6 +281,8 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     [aCoder encodeObject:dataSource forKey:LPChartViewDataSourceKey];
     [aCoder encodeObject:drawView forKey:LPChartViewDrawViewKey];
     
+    [aCoder encodeObject:gridView forKey:LPChartViewGridViewKey];
+    
     [aCoder encodeBool:displayLabels forKey:LPChartViewDisplayLabelsKey];
     [aCoder encodeObject:labelView forKey:LPChartViewLabelViewKey];
     
@@ -263,6 +290,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     [aCoder encodeInt:_maxValue forKey:LPChartViewMaxValueKey];
     
     [aCoder encodeObject:_framesSet forKey:LPChartViewFramesSetKey];
+    
     if (_currentSize)
         [aCoder encodeSize:_currentSize forKey:LPChartViewCurrentSizeKey];
 }
@@ -270,17 +298,43 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 @end
 
 
-@implementation LPChartDrawView : CPView
+@implementation LPChartGridView : CPView
 {
 }
 
-- (void)init
+- (void)drawRect:(CGRect)aRect
 {
-    if (self = [super initWithFrame:CGRectMakeZero()])
+    if (itemFrames = [[self superview] itemFrames])
     {
-        [self setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
+        var context = [[CPGraphicsContext currentContext] graphicsPort],
+            bounds = [self bounds],
+            width = CGRectGetWidth(bounds),
+            height = CGRectGetHeight(bounds),
+            lineWidth = 1;
+    
+        // TODO: how to customize this?
+        CGContextSetFillColor(context, [CPColor colorWithWhite:0 alpha:0.05]);
+        
+        // Vertical lines
+        for (var i = 0; i < itemFrames[0].length; i++)
+        {
+            CGContextFillRect(context, CGRectMake(itemFrames[0][i].origin.x, 0, lineWidth, height));
+        }
+    
+        // Right most line
+        CGContextFillRect(context, CGRectMake(width - lineWidth, 0, lineWidth, height));
+    
+        // Bottom & middle line
+        CGContextFillRect(context, CGRectMake(0, height - lineWidth, width, lineWidth));
+        CGContextFillRect(context, CGRectMake(0, FLOOR(height / 2), width, lineWidth));
     }
-    return self;
+}
+
+@end
+
+
+@implementation LPChartDrawView : CPView
+{
 }
 
 - (void)drawRect:(CGRect)aRect
@@ -339,8 +393,6 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     {
         [self setAutoresizingMask:CPViewWidthSizable | CPViewMinYMargin];
         [self setHitTests:NO];
-        
-        //[self setBackgroundColor:[CPColor redColor]];
     }
     return self;
 }
@@ -354,16 +406,11 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 		while (numberOfSubviews--)
 			[subviews[numberOfSubviews] removeFromSuperview];
 	
-	//var chart = [self superview];
-	
 	// Insert new subviews
 	if (itemFrames = [chart itemFrames][0])
 	{
 	    for (var i = 0, length = itemFrames.length; i < length; i++)
-	    {
-	        if (label = [chart horizontalLabelForIndex:i])
-	            [self addSubview:[LPChartLabel labelWithItemIndex:i]];
-	    }
+	        [self addSubview:[LPChartLabel labelWithItemIndex:i]];
     }
     
     // Layout subviews
@@ -386,12 +433,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     while (numberOfSubviews--)
     {
         var subview = subviews[numberOfSubviews];
-    
-        if (label = [chart horizontalLabelForIndex:[subview itemIndex]])
-        {
-            [subview setLabel:label];
-            [subview setCenter:CGPointMake(CGRectGetMidX(itemFrames[numberOfSubviews]) + drawViewPadding, CGRectGetMidY(bounds))];
-        }
+        
+        [subview setLabel:[chart horizontalLabelForIndex:[subview itemIndex]]];
+        [subview setCenter:CGPointMake(CGRectGetMidX(itemFrames[numberOfSubviews]) + drawViewPadding, CGRectGetMidY(bounds))];
     }
 }
  
@@ -406,7 +450,7 @@ var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
 {
     if (self = [super initWithCoder:aCoder])
     {
-        chart = [aCoder decodeIntForKey:LPChartLabelViewChartKey];
+        chart = [aCoder decodeObjectForKey:LPChartLabelViewChartKey];
     }
     return self;
 }
@@ -414,7 +458,7 @@ var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
 - (void)encodeWithCoder:(CPCoder)aCoder
 {
     [super encodeWithCoder:aCoder];
-    [aCoder encodeInt:chart forKey:LPChartLabelViewChartKey];
+    [aCoder encodeObject:chart forKey:LPChartLabelViewChartKey];
 }
 
 @end
