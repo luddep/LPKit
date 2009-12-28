@@ -37,6 +37,7 @@ var labelViewHeight = 20,
 @implementation LPChartView : CPView
 {
     id dataSource @accessors;
+    id delegate @accessors;
     id drawView @accessors;
     
     LPGridView gridView;
@@ -183,9 +184,10 @@ var labelViewHeight = 20,
 {
     drawViewSize = [drawView bounds].size;
     
-    //if (_currentSize && CGSizeEqualToSize(_currentSize, drawViewSize))
-    //    return _framesSet;  
-    //_currentSize = drawViewSize;
+    if (_currentSize && CGSizeEqualToSize(_currentSize, drawViewSize))
+        return _framesSet;
+        
+    _currentSize = drawViewSize;
 
     // Reset frames set
     _framesSet = [CPArray array];
@@ -236,6 +238,29 @@ var labelViewHeight = 20,
 - (CPString)horizontalLabelForIndex:(int)anIndex
 {
     return [dataSource chart:self labelValueForIndex:anIndex];
+}
+
+- (void)mouseMoved:(CPEvent)anEvent
+{
+    if (delegate && [delegate respondsToSelector:@selector(chart:didMouseOverItemAtIndex:)])
+    {
+        var itemFrames = [self itemFrames][0],
+            locationInDrawView = [drawView convertPoint:[anEvent locationInWindow] fromView:nil];
+    
+        for (var i = 0; i < itemFrames.length; i++)
+        {
+            var itemFrame = itemFrames[i];
+        
+            if (itemFrame.origin.x <= locationInDrawView.x && (itemFrame.origin.x + itemFrame.size.width) > locationInDrawView.x)
+                [delegate chart:self didMouseOverItemAtIndex:i];
+        }
+    }
+}
+
+- (void)mouseExited:(CPEvent)anEvent
+{
+    if (delegate && [delegate respondsToSelector:@selector(chart:didMouseOverItemAtIndex:)])
+        [delegate chart:self didMouseOverItemAtIndex:-1];
 }
 
 @end
@@ -302,6 +327,15 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 {
 }
 
+- (void)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        [self setHitTests:NO];
+    }
+    return self;
+}
+
 - (void)drawRect:(CGRect)aRect
 {
     if (itemFrames = [[self superview] itemFrames])
@@ -335,6 +369,15 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 
 @implementation LPChartDrawView : CPView
 {
+}
+
+- (id)initWithFrame:(CPRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+        [self setHitTests:NO];
+    }
+    return self;
 }
 
 - (void)drawRect:(CGRect)aRect
@@ -527,7 +570,8 @@ var LPChartLabelViewChartKey          = @"LPChartLabelViewChartKey",
 {
     if (self = [super initWithFrame:aFrame])
     {
-        [self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
+        [self setHitTests:NO];
+        //[self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
         /*[self setFont:[CPFont boldFontWithName:@"Lucida Grande" size:10]];
         [self setTextColor:[CPColor colorWithHexString:@"333"]];*/
     }
