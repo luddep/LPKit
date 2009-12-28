@@ -571,9 +571,6 @@ var LPChartLabelViewChartKey          = @"LPChartLabelViewChartKey",
     if (self = [super initWithFrame:aFrame])
     {
         [self setHitTests:NO];
-        //[self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
-        /*[self setFont:[CPFont boldFontWithName:@"Lucida Grande" size:10]];
-        [self setTextColor:[CPColor colorWithHexString:@"333"]];*/
     }
     return self;
 }
