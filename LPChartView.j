@@ -325,15 +325,23 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 
 @implementation LPChartGridView : CPView
 {
+    CPColor gridColor @accessors;
 }
 
 - (void)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
     {
+        gridColor = [CPColor colorWithWhite:0 alpha:0.05];
         [self setHitTests:NO];
     }
     return self;
+}
+
+- (void)setGridColor:(CPColor)aColor
+{
+    gridColor = aColor;
+    [self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(CGRect)aRect
@@ -346,8 +354,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
             height = CGRectGetHeight(bounds),
             lineWidth = 1;
     
-        // TODO: how to customize this?
-        CGContextSetFillColor(context, [CPColor colorWithWhite:0 alpha:0.05]);
+        CGContextSetFillColor(context, gridColor);
         
         // Vertical lines
         for (var i = 0; i < itemFrames[0].length; i++)
