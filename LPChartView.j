@@ -41,7 +41,7 @@ var labelViewHeight = 20,
     
     LPGridView gridView;
     
-    LPChartLabelView labelView;
+    LPChartLabelView labelView @accessors(readonly);
     BOOL displayLabels @accessors;
     
     CPArray _data;
@@ -385,6 +385,10 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 @implementation LPChartLabelView : CPView
 {
     LPChartView chart;
+    
+    id _labelPrototype;
+    CPData _labelData;
+    CPArray _cachedLabels;
 }
  
 - (id)initWithFrame:(CPRect)aFrame
@@ -393,28 +397,67 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     {
         [self setAutoresizingMask:CPViewWidthSizable | CPViewMinYMargin];
         [self setHitTests:NO];
+
+        [self setLabelPrototype:[LPChartLabel labelWithItemIndex:-1]];
     }
     return self;
 }
 
-- (void)reloadData
+- (void)setLabelPrototype:(id)aLabelPrototype
 {
-    var subviews = [self subviews];
+    _labelPrototype = aLabelPrototype;
+    _labelData = nil;
+    _cachedLabels = [CPArray array];
+    
+    [self reloadData];
+}
 
-    // Clear any previous labels
-	if (numberOfSubviews = subviews.length)
-		while (numberOfSubviews--)
-			[subviews[numberOfSubviews] removeFromSuperview];
-	
-	// Insert new subviews
-	if (itemFrames = [chart itemFrames][0])
-	{
-	    for (var i = 0, length = itemFrames.length; i < length; i++)
-	        [self addSubview:[LPChartLabel labelWithItemIndex:i]];
+- (id)newLabelWithItemIndex:(int)anItemIndex
+{
+    if (_cachedLabels.length)
+        var label = _cachedLabels.pop();
+    else
+    {
+        if (!_labelData)
+            if (_labelPrototype)
+                _labelData = [CPKeyedArchiver archivedDataWithRootObject:_labelPrototype];
+        
+        var label = [CPKeyedUnarchiver unarchiveObjectWithData:_labelData];
     }
     
-    // Layout subviews
-    [self setNeedsLayout];
+    [label setItemIndex:anItemIndex];
+    
+    return label;
+}
+
+- (void)reloadData
+{
+    if (chart)
+    {
+        var subviews = [self subviews];
+        
+        // Clear any previous labels
+    	if (numberOfSubviews = subviews.length)
+    	{
+    		while (numberOfSubviews--)
+    		{
+    			[subviews[numberOfSubviews] removeFromSuperview];
+    			
+    			if (_labelData)
+    		        _cachedLabels.push(subviews[numberOfSubviews]);
+    		}
+	    }
+	    
+    	// Insert new subviews
+    	if (itemFrames = [chart itemFrames][0])
+    	{
+    	    for (var i = 0, length = itemFrames.length; i < length; i++)
+    	        [self addSubview:[self newLabelWithItemIndex:i]];
+        }
+        
+        // Layout subviews
+        [self setNeedsLayout];
+    }
 }
 
 - (void)viewDidMoveToSuperview
@@ -428,7 +471,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         numberOfSubviews = subviews.length,
         bounds = [self bounds],
         itemFrames = [chart itemFrames][0],
-        drawViewPadding = CGRectGetMinX([[chart drawView] frame])
+        drawViewPadding = CGRectGetMinX([[chart drawView] frame]);
 
     while (numberOfSubviews--)
     {
@@ -442,7 +485,8 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 @end
 
 
-var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
+var LPChartLabelViewChartKey          = @"LPChartLabelViewChartKey",
+    LPChartLabelViewLabelPrototypeKey = @"LPChartLabelViewLabelPrototypeKey";
 
 @implementation LPChartLabelView (CPCoding)
 
@@ -451,6 +495,8 @@ var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
     if (self = [super initWithCoder:aCoder])
     {
         chart = [aCoder decodeObjectForKey:LPChartLabelViewChartKey];
+        _labelPrototype = [aCoder decodeObjectForKey:LPChartLabelViewLabelPrototypeKey];
+        _cachedLabels = [CPArray array];
     }
     return self;
 }
@@ -459,6 +505,7 @@ var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
 {
     [super encodeWithCoder:aCoder];
     [aCoder encodeObject:chart forKey:LPChartLabelViewChartKey];
+    [aCoder encodeObject:_labelPrototype forKey:LPChartLabelViewLabelPrototypeKey];
 }
 
 @end
@@ -471,19 +518,18 @@ var LPChartLabelViewChartKey = @"LPChartLabelViewChartKey";
  
 + (id)labelWithItemIndex:(int)anItemIndex
 {
-    return [[self alloc] initWithItemIndex:anItemIndex];
+    var label = [[self alloc] initWithFrame:CGRectMakeZero()];
+    [label setItemIndex:anItemIndex];
+    return label;
 }
  
-- (id)initWithItemIndex:(int)anItemIndex
+- (id)initWithFrame:(CGRect)aFrame
 {
-    if (self = [super initWithFrame:CGRectMakeZero()])
+    if (self = [super initWithFrame:aFrame])
     {
-        _itemIndex = anItemIndex;
-        
         [self setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
-        [self setFont:[CPFont boldFontWithName:@"Lucida Grande" size:10]];
-        [self setTextColor:[CPColor colorWithHexString:@"333"]];
-        //[self setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.1]]
+        /*[self setFont:[CPFont boldFontWithName:@"Lucida Grande" size:10]];
+        [self setTextColor:[CPColor colorWithHexString:@"333"]];*/
     }
     return self;
 }
