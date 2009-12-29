@@ -60,7 +60,7 @@ var labelViewHeight = 20,
         [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
         [self addSubview:gridView];
         
-        labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(aFrame) - labelViewHeight, CGRectGetWidth(aFrame), labelViewHeight)];
+        labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(drawViewPadding, CGRectGetHeight(aFrame) - labelViewHeight, CGRectGetWidth(aFrame) - (2 * drawViewPadding), labelViewHeight)];
         [self addSubview:labelView];
         
         _currentSize = CGSizeMake(0,0);
