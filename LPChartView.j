@@ -529,6 +529,24 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         
         [subview setLabel:[chart horizontalLabelForIndex:[subview itemIndex]]];
         [subview setCenter:CGPointMake(CGRectGetMidX(itemFrames[numberOfSubviews]) + drawViewPadding, CGRectGetMidY(bounds))];
+        
+        // If either min x or max x is overflowing, set them to the possible min / max
+        var subviewFrame = [subview frame],
+            frameIsDirty = NO;
+            
+        if (subviewFrame.origin.x < 0)
+        {
+            frameIsDirty = YES;
+            subviewFrame.origin.x = 0;
+        }
+        else if (CGRectGetMaxX(subviewFrame) > bounds.size.width)
+        {
+            frameIsDirty = YES;
+            subviewFrame.origin.x -= CGRectGetMaxX(subviewFrame) - bounds.size.width;
+        }
+        
+        if (frameIsDirty)
+            [subview setFrame:subviewFrame];
     }
 }
  
