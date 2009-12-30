@@ -292,7 +292,7 @@ var _startAndEndOfWeekCache = {};
 
 - (CGPoint)locationInViewForEvent:(CPEvent)anEvent
 {
-    return [self convertPoint:[anEvent locationInWindow] fromView:[[self window] contentView]];
+    return [self convertPoint:[anEvent locationInWindow] fromView:nil]
 }
 
 - (int)indexOfTileAtPoint:(CGPoint)aPoint
