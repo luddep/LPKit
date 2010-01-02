@@ -484,6 +484,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 {
     if (chart)
     {
+        
         var subviews = [self subviews];
         
         // Clear any previous labels
@@ -499,8 +500,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 	    }
 	    
     	// Insert new subviews
-    	if (itemFrames = [chart itemFrames][0])
+    	if (itemFrames = [chart itemFrames])
     	{
+    	    itemFrames = itemFrames[0];
     	    for (var i = 0, length = itemFrames.length; i < length; i++)
     	        [self addSubview:[self newLabelWithItemIndex:i]];
         }
