@@ -133,6 +133,9 @@ var LPPieChartViewDrawViewKey = @"LPPieChartViewDrawViewKey";
     float sum @accessors;
     CPArray values @accessors;
     CPArray colors @accessors;
+    
+    int lineWidth @accessors;
+    CPColor strokeColor @accessors;
 }
 
 - (void)drawRect:(CGRect)aRect
@@ -143,6 +146,9 @@ var LPPieChartViewDrawViewKey = @"LPPieChartViewDrawViewKey";
         midX = CGRectGetMidX(bounds),
         midY = CGRectGetMidY(bounds),
         current_angle = 0.0;
+    
+    CGContextSetLineWidth(context, lineWidth || 1.0);
+    CGContextSetStrokeColor(context, strokeColor || [CPColor clearColor]);
     
     for (var i = 0; i < [values count]; i++)
     {
@@ -157,6 +163,7 @@ var LPPieChartViewDrawViewKey = @"LPPieChartViewDrawViewKey";
         
         CGContextSetFillColor(context, [colors objectAtIndex:i]);
         CGContextFillPath(context);
+        CGContextStrokePath(context);
         CGContextClosePath(context);
         
         current_angle += end_angle;
@@ -168,7 +175,9 @@ var LPPieChartViewDrawViewKey = @"LPPieChartViewDrawViewKey";
 
 var LPPieChartDrawViewSumKey    = @"LPPieChartDrawViewSumKey",
     LPPieChartDrawViewValuesKey = @"LPPieChartDrawViewValuesKey",
-    LPPieChartDrawViewColorsKey = @"LPPieChartDrawViewColorsKey";
+    LPPieChartDrawViewColorsKey = @"LPPieChartDrawViewColorsKey",
+    LPPieChartDrawViewLineWidthKey = @"LPPieChartDrawViewLineWidthKey",
+    LPPieChartDrawViewStrokeColorKey = @"LPPieChartDrawViewStrokeColorKey";
 
 @implementation LPPieChartDrawView (CPCoding)
  
@@ -179,6 +188,8 @@ var LPPieChartDrawViewSumKey    = @"LPPieChartDrawViewSumKey",
         sum = [aCoder decodeFloatForKey:LPPieChartDrawViewSumKey];
         values = [aCoder decodeObjectForKey:LPPieChartDrawViewValuesKey];
         colors = [aCoder decodeObjectForKey:LPPieChartDrawViewColorsKey];
+        lineWidth = [aCoder decodeIntForKey:LPPieChartDrawViewLineWidthKey];
+        strokeColor = [aCoder decodeObjectForKey:LPPieChartDrawViewStrokeColorKey];
     }
  
     return self;
@@ -189,6 +200,8 @@ var LPPieChartDrawViewSumKey    = @"LPPieChartDrawViewSumKey",
     [aCoder encodeFloat:sum forKey:LPPieChartDrawViewSumKey];
     [aCoder encodeObject:values forKey:LPPieChartDrawViewValuesKey];
     [aCoder encodeObject:colors forKey:LPPieChartDrawViewColorsKey];
+    [aCoder encodeInt:lineWidth forKey:LPPieChartDrawViewLineWidthKey];
+    [aCoder encodeObject:strokeColor forKey:LPPieChartDrawViewStrokeColorKey];
 }
  
 @end
