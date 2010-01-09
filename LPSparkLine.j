@@ -65,7 +65,7 @@
 	    bounds = [self bounds],
 	    height = CGRectGetHeight(bounds) - 2,
 	    tickWidth = CGRectGetWidth(bounds) / ([data count] - 1),
-	    maxValue = [data _LPmaxValue];
+	    maxValue = Math.max.apply(Math, data);
 
 	CGContextBeginPath(context);
 	
