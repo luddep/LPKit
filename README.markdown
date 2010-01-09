@@ -76,3 +76,7 @@ Example:
 
 LPKit makes heavy use of the theme API in Cappuccino.
 An example on how to use themes with LPKit is available in in the [LPKit-Examples repository](https://github.com/luddep/LPKit-Examples) which has a demo theme with an Aristo inspired look.
+
+# Contributors
+* [Ludwig Pettersson](http://github.com/luddep)
+* [aljungberg](http://github.com/aljungberg)
