@@ -28,7 +28,6 @@
  * 
  */
 
-@import <LPKit/CPArray+Additions.j>
 @import <LPKit/LPAnchorButton.j>
 @import <LPKit/LPCalendarView.j>
 @import <LPKit/LPChartView.j>

@@ -29,7 +29,6 @@
  */
 
 @import <Foundation/CPObject.j>
-@import "CPArray+Additions.j"
 
 @implementation LPSparkLine : CPView
 {
