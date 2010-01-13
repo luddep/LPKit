@@ -71,7 +71,7 @@ LPSlideViewNegativeDirection = 4;
     else
         [aView setHidden:YES];
     
-    [aView setAutoresizingMask:CPViewWidthSizable];
+    [aView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
     [super addSubview:aView];
 }
 
