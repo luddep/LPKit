@@ -47,6 +47,8 @@
     {
         // Default draw view
         [self setDrawView:[[LPPieChartDrawView alloc] initWithFrame:CGRectMakeZero()]];
+        
+        paths = [CPArray array];
     }
     return self;
 }
