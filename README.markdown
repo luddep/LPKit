@@ -79,4 +79,4 @@ An example on how to use themes with LPKit is available in in the [LPKit-Example
 
 # Contributors
 * [Ludwig Pettersson](http://github.com/luddep)
-* [aljungberg](http://github.com/aljungberg)
+* [Alexander Ljungberg](http://github.com/aljungberg)
