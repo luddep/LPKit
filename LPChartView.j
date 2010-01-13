@@ -401,6 +401,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     // Overwrite this method in your subclass
     // to get complete control of the drawing.
     
+    CGContextSetStrokeColor(context, [CPColor colorWithHexString:@"4379ca"]);
+    CGContextSetLineWidth(context, 2.0);
+    
     for (var setIndex = 0; setIndex < aFramesSet.length; setIndex++)
     {
         var items = aFramesSet[setIndex];
@@ -421,6 +424,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
             else
                 CGContextAddLineToPoint(context, point.x, point.y);
         }
+        
         // Stroke path
         CGContextStrokePath(context);
         
