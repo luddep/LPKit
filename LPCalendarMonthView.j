@@ -445,13 +445,13 @@ var _startAndEndOfWeekCache = {};
 
 - (void)drawRect:(CGRect)aRect
 {
-	var context = [[CPGraphicsContext currentContext] graphicsPort],
-	    bounds = [self bounds],
-	    width = CGRectGetWidth(bounds),
-	    height = CGRectGetHeight(bounds),
-	    tileSize = [self tileSize];
-	
-	CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
+    var context = [[CPGraphicsContext currentContext] graphicsPort],
+        bounds = [self bounds],
+        width = CGRectGetWidth(bounds),
+        height = CGRectGetHeight(bounds),
+        tileSize = [self tileSize];
+    
+    CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
     
     // Horizontal lines
     for (var i = 0; i < 6; i++)

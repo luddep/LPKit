@@ -56,20 +56,20 @@
 
 - (void)setCurrentProgress:(float)progress
 {
-	[super setCurrentProgress:progress];
-	
-	// Get the progress with respect to the animationCurve
-	progress = [self currentValue];
+    [super setCurrentProgress:progress];
+    
+    // Get the progress with respect to the animationCurve
+    progress = [self currentValue];
  
-	for (var i = 0; i < views.length; i++)
-	{
-		var property = properties[i],
-		    start = property['start'],
-			end = property['end'];
-		
-		[views[i] setFrame:CGRectMake((progress * (end.origin.x - start.origin.x)) + start.origin.x, (progress * (end.origin.y - start.origin.y)) + start.origin.y,
-		                              (progress * (end.size.width - start.size.width)) + start.size.width, (progress * (end.size.height - start.size.height)) + start.size.height)];
-	}
+    for (var i = 0; i < views.length; i++)
+    {
+        var property = properties[i],
+            start = property['start'],
+            end = property['end'];
+        
+        [views[i] setFrame:CGRectMake((progress * (end.origin.x - start.origin.x)) + start.origin.x, (progress * (end.origin.y - start.origin.y)) + start.origin.y,
+                                      (progress * (end.size.width - start.size.width)) + start.size.width, (progress * (end.size.height - start.size.height)) + start.size.height)];
+    }
 }
 
 - (void)startAnimation

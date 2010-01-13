@@ -32,72 +32,72 @@
 
 @implementation LPSparkLine : CPView
 {
-	CPArray data @accessors;
-	CPColor lineColor;
-	float lineWeight;
-	
-	CPColor shadowColor;
-	CGSize shadowOffset;
-	
-	BOOL isEmpty;
+    CPArray data @accessors;
+    CPColor lineColor;
+    float lineWeight;
+    
+    CPColor shadowColor;
+    CGSize shadowOffset;
+    
+    BOOL isEmpty;
 } 
 
 - (id)initWithFrame:(CGRect)aFrame 
 { 
-	self = [super initWithFrame:aFrame];
+    self = [super initWithFrame:aFrame];
     
-	if (self) 
-	{ 
-	    lineWeight = 1.0;
-	    lineColor = [CPColor blackColor];
-	    
-	    shadowColor = nil;
-	    shadowOffset = CGSizeMake(0,1);
-	} 
+    if (self) 
+    { 
+        lineWeight = 1.0;
+        lineColor = [CPColor blackColor];
+        
+        shadowColor = nil;
+        shadowOffset = CGSizeMake(0,1);
+    } 
 
-	return self; 
+    return self; 
 } 
 
 - (void)drawRect:(CPRect)aRect
 {
-	var context = [[CPGraphicsContext currentContext] graphicsPort],
-	    bounds = [self bounds],
-	    height = CGRectGetHeight(bounds) - 2,
-	    tickWidth = CGRectGetWidth(bounds) / ([data count] - 1),
-	    maxValue = Math.max.apply(Math, data);
+    var context = [[CPGraphicsContext currentContext] graphicsPort],
+        bounds = [self bounds],
+        height = CGRectGetHeight(bounds) - 2,
+        tickWidth = CGRectGetWidth(bounds) / ([data count] - 1),
+        maxValue = Math.max.apply(Math, data);
 
-	CGContextBeginPath(context);
-	
-	var x,
-	    y;
-	
-	// Just draw a single line in the middle if it's empty
-	if (isEmpty)
-	{
-	    CGContextMoveToPoint(context, 0, height / 2);
-    	CGContextAddLineToPoint(context, CGRectGetWidth(bounds), height / 2);
-	}
-	else
-	{	
-    	// Draw the path
-    	for (var i = 0; i < [data count]; i++)
-    	{
-            x = i * tickWidth;
-    	    y = 2 + (height - (([data objectAtIndex:i] / maxValue) * height));
-	    
-    	    if (i === 0)
-    	        CGContextMoveToPoint(context, 0, y);
-    	    else
-    	        CGContextAddLineToPoint(context, x, y);
-    	}
+    CGContextBeginPath(context);
+    
+    var x,
+        y;
+    
+    // Just draw a single line in the middle if it's empty
+    if (isEmpty)
+    {
+        CGContextMoveToPoint(context, 0, height / 2);
+        CGContextAddLineToPoint(context, CGRectGetWidth(bounds), height / 2);
     }
-	
+    else
+    {   
+        // Draw the path
+        for (var i = 0; i < [data count]; i++)
+        {
+            x = i * tickWidth;
+            y = 2 + (height - (([data objectAtIndex:i] / maxValue) * height));
+        
+            if (i === 0)
+                CGContextMoveToPoint(context, 0, y);
+            else
+                CGContextAddLineToPoint(context, x, y);
+        }
+    }
+    
     CGContextSetLineJoin(context, kCGLineJoinRound)
     CGContextSetLineWidth(context, lineWeight);
-	CGContextSetStrokeColor(context, lineColor);
-	CGContextSetShadowWithColor(context, shadowOffset, 0.0, shadowColor);
-	CGContextStrokePath(context);
-	CGContextClosePath(context);	
+    CGContextSetStrokeColor(context, lineColor);
+    CGContextSetShadowWithColor(context, shadowOffset, 0.0, shadowColor);
+    CGContextStrokePath(context);
+    CGContextClosePath(context);    
 }
 
 - (void)setData:(CPArray)aData

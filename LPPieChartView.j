@@ -138,14 +138,14 @@
     
     if (context.isPointInPath)
     {    
-    	for (var i = 0; i < paths.length; i++)
+        for (var i = 0; i < paths.length; i++)
         {
             CGContextBeginPath(context);
             CGContextAddPath(context, paths[i]);
-    	    CGContextClosePath(context);
-	    
-    	    if (context.isPointInPath(aPoint.x, aPoint.y))
-    	        return i;
+            CGContextClosePath(context);
+        
+            if (context.isPointInPath(aPoint.x, aPoint.y))
+                return i;
         }
     }
     
@@ -232,17 +232,17 @@ var LPPieChartViewDrawViewKey = @"LPPieChartViewDrawView",
     
     var fillColors = [self currentValueForThemeAttribute:@"fill-colors"];
     
-	for (var i = 0; i < paths.length; i++)
+    for (var i = 0; i < paths.length; i++)
     {
         CGContextBeginPath(context);
         CGContextAddPath(context, paths[i]);
-	    CGContextClosePath(context);
+        CGContextClosePath(context);
 
-	    CGContextSetFillColor(context, fillColors[i]);
+        CGContextSetFillColor(context, fillColors[i]);
 
-    	CGContextFillPath(context);
-    	CGContextStrokePath(context);
-	}
+        CGContextFillPath(context);
+        CGContextStrokePath(context);
+    }
 }
 
 @end

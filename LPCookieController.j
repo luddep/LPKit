@@ -77,17 +77,17 @@ var sharedCookieControllerInstance = nil;
 - (id)valueForKey:(CPString)aKey
 {
     var cookies = [document.cookie componentsSeparatedByString:@";"];
-	
-	for(var i = 0; i < [cookies count]; i++)
-	{
-		var cookie = [cookies objectAtIndex:i],
-		    range = [cookie rangeOfString:[CPString stringWithFormat:@"%s=", aKey] options:CPCaseInsensitiveSearch];
-		
-		if (range.length > 0)
-		    return [cookie substringFromIndex:CPMaxRange(range)];
-	}
-	
-	return nil;
+    
+    for(var i = 0; i < [cookies count]; i++)
+    {
+        var cookie = [cookies objectAtIndex:i],
+            range = [cookie rangeOfString:[CPString stringWithFormat:@"%s=", aKey] options:CPCaseInsensitiveSearch];
+        
+        if (range.length > 0)
+            return [cookie substringFromIndex:CPMaxRange(range)];
+    }
+    
+    return nil;
 }
 
 @end
