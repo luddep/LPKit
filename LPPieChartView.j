@@ -163,6 +163,12 @@
     }
 }
 
+- (void)mouseExited:(CPEvent)anEvent
+{
+    if ([delegate respondsToSelector:@selector(pieChartView:mouseMovedOverIndex:)])
+        [delegate pieChartView:self mouseMovedOverIndex:-1];
+}
+
 @end
 
 
