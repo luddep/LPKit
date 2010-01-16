@@ -28,6 +28,7 @@
  * 
  */
 @import <Foundation/CPObject.j>
+@import <AppKit/CPPlatform.j>
 
 var sharedLocationControllerInstance = nil;
 
@@ -50,6 +51,7 @@ var sharedLocationControllerInstance = nil;
     if (self = [super init])
     {
         observers = [CPArray array];
+        
         [CPTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateLocation:) userInfo:nil repeats:YES];
     }
     return self;
@@ -73,7 +75,7 @@ var sharedLocationControllerInstance = nil;
         currentHash = window.location.hash;
 
         var _formattedHash = [self formattedHash];
-        
+    
         // Post notifications
         for (var i = 0, length = observers.length; i < length; i++)
             [observers[i][0] performSelector:observers[i][1] withObject:_formattedHash];
@@ -86,10 +88,7 @@ var sharedLocationControllerInstance = nil;
     [observers addObject:[anObserver, aSelector]];
     
     // Post a notification right away
-    [anObserver performSelector:aSelector withObject:[self formattedHash]]
+    [anObserver performSelector:aSelector withObject:[self formattedHash]];
 }
 
 @end
-
-// TODO: better way of making sure that it starts up?
-[LPLocationController sharedLocationController]
