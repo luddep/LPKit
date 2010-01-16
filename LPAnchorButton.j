@@ -36,6 +36,9 @@ LPAnchorButtonHoverUnderline  = 2;
 @implementation LPAnchorButton : CPButton
 {
     unsigned _underlineMask @accessors(property=underlineMask);
+    
+    CPURL URL;
+    id _DOMAnchorElement;
 }
 
 - (id)init
@@ -52,6 +55,13 @@ LPAnchorButtonHoverUnderline  = 2;
         [self setBordered:NO];
     }
     return self;
+}
+
+- (void)openURLOnClick:(CPURL)aURL
+{   
+    URL = aURL;
+    
+    [self setNeedsLayout];
 }
 
 - (void)setTextColor:(CPColor)aColor
@@ -77,6 +87,24 @@ LPAnchorButtonHoverUnderline  = 2;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
+    // Set up anchor element if needed
+    if (URL)
+    {
+        if (!_DOMAnchorElement)
+        {
+            var _DOMAnchorElement = document.createElement("a");
+        	_DOMAnchorElement.target = @"_blank";
+        	_DOMAnchorElement.style.position = "absolute";
+        	_DOMAnchorElement.style.zIndex = "100";
+
+            self._DOMElement.appendChild(_DOMAnchorElement)
+        }
+        
+    	_DOMAnchorElement.href = [URL absoluteString];
+    	_DOMAnchorElement.style.width = CGRectGetWidth([self bounds]) + @"px";
+    	_DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
+    }
     
     // Hack to make the underline use the same color as the text.
     self._DOMElement.style.setProperty(@"color", [[self currentValueForThemeAttribute:@"text-color"] cssString], null);
