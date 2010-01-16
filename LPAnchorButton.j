@@ -94,16 +94,16 @@ LPAnchorButtonHoverUnderline  = 2;
         if (!_DOMAnchorElement)
         {
             var _DOMAnchorElement = document.createElement("a");
-        	_DOMAnchorElement.target = @"_blank";
-        	_DOMAnchorElement.style.position = "absolute";
-        	_DOMAnchorElement.style.zIndex = "100";
+            _DOMAnchorElement.target = @"_blank";
+            _DOMAnchorElement.style.position = "absolute";
+            _DOMAnchorElement.style.zIndex = "100";
 
             self._DOMElement.appendChild(_DOMAnchorElement)
         }
         
-    	_DOMAnchorElement.href = [URL absoluteString];
-    	_DOMAnchorElement.style.width = CGRectGetWidth([self bounds]) + @"px";
-    	_DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
+        _DOMAnchorElement.href = [URL absoluteString];
+        _DOMAnchorElement.style.width = CGRectGetWidth([self bounds]) + @"px";
+        _DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
     }
     
     // Hack to make the underline use the same color as the text.
