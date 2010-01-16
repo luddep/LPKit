@@ -31,12 +31,13 @@
 var ENV = require("system").env,
     FILE = require("file"),
     task = require("jake").task,
+    CLEAN = require("jake/clean").CLEAN,
     FileList = require("jake").FileList,
     framework = require("cappuccino/jake").framework,
     configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug";
 
 framework ("LPKit", function(task)
-{
+{   
     task.setBuildIntermediatesPath(FILE.join("Build", "LPKit.build", configuration));
     task.setBuildPath(FILE.join("Build", configuration));
 
@@ -46,7 +47,7 @@ framework ("LPKit", function(task)
     task.setAuthor("Ludwig Pettersson");
     task.setEmail("luddep@gmail.com");
     task.setSummary("A collection of generic views, controls & utilities for Cappuccino.");
-    task.setSources(new FileList("**/*.j"));
+    task.setSources(new FileList("*.j"));
     task.setResources(new FileList("Resources/**/*"));
     task.setFlattensSources(true);
     task.setInfoPlistPath("Info.plist");
@@ -57,4 +58,6 @@ framework ("LPKit", function(task)
         task.setCompilerFlags("-O");
 });
 
-task ("default", ["LPKit"]);
+CLEAN.include(FILE.join("Build", "LPKit.build"));
+
+task ("default", ["LPKit", "clean"]);

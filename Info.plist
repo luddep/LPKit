@@ -10,7 +10,5 @@
 	<string>LPKit</string>
 	<key>CPBundlePackageType</key>
 	<string>FMWK</string>
-	<key>CPBundleVersion</key>
-	<string>0.1</string>
 </dict>
 </plist>
