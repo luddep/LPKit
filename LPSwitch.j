@@ -78,7 +78,7 @@
         [onBackgroundView setHitTests:NO];
         [self addSubview:onBackgroundView];
         
-        knob = [[LPSwitchKnob alloc] initWithFrame:CGRectMake(0,0,20,20)];
+        knob = [[LPSwitchKnob alloc] initWithFrame:CGRectMakeZero()];
         [self addSubview:knob];
         
         offLabel = [CPTextField labelWithTitle:@"Off"];
@@ -89,6 +89,11 @@
         
         animationDuration = 0.2;
         animationCurve = CPAnimationEaseOut;
+        
+        // Need to call layoutSubviews directly to make sure
+        // all theme attributes are set.
+        // TODO: FIX THIS.
+        [self layoutSubviews];
         
         [self setNeedsLayout];
     }
@@ -124,7 +129,7 @@
     {
         [knob setFrame:knobEndFrame];
         [onBackgroundView setFrame:onBackgroundEndFrame];
-        [offLabel setFrame:offLabelEndFrame]
+        [offLabel setFrame:offLabelEndFrame];
     }
 }
 
@@ -135,7 +140,7 @@
     
     isDragging = NO;
     
-    // If the drag started on top of the know, we highlight it
+    // If the drag started on top of the knob, we highlight it
     var startPointX = [knob convertPoint:dragStartPoint fromView:self].x;
     if (startPointX > 0 && startPointX < CGRectGetWidth([knob bounds]))
     {
