@@ -28,7 +28,6 @@
  * 
  */
 @import <Foundation/CPObject.j>
-@import <AppKit/CPPlatform.j>
 
 var sharedLocationControllerInstance = nil;
 
