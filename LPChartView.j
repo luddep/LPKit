@@ -52,7 +52,7 @@ var labelViewHeight = 20,
     CGSize _currentSize;
 }
 
-- (void)initWithFrame:(CGRect)aFrame
+- (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
     {
@@ -328,7 +328,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     CPColor gridColor @accessors;
 }
 
-- (void)initWithFrame:(CGRect)aFrame
+- (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
     {
