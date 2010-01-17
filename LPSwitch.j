@@ -102,10 +102,16 @@
 
 - (void)setOn:(BOOL)shouldSetOn animated:(BOOL)shouldAnimate
 {
+   [self setOn:shouldSetOn animated:shouldAnimate sendAction:YES];
+}
+
+- (void)setOn:(BOOL)shouldSetOn animated:(BOOL)shouldAnimate sendAction:(BOOL)shouldSendAction
+{
     on = shouldSetOn;
     
     // Send action
-    [self sendAction:_action to:_target];
+    if (shouldSendAction)
+        [self sendAction:_action to:_target];
     
     var knobMinY = CGRectGetMinY([knob frame]),
         knobEndFrame = CGRectMake((on) ? [knob maxX] : [knob minX], knobMinY, CGRectGetWidth([knob frame]), CGRectGetHeight([knob frame])),
