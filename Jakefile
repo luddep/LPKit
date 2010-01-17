@@ -46,7 +46,7 @@ framework ("LPKit", function(task)
     task.setVersion("0.1");
     task.setAuthor("Ludwig Pettersson");
     task.setEmail("luddep@gmail.com");
-    task.setSummary("A collection of generic views, controls & utilities for Cappuccino.");
+    task.setSummary("A collection of re-usable views, controls & utilities for Cappuccino.");
     task.setSources(new FileList("*.j"));
     task.setResources(new FileList("Resources/**/*"));
     task.setFlattensSources(true);
