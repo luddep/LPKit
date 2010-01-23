@@ -67,13 +67,15 @@
 
 - (void)setDrawView:(id)aDrawView
 {
+    var _newDrawView = [CPKeyedUnarchiver unarchiveObjectWithData:[CPKeyedArchiver archivedDataWithRootObject:aDrawView]];
+    
     if (!drawView)
-        [self addSubview:aDrawView];
+        [self addSubview:_newDrawView];
     else
-        [self replaceSubview:drawView with:aDrawView];
+        [self replaceSubview:drawView with:_newDrawView];
     
     // Got a new drawView
-    drawView = aDrawView;
+    drawView = _newDrawView;
     
     // Update drawView frame & autoresizingmask
     [drawView setFrame:[self bounds]];
