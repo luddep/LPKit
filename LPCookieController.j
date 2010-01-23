@@ -69,8 +69,7 @@ var sharedCookieControllerInstance = nil;
     // Add path
     cookieString += [CPString stringWithFormat:@"path=%s", (aPath) ? aPath : @"/"]
     
-    //console.log(cookieString)
-    
+    // Set the cookie
     document.cookie = cookieString;
 }
 
