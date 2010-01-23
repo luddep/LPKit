@@ -106,9 +106,6 @@ LPAnchorButtonHoverUnderline  = 2;
         _DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
     }
     
-    // Hack to make the underline use the same color as the text.
-    self._DOMElement.style.setProperty(@"color", [[self currentValueForThemeAttribute:@"text-color"] cssString], null);
-    
     var themeState = [self themeState],
         cssTextDecoration = @"none";
     
@@ -119,8 +116,20 @@ LPAnchorButtonHoverUnderline  = 2;
         cssTextDecoration = @"underline";
     }
     
-    // Set it
-    self._DOMElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+    var contentView = [self layoutEphemeralSubviewNamed:@"content-view"
+                                             positioned:CPWindowAbove
+                        relativeToEphemeralSubviewNamed:@"bezel-view"];
+    
+    
+    // Call directly to make sure the contentview creates its DOM elements
+    [contentView layoutSubviews];
+    
+    // Update DOM elements
+    if (contentView._DOMTextElement)
+        contentView._DOMTextElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+    
+    if (contentView._DOMTextShadowElement)
+        contentView._DOMTextShadowElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
 }
 
 @end
