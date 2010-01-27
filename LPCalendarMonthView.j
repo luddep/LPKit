@@ -3,21 +3,21 @@
  * LPKit
  *
  * Created by Ludwig Pettersson on September 21, 2009.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2009 Ludwig Pettersson
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
 var immutableDistantFuture = [CPDate distantFuture];
@@ -59,21 +59,21 @@ var _startAndEndOfWeekCache = {};
     CPDate previousMonth @accessors(readonly);
     CPDate nextMonth @accessors(readonly);
     BOOL _dataIsDirty;
-    
+
     BOOL allowsMultipleSelection @accessors;
     int startSelectionIndex;
     int currentSelectionIndex;
     id selectionLengthType @accessors;
     CPArray selection;
-    
+
     BOOL highlightCurrentPeriod @accessors;
-    
+
     BOOL weekStartsOnMonday @accessors;
-    
+
     id _delegate @accessors(property=delegate);
-    
+
     LPCalendarView calendarView @accessors;
-    
+
     CPArray hiddenRows @accessors;
 }
 
@@ -93,16 +93,16 @@ var _startAndEndOfWeekCache = {};
     if (self = [super initWithFrame:aFrame])
     {
         calendarView = aCalendarView;
-        
+
         selectionLengthType = LPCalendarDayLength;
         selection = [CPArray array];
-        
+
         weekStartsOnMonday = YES;
-        
+
         hiddenRows = [];
-        
+
         //[self setValue:[CPColor colorWithWhite:0.8 alpha:1] forThemeAttribute:@"grid-color" inState:CPThemeStateNormal];
-        
+
         // Create tiles
         for (var i = 0; i < 42; i++)
             [self addSubview:[LPCalendarDayView dayViewWithCalendarView:aCalendarView]];
@@ -111,16 +111,16 @@ var _startAndEndOfWeekCache = {};
 
         // [self setNeedsDisplay:YES];
         /*
-            Bugfix: if loaded from a CIB, the grid lines drawn by drawRect are not rendered until the first 
+            Bugfix: if loaded from a CIB, the grid lines drawn by drawRect are not rendered until the first
             resize because drawRect is not called. Strangely enough, calling [self setNeedsDisplay:YES] does
             not help either. The workaround is to force an initial call to display.
-            
+
             Also, we must check for the absence of a _DOMElement since theme building won't work otherwise.
-            During theme building there are no _DOMElements and the build process would error out with a 
+            During theme building there are no _DOMElements and the build process would error out with a
             ReferenceError: Can't find variable: _DOMElement if display was called.
         */
         if ('_DOMElement' in self)
-            [self display];  
+            [self display];
     }
     return self;
 }
@@ -134,18 +134,18 @@ var _startAndEndOfWeekCache = {};
 {
     // Make a copy of the date
     date = new Date(aDate);
-    
+
     if (![aDate isEqualToDate:immutableDistantFuture])
     {
-    
+
         // Reset the date to the first day of the month & midnight
         date.setDate(1);
         [date resetToMidnight];
-    
+
         // There must be a better way to do this.
         _firstDay = new Date(date);
         _firstDay.setDate(1);
-    
+
         previousMonth = new Date(_firstDay.getTime() - 86400000);
         nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
     }
@@ -155,7 +155,7 @@ var _startAndEndOfWeekCache = {};
 - (void)tileSize
 {
     var bounds = [self bounds];
-    
+
     // I need pixel level precision
     if (CGRectGetWidth(bounds) == 195)
         return CGSizeMake(28, 22);
@@ -166,7 +166,7 @@ var _startAndEndOfWeekCache = {};
 - (int)startOfWeekForDate:(CPDate)aDate
 {
     var day = aDate.getDay();
-    
+
     if (weekStartsOnMonday)
     {
         if (day == 0)
@@ -174,23 +174,23 @@ var _startAndEndOfWeekCache = {};
         else if(day > 0)
             day -= 1
     }
-    
+
     return day;
 }
 
 - (CPArray)startAndEndOfWeekForDate:(CPDate)aDate
 {
     _cached = _startAndEndOfWeekCache[aDate.toString()];
-    
+
     if (_cached)
         return _cached;
-    
+
     var startOfWeek = new Date(aDate.getTime() - ([self startOfWeekForDate:aDate] * 86400000)),
         endOfWeek = new Date(startOfWeek.getTime() + (6 * 86400000));
-    
+
     // Cache it
     _startAndEndOfWeekCache[aDate.toString()] = [startOfWeek, endOfWeek];
-    
+
     return [startOfWeek, endOfWeek];
 }
 
@@ -198,19 +198,19 @@ var _startAndEndOfWeekCache = {};
 {
     var currentPeriod = [CPDate date];
     [currentPeriod resetToMidnight];
-    
+
     if (selectionLengthType === LPCalendarDayLength)
         return (currentPeriod.getDate() === aDate.getDate() &&
                 currentPeriod.getMonth() === aDate.getMonth() &&
                 currentPeriod.getFullYear() === aDate.getFullYear());
-    
+
     if (selectionLengthType === LPCalendarWeekLength)
     {
         var startAndEnd = [self startAndEndOfWeekForDate:currentPeriod];
-        
+
         return (([startAndEnd objectAtIndex:0] <= aDate) && ([startAndEnd objectAtIndex:1] >= aDate));
     }
-    
+
     return NO;
 }
 
@@ -235,30 +235,30 @@ var _startAndEndOfWeekCache = {};
     for (var weekIndex = 0; weekIndex < 6; weekIndex++)
     {
         var isHidden = [hiddenRows indexOfObject:weekIndex] > -1;
-        
+
         for (var dayIndex = 0; dayIndex < 7; dayIndex++)
         {
             var dayTile = tiles[tileIndex];
-            
+
             // Increment to next day
             currentDate.setTime(currentDate.getTime() + 90000000);
             [currentDate resetToMidnight];
-            
+
             [dayTile setHidden:isHidden];
-            
+
             if (!isHidden)
             {
                 [dayTile setIsFillerTile:(entireMonthIsFiller) ? YES : currentDate.getMonth() != currentMonth.getMonth()];
                 [dayTile setDate:currentDate];
-            
+
                 if (!entireMonthIsFiller)
                     [dayTile setHighlighted:[self dateIsWithinCurrentPeriod:currentDate]];
             }
-            
+
             tileIndex += 1;
         }
     }
-    
+
     // TODO: Should hiddenrows really be reset here?
     hiddenRows = [];
 }
@@ -268,7 +268,7 @@ var _startAndEndOfWeekCache = {};
     var tiles = [self subviews],
         tileSize = [self tileSize],
         tileIndex = 0;
-    
+
     if ([tiles count] > 0)
     {
         for (var weekIndex = 0; weekIndex < 6; weekIndex++)
@@ -277,7 +277,7 @@ var _startAndEndOfWeekCache = {};
             {
                 // CGRectInset() mucks up the frame for some reason.
                 var tileFrame = CGRectMake((dayIndex * tileSize.width), weekIndex * tileSize.height + 1, tileSize.width - 1, tileSize.height -1);
-            
+
                 [[tiles objectAtIndex:tileIndex] setFrame:tileFrame];
                 tileIndex += 1;
             }
@@ -298,29 +298,29 @@ var _startAndEndOfWeekCache = {};
 - (int)indexOfTileAtPoint:(CGPoint)aPoint
 {
     var tileSize = [self tileSize];
-    
+
     // Get the week row
     var rowIndex = FLOOR(aPoint.y / tileSize.height),
         columnIndex = FLOOR(aPoint.x / tileSize.width);
-    
+
     // Limit the column index, there are only 7
     if (columnIndex > 6)
         columnIndex = 6;
     else if (columnIndex < 0)
         columnIndex = 0;
-    
+
     // Limit the row index, there are only 6
     if (rowIndex > 5)
         rowIndex = 5;
     else if (rowIndex < 0)
         rowIndex = 0;
-    
+
     var tileIndex = (rowIndex * 7) + columnIndex;
-    
+
     // There are only 42 tiles
     if (tileIndex > 41)
         return 41;
-    
+
     return tileIndex;
 }
 
@@ -329,7 +329,7 @@ var _startAndEndOfWeekCache = {};
     var locationInView = [self locationInViewForEvent:anEvent],
         tileIndex = [self indexOfTileAtPoint:locationInView],
         tile = [[self subviews] objectAtIndex:tileIndex];
-    
+
     startSelectionIndex = tileIndex;
     [self makeSelectionWithIndex:startSelectionIndex end:nil];
 }
@@ -338,15 +338,15 @@ var _startAndEndOfWeekCache = {};
 {
     var locationInView = [self locationInViewForEvent:anEvent],
         tileIndex = [self indexOfTileAtPoint:locationInView];
-    
+
     if (currentSelectionIndex == tileIndex)
         return;
-    
+
     currentSelectionIndex = tileIndex;
-    
+
     if (!allowsMultipleSelection)
         startSelectionIndex = currentSelectionIndex;
-    
+
     [self makeSelectionWithIndex:startSelectionIndex end:currentSelectionIndex];
 }
 
@@ -363,15 +363,15 @@ var _startAndEndOfWeekCache = {};
         // Clicked within the current month
         //if (tileMonth == date.getMonth())
         //    console.log('same month')
-        
+
         // Clicked the Previous month
         if (tileMonth == previousMonth.getMonth())
             [calendarView changeToMonth:previousMonth];
-        
+
         // Clicked the Next month
         if (tileMonth == nextMonth.getMonth())
             [calendarView changeToMonth:nextMonth];
-        
+
     }
     // Made a selection
     else
@@ -382,15 +382,15 @@ var _startAndEndOfWeekCache = {};
 {
     if (!allowsMultipleSelection)
         anEndDate = nil;
-    
+
     if (selectionLengthType === LPCalendarWeekLength)
     {
         var startAndEnd = [self startAndEndOfWeekForDate:aStartDate];
-        
+
         aStartDate = startAndEnd[0];
         anEndDate = startAndEnd[1];
     }
-    
+
     // Replace hours / minutes / seconds
     var _dates = [aStartDate, anEndDate];
     for (var i = 0; i < 2; i++)
@@ -398,20 +398,20 @@ var _startAndEndOfWeekCache = {};
         if (_dates[i])
             [_dates[i] resetToMidnight];
     }
-    
+
     // Swap the dates if startDate is bigger than endDate
     if (aStartDate > anEndDate && anEndDate != nil)
     {
         // Make a copy of startDate
         var _aStartDateCopy = aStartDate;
-        
+
         aStartDate = anEndDate;
         anEndDate = _aStartDateCopy;
     }
-    
+
     // Reset selection data
     [selection removeAllObjects];
-    
+
     var tiles = [self subviews],
         tilesCount = [tiles count];
 
@@ -421,7 +421,7 @@ var _startAndEndOfWeekCache = {};
             tileDate = [tile date];
 
         [tileDate resetToMidnight];
-        
+
         if (aStartDate && ((tileDate >= aStartDate && tileDate <= anEndDate) || tileDate.getTime() == aStartDate.getTime()))
         {
             [selection addObject:[tile date]];
@@ -430,7 +430,7 @@ var _startAndEndOfWeekCache = {};
         else
             [tile setSelected:NO];
     }
-    
+
     if ([selection count] > 0 && [_delegate respondsToSelector:@selector(didMakeSelection:)])
         [_delegate didMakeSelection:selection];
 }
@@ -438,7 +438,7 @@ var _startAndEndOfWeekCache = {};
 - (void)makeSelectionWithIndex:(int)aStartIndex end:(int)anEndIndex
 {
     var tiles = [self subviews];
-    
+
     [self makeSelectionWithDate:(aStartIndex > -1) ? [[tiles objectAtIndex:aStartIndex] date] : nil
                             end:(anEndIndex > -1) ? [[tiles objectAtIndex:anEndIndex] date] : nil];
 }
@@ -450,9 +450,9 @@ var _startAndEndOfWeekCache = {};
         width = CGRectGetWidth(bounds),
         height = CGRectGetHeight(bounds),
         tileSize = [self tileSize];
-    
+
     CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
-    
+
     // Horizontal lines
     for (var i = 0; i < 6; i++)
         CGContextFillRect(context, CGRectMake(0, i * tileSize.height, width, 1));
@@ -472,7 +472,7 @@ var _startAndEndOfWeekCache = {};
     BOOL isFillerTile @accessors;
     BOOL isSelected @accessors(setter=setSelected:);
     BOOL isHighlighted @accessors(setter=setHighlighted:);
-    
+
     LPCalendarView calendarView @accessors;
 }
 
@@ -500,10 +500,10 @@ var _startAndEndOfWeekCache = {};
     {
         [self setHitTests:NO];
         date = [CPDate date];
-        
+
         textField = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
         [textField setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin | CPViewMinYMargin | CPViewMaxYMargin];
-    
+
         //[self setIsFillerTile:NO];
         [self addSubview:textField];
     }
@@ -514,9 +514,9 @@ var _startAndEndOfWeekCache = {};
 {
     if (isSelected == shouldBeSelected)
         return;
-    
+
     isSelected = shouldBeSelected;
-    
+
     if (shouldBeSelected)
         [self setThemeState:CPThemeStateSelected];
     else
@@ -527,9 +527,9 @@ var _startAndEndOfWeekCache = {};
 {
     if (isFillerTile == shouldBeFillerTile)
         return;
-    
+
     isFillerTile = shouldBeFillerTile;
-    
+
     if (isFillerTile)
         [self setThemeState:CPThemeStateDisabled];
     else
@@ -540,7 +540,7 @@ var _startAndEndOfWeekCache = {};
 {
     if (isHighlighted == shouldBeHighlighted)
         return;
-    
+
     isHighlighted = shouldBeHighlighted;
 
     if (shouldBeHighlighted)
@@ -553,11 +553,11 @@ var _startAndEndOfWeekCache = {};
 {
     // Update date
     date.setTime(aDate.getTime());
-    
+
     // Update & Position the new label
     [textField setStringValue:[date.getDate() stringValue]];
     [textField sizeToFit];
-    
+
     var bounds = [self bounds];
     [textField setCenter:CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds))];
 }
@@ -565,7 +565,7 @@ var _startAndEndOfWeekCache = {};
 - (void)layoutSubviews
 {
     [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:[self themeState]]]
-    
+
     [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:[self themeState]]];
     [textField setTextColor:[calendarView valueForThemeAttribute:@"tile-text-color" inState:[self themeState]]];
     [textField setTextShadowColor:[calendarView valueForThemeAttribute:@"tile-text-shadow-color" inState:[self themeState]]];
