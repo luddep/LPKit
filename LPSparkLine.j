@@ -27,8 +27,12 @@
  * THE SOFTWARE.
  * 
  */
-
 @import <Foundation/CPObject.j>
+
+/*
+    TODO: replace this with a wrapper around
+    LPChartView & a simple draw view.
+*/
 
 @implementation LPSparkLine : CPView
 {
@@ -56,20 +60,23 @@
     } 
 
     return self; 
-} 
+}
+
+- (void)setLineInset:(CGInset)anInset
+{
+    lineInset = anInset;
+    [self setNeedsDisplay:YES];
+}
 
 - (void)drawRect:(CPRect)aRect
 {
     var context = [[CPGraphicsContext currentContext] graphicsPort],
         bounds = [self bounds],
-        height = CGRectGetHeight(bounds) - 2,
+        height = CGRectGetHeight(bounds) - (2 * lineWeight),
         tickWidth = CGRectGetWidth(bounds) / ([data count] - 1),
         maxValue = Math.max.apply(Math, data);
 
     CGContextBeginPath(context);
-    
-    var x,
-        y;
     
     // Just draw a single line in the middle if it's empty
     if (isEmpty)
@@ -82,8 +89,8 @@
         // Draw the path
         for (var i = 0; i < [data count]; i++)
         {
-            x = i * tickWidth;
-            y = 2 + (height - (([data objectAtIndex:i] / maxValue) * height));
+            var x = i * tickWidth,
+                y = lineWeight + (height - (([data objectAtIndex:i] / maxValue) * height));
         
             if (i === 0)
                 CGContextMoveToPoint(context, 0, y);
