@@ -29,10 +29,16 @@
  */
 @import <AppKit/CPAnimation.j>
 
+LPViewAnimationUpdateXMask = 1;
+LPViewAnimationUpdateYMask = 2;
+ 
+
+
 @implementation LPViewAnimation : CPAnimation
 {
     CPArray views;
     CPArray properties;
+    id kindMask @accessors;
 }
 
 - (id)initWithDuration:(float)aDuration animationCurve:(id)anAnimationCurve
@@ -41,6 +47,7 @@
     {   
         views = [CPArray array];
         properties = [CPArray array];
+        kindMask = LPViewAnimationUpdateXMask | LPViewAnimationUpdateYMask;
     }
     return self;
 }
@@ -62,20 +69,39 @@
     progress = [self currentValue];
  
     for (var i = 0; i < views.length; i++)
-    {
+    {   
         var property = properties[i],
             start = property['start'],
             end = property['end'];
         
-        [views[i] setFrame:CGRectMake((progress * (end.origin.x - start.origin.x)) + start.origin.x, (progress * (end.origin.y - start.origin.y)) + start.origin.y,
-                                      (progress * (end.size.width - start.size.width)) + start.size.width, (progress * (end.size.height - start.size.height)) + start.size.height)];
+        
+        [self setFrame:CGRectMake((progress * (end.origin.x - start.origin.x)) + start.origin.x, (progress * (end.origin.y - start.origin.y)) + start.origin.y,
+                                  (progress * (end.size.width - start.size.width)) + start.size.width, (progress * (end.size.height - start.size.height)) + start.size.height)
+               forView:views[i]];
     }
+}
+
+- (void)setFrame:(CGRect)aFrame forView:(id)aView
+{
+    if (!(kindMask & LPViewAnimationUpdateXMask))
+    {
+        aFrame.origin.x = aView._frame.origin.x;
+        aFrame.size.width = aView._frame.size.width;
+    }
+    
+    if (!(kindMask & LPViewAnimationUpdateYMask))
+    {
+        aFrame.origin.y = aView._frame.origin.y;
+        aFrame.size.height = aView._frame.size.height;
+    }
+    
+    [aView setFrame:aFrame];
 }
 
 - (void)startAnimation
 {
     for (var i = 0; i < views.length; i++)
-        [views[i] setFrame:properties[i]['start']];
+        [self setFrame:properties[i]['start'] forView:views[i]];
     
     [super startAnimation];
 }
