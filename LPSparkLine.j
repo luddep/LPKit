@@ -62,12 +62,6 @@
     return self; 
 }
 
-- (void)setLineInset:(CGInset)anInset
-{
-    lineInset = anInset;
-    [self setNeedsDisplay:YES];
-}
-
 - (void)drawRect:(CPRect)aRect
 {
     var context = [[CPGraphicsContext currentContext] graphicsPort],
