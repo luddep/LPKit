@@ -415,7 +415,7 @@ var _startAndEndOfWeekCache = {};
 
         if (aStartDate && ((tileDate >= aStartDate && tileDate <= anEndDate) || tileDate.getTime() == aStartDate.getTime()))
         {
-            [selection addObject:[tile date]];
+            [selection addObject:[[tile date] copy]];
             [tile setSelected:YES];
         }
         else
