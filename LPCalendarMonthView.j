@@ -120,7 +120,7 @@ var _startAndEndOfWeekCache = {};
 - (void)setDate:(CPDate)aDate
 {
     // Make a copy of the date
-    date = new Date(aDate);
+    date = [aDate copy];
 
     if (![aDate isEqualToDate:immutableDistantFuture])
     {
@@ -130,7 +130,7 @@ var _startAndEndOfWeekCache = {};
         [date resetToMidnight];
 
         // There must be a better way to do this.
-        _firstDay = new Date(date);
+        _firstDay = [date copy];
         _firstDay.setDate(1);
 
         previousMonth = new Date(_firstDay.getTime() - 86400000);
@@ -367,6 +367,10 @@ var _startAndEndOfWeekCache = {};
 
 - (void)makeSelectionWithDate:(CPDate)aStartDate end:(CPDate)anEndDate
 {
+    // Avoid having the manipulation below affect the original instance.
+    aStartDate = [aStartDate copy];
+    anEndDate = [anEndDate copy];
+
     if (!allowsMultipleSelection)
         anEndDate = nil;
 
