@@ -103,6 +103,12 @@
     return self;
 }
 
+- (void)selectDate:(CPDate)aDate
+{
+    [self setMonth:aDate];
+    [self makeSelectionWithDate:aDate end:aDate];
+}
+
 - (void)setMonth:(CPDate)aMonth
 {
     [currentMonthView setDate:aMonth]
