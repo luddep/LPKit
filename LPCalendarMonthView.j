@@ -371,8 +371,8 @@ var _startAndEndOfWeekCache = {};
     aStartDate = [aStartDate copy];
     anEndDate = [anEndDate copy];
 
-    if (!allowsMultipleSelection)
-        anEndDate = nil;
+    if (!allowsMultipleSelection || anEndDate === nil)
+        anEndDate = aStartDate;
 
     if (selectionLengthType === LPCalendarWeekLength)
     {
@@ -391,7 +391,7 @@ var _startAndEndOfWeekCache = {};
     }
 
     // Swap the dates if startDate is bigger than endDate
-    if (aStartDate > anEndDate && anEndDate != nil)
+    if (aStartDate > anEndDate)
     {
         // Make a copy of startDate
         var _aStartDateCopy = aStartDate;
@@ -413,7 +413,7 @@ var _startAndEndOfWeekCache = {};
 
         [tileDate resetToMidnight];
 
-        if (aStartDate && ((tileDate >= aStartDate && tileDate <= anEndDate) || tileDate.getTime() == aStartDate.getTime()))
+        if (aStartDate && tileDate >= aStartDate && tileDate <= anEndDate)
         {
             [selection addObject:[[tile date] copy]];
             [tile setSelected:YES];
