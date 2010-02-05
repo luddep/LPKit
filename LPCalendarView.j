@@ -3,21 +3,21 @@
  * LPKit
  *
  * Created by Ludwig Pettersson on September 21, 2009.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2009 Ludwig Pettersson
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
 
@@ -40,10 +40,10 @@
     id headerView @accessors(readonly);
     id slideView;
     id currentMonthView;
-    
+
     id firstMonthView;
     id secondMonthView;
-    
+
     CPArray fullSelection @accessors(readonly);
     id _delegate @accessors(property=delegate);
 }
@@ -66,9 +66,9 @@
     if (self = [super initWithFrame:aFrame])
     {
         fullSelection = [nil, nil];
-        
+
         var bounds = [self bounds];
-        
+
         headerView = [[LPCalendarHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(bounds), 40)];
         [[headerView prevButton] setTarget:self];
         [[headerView prevButton] setAction:@selector(didClickPrevButton:)];
@@ -76,7 +76,7 @@
         [[headerView nextButton] setAction:@selector(didClickNextButton:)];
         [headerView setAutoresizingMask:CPViewWidthSizable];
         [self addSubview:headerView];
-        
+
         slideView = [[LPSlideView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([headerView bounds]), CGRectGetWidth(bounds), CGRectGetHeight(bounds) - CGRectGetHeight([headerView bounds]))];
         [slideView setSlideDirection:LPSlideViewVerticalDirection];
         [slideView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable | CPViewMinYMargin];
@@ -84,7 +84,7 @@
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
-        
+
         firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [firstMonthView setDelegate:self];
         [slideView addSubview:firstMonthView];
@@ -93,11 +93,11 @@
         [secondMonthView setDelegate:self];
         [slideView addSubview:secondMonthView];
 
-        currentMonthView = firstMonthView;        
+        currentMonthView = firstMonthView;
 
         // Default to today's date.
         [self setMonth:[CPDate date]];
-                
+
         [self setNeedsLayout];
     }
     return self;
@@ -124,14 +124,14 @@
 }
 
 - (void)changeToMonth:(CPDate)aMonth
-{   
+{
     // Get the month view to slide to
     var slideToView = [self monthViewForMonth:aMonth],
         slideFromView = currentMonthView;
-    
+
     var direction,
         startDelta;
-    
+
     // Moving to a previous month
     if ([currentMonthView date].getTime() > aMonth.getTime())
     {
@@ -146,15 +146,15 @@
         startDelta = 0.34;
         [slideFromView setHiddenRows:[4,5]];
     }
-    
+
     // Set the previous months tiles as fillers, to make it look a bit better.
     [slideFromView setAllTilesAsFiller];
-    
+
     // new current view
     currentMonthView = slideToView;
-    
+
     [headerView setDate:aMonth];
-    
+
     setTimeout(function(){
         [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
     }, 1);
@@ -208,7 +208,7 @@
 - (void)didMakeSelection:(CPArray)aSelection
 {
     fullSelection = [CPArray arrayWithArray:aSelection];
-    
+
     if ([fullSelection count] <= 1)
         [fullSelection addObject:nil];
 
