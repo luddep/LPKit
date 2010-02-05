@@ -192,11 +192,17 @@
 
 - (void)didClickPrevButton:(id)sender
 {
+    // We can only slide one month in at a time.
+    if ([slideView isSliding])
+        return;
     [self changeToMonth:[currentMonthView previousMonth]];
 }
 
 - (void)didClickNextButton:(id)sender
 {
+    // We can only slide one month in at a time.
+    if ([slideView isSliding])
+        return;
     [self changeToMonth:[currentMonthView nextMonth]];
 }
 
