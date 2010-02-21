@@ -53,6 +53,9 @@ var sharedErrorLoggerInstance = nil;
 {
     if ([self shouldInterceptException])
     {
+        if (_exception)
+            return;
+        
         _exception = anException;
         
         var alert = [[CPAlert alloc] init];
