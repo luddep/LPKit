@@ -65,7 +65,10 @@ var sharedErrorLoggerInstance = nil;
         [alert runModal];
     }
     else
+    {
+        shouldCatchExceptions = NO;
         [anException raise];
+    }
 }
 
 - (BOOL)shouldInterceptException
@@ -222,12 +225,17 @@ var sharedErrorLoggerInstance = nil;
     Let the monkey patching begin
 */
 
-original_objj_msgSend = objj_msgSend;
+var original_objj_msgSend = objj_msgSend,
+    shouldCatchExceptions = YES;
+
 objj_msgSend = function()
 {
+    if (!shouldCatchExceptions)
+        return original_objj_msgSend.apply(this, arguments);
+    
     try
     {
-        return original_objj_msgSend.apply(this, arguments)
+        return original_objj_msgSend.apply(this, arguments);
     }
     catch (anException)
     {
