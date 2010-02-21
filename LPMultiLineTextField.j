@@ -42,12 +42,12 @@ var CPTextFieldInputOwner = nil;
     if (self = [super initWithFrame:aFrame])
     {
         _DOMTextareaElement = document.createElement("textarea");
-        _DOMTextareaElement.style.position = "absolute";
-        _DOMTextareaElement.style.background = "none";
-        _DOMTextareaElement.style.border = "0";
-        _DOMTextareaElement.style.outline = "0";
-        _DOMTextareaElement.style.zIndex = "100";
-        _DOMTextareaElement.style.resize = "none";
+        _DOMTextareaElement.style.position = @"absolute";
+        _DOMTextareaElement.style.background = @"none";
+        _DOMTextareaElement.style.border = @"0";
+        _DOMTextareaElement.style.outline = @"0";
+        _DOMTextareaElement.style.zIndex = @"100";
+        _DOMTextareaElement.style.resize = @"none";
         
         _DOMTextareaElement.onblur = function(){
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
@@ -57,6 +57,13 @@ var CPTextFieldInputOwner = nil;
         self._DOMElement.appendChild(_DOMTextareaElement);
     }
     return self;
+}
+
+- (void)setEditable:(BOOL)shouldBeEditable
+{
+    [super setEditable:shouldBeEditable];
+    
+    _DOMTextareaElement.style.cursor = shouldBeEditable ? @"cursor" : @"default";
 }
 
 - (void)layoutSubviews
@@ -78,6 +85,14 @@ var CPTextFieldInputOwner = nil;
     _DOMTextareaElement.style.right = contentInset.right / 2 + @"px";
     
     _DOMTextareaElement.value = _stringValue || @"";
+}
+
+- (void)mouseDown:(CPEvent)anEvent
+{
+    if ([self isEditable] && [self isEnabled])
+        [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
+    else
+        [super mouseDown:anEvent];
 }
 
 - (void)keyDown:(CPEvent)anEvent
