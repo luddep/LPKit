@@ -169,7 +169,7 @@ var sharedErrorLoggerInstance = nil;
         [contentView addSubview:descriptionTextField];
         
         sendButton = [CPButton buttonWithTitle:[CPString stringWithFormat:@"Send to %@", applicationName]];
-        [sendButton setFrameOrigin:CGPointMake(333,270)];
+        [sendButton setFrameOrigin:CGPointMake(CGRectGetWidth(aContentRect) - CGRectGetWidth([sendButton frame]) - 15, 270)];
         [sendButton setAutoresizingMask:CPViewMinXMargin | CPViewMinYMargin];
         [sendButton setTarget:self];
         [sendButton setAction:@selector(didClickSendButton:)];
