@@ -1,5 +1,5 @@
 /*
- * LPErrorLogger.j
+ * LPCrashReporter.j
  * LPKit
  *
  * Created by Ludwig Pettersson on February 19, 2010.
@@ -36,7 +36,7 @@
 var sharedErrorLoggerInstance = nil;
 
 
-@implementation LPErrorLogger : CPObject
+@implementation LPCrashReporter : CPObject
 {
     CPException _exception @accessors(property=exception);
 }
@@ -44,7 +44,7 @@ var sharedErrorLoggerInstance = nil;
 + (id)sharedErrorLogger
 {
     if (!sharedErrorLoggerInstance)
-        sharedErrorLoggerInstance = [[LPErrorLogger alloc] init];
+        sharedErrorLoggerInstance = [[LPCrashReporter alloc] init];
     
     return sharedErrorLoggerInstance;
 }
@@ -124,7 +124,7 @@ var sharedErrorLoggerInstance = nil;
         [contentView addSubview:informationLabel];
         
         var informationTextValue = [CPString stringWithFormat:@"User-Agent: %@\n\nException: %@",
-                                                              navigator.userAgent, [[LPErrorLogger sharedErrorLogger] exception]];
+                                                              navigator.userAgent, [[LPCrashReporter sharedErrorLogger] exception]];
         informationTextField = [LPMultiLineTextField textFieldWithStringValue:informationTextValue placeholder:@"" width:0];
         [informationTextField setEditable:NO];
         [informationTextField setFrame:CGRectMake(12, 31, CGRectGetWidth(aContentRect) - 24, 100)];
@@ -184,7 +184,7 @@ var sharedErrorLoggerInstance = nil;
     
     var loggingURL = [CPURL URLWithString:[[CPBundle mainBundle] objectForInfoDictionaryKey:@"LPCrashReporterLoggingURL"] || @"/"],
         request = [LPURLPostRequest requestWithURL:loggingURL],
-        exception = [[LPErrorLogger sharedErrorLogger] exception],
+        exception = [[LPCrashReporter sharedErrorLogger] exception],
         content = {'name': [exception name], 'reason': [exception reason],
                    'userAgent': navigator.userAgent, 'description': [descriptionTextField stringValue]};
 
@@ -196,7 +196,7 @@ var sharedErrorLoggerInstance = nil;
 {
     // Make the behaviour the same as if you click reload
     // on the initial alert.
-    [[LPErrorLogger sharedErrorLogger] alertDidEnd:nil returnCode:0];
+    [[LPCrashReporter sharedErrorLogger] alertDidEnd:nil returnCode:0];
 }
 
 /*
@@ -209,7 +209,7 @@ var sharedErrorLoggerInstance = nil;
     [self orderOut:nil];
     
     var alert = [[CPAlert alloc] init];
-    [alert setDelegate:[LPErrorLogger sharedErrorLogger]];
+    [alert setDelegate:[LPCrashReporter sharedErrorLogger]];
     [alert setAlertStyle:CPInformationalAlertStyle];
     [alert addButtonWithTitle:@"Thanks!"];
     [alert setMessageText:@"Your report has been sent."];
@@ -229,7 +229,7 @@ var sharedErrorLoggerInstance = nil;
     }
     catch (anException)
     {
-        [[LPErrorLogger sharedErrorLogger] didCatchException:anException];
+        [[LPCrashReporter sharedErrorLogger] didCatchException:anException];
     }
 }
 
