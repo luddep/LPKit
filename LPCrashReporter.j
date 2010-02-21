@@ -58,6 +58,10 @@ var sharedErrorLoggerInstance = nil;
         
         _exception = anException;
         
+        var overlayWindow = [[LPCrashReporterOverlayWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask];
+        [overlayWindow setLevel:CPFloatingWindowLevel];
+        [overlayWindow makeKeyAndOrderFront:nil];
+        
         var alert = [[CPAlert alloc] init];
         [alert setDelegate:self];
         [alert setAlertStyle:CPCriticalAlertStyle];
@@ -92,9 +96,6 @@ var sharedErrorLoggerInstance = nil;
                 break;
         
         case 1: // Send report
-                var overlayWindow = [[LPCrashReporterOverlayWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask];
-                [overlayWindow orderFront:nil];
-        
                 var reportWindow = [[LPCrashReporterReportWindow alloc] initWithContentRect:CGRectMake(0,0,460,309) styleMask:CPTitledWindowMask | CPResizableWindowMask];
                 [CPApp runModalForWindow:reportWindow];
                 break;
@@ -113,7 +114,7 @@ var sharedErrorLoggerInstance = nil;
 {
     if (self = [super initWithContentRect:aContentRect styleMask:aStyleMask])
     {
-        [[self contentView] setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.2]];
+        [[self contentView] setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.4]];
     }
     return self;
 }
@@ -142,6 +143,7 @@ var sharedErrorLoggerInstance = nil;
         var contentView = [self contentView],
             applicationName = [[CPBundle mainBundle] objectForInfoDictionaryKey:@"CPBundleName"];
         
+        [self setLevel:CPFloatingWindowLevel];
         [self setMinSize:aContentRect.size];
         [self setTitle:[CPString stringWithFormat:@"Problem Report for %@", applicationName]];
         
