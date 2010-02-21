@@ -218,19 +218,20 @@ var sharedErrorLoggerInstance = nil;
 
 @end
 
+/*
+    Let the monkey patching begin
+*/
 
-@implementation CPApplication (ErrorLogging)
-
-- (void)run
+original_objj_msgSend = objj_msgSend;
+objj_msgSend = function()
 {
     try
     {
-        [self finishLaunching];
+        return original_objj_msgSend.apply(this, arguments)
     }
     catch (anException)
     {
         [[LPCrashReporter sharedErrorLogger] didCatchException:anException];
+        return nil;
     }
 }
-
-@end
