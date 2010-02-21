@@ -92,10 +92,30 @@ var sharedErrorLoggerInstance = nil;
                 break;
         
         case 1: // Send report
+                var overlayWindow = [[LPCrashReporterOverlayWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask];
+                [overlayWindow orderFront:nil];
+        
                 var reportWindow = [[LPCrashReporterReportWindow alloc] initWithContentRect:CGRectMake(0,0,460,309) styleMask:CPTitledWindowMask | CPResizableWindowMask];
                 [CPApp runModalForWindow:reportWindow];
                 break;
     }
+}
+
+@end
+
+
+@implementation LPCrashReporterOverlayWindow : CPWindow
+{
+    
+}
+
+- (void)initWithContentRect:(CGRect)aContentRect styleMask:(id)aStyleMask
+{
+    if (self = [super initWithContentRect:aContentRect styleMask:aStyleMask])
+    {
+        [[self contentView] setBackgroundColor:[CPColor colorWithWhite:0 alpha:0.2]];
+    }
+    return self;
 }
 
 @end
