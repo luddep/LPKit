@@ -60,7 +60,6 @@
     content = [content substringToIndex:[content length] - 1];
 
     [self setHTTPBody:content];
-    //[self setValue:[[content length] stringValue] forHTTPHeaderField:@"Content-Length"]; 
 }
 
 @end
