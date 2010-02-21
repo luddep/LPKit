@@ -53,11 +53,8 @@
 {
     var content = @"";
     
-    // TODO: Does this work in Internet Explorer 6/7?
     for (key in anObject)
-    {
-        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, anObject[key]]];
-    }
+        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, escape(anObject[key])]];
     
     // Remove trailing &
     content = [content substringToIndex:[content length] - 1];
