@@ -59,7 +59,7 @@ var sharedErrorLoggerInstance = nil;
         _exception = anException;
         
         var overlayWindow = [[LPCrashReporterOverlayWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask];
-        [overlayWindow setLevel:CPFloatingWindowLevel];
+        [overlayWindow setLevel:CPNormalWindowLevel];
         [overlayWindow makeKeyAndOrderFront:nil];
         
         var alert = [[CPAlert alloc] init];
@@ -143,7 +143,6 @@ var sharedErrorLoggerInstance = nil;
         var contentView = [self contentView],
             applicationName = [[CPBundle mainBundle] objectForInfoDictionaryKey:@"CPBundleName"];
         
-        [self setLevel:CPFloatingWindowLevel];
         [self setMinSize:aContentRect.size];
         [self setTitle:[CPString stringWithFormat:@"Problem Report for %@", applicationName]];
         
