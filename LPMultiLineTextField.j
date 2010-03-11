@@ -36,10 +36,10 @@ var CPTextFieldInputOwner = nil;
     CPString oldValue;
     CPString _stringValue;
 }
- 
-- (id)initWithFrame:(CGRect)aFrame
+
+- (DOMElement)_DOMTextareaElement
 {
-    if (self = [super initWithFrame:aFrame])
+    if (!_DOMTextareaElement)
     {
         _DOMTextareaElement = document.createElement("textarea");
         _DOMTextareaElement.style.position = @"absolute";
@@ -56,6 +56,15 @@ var CPTextFieldInputOwner = nil;
         
         self._DOMElement.appendChild(_DOMTextareaElement);
     }
+    
+    return _DOMTextareaElement;
+}
+
+- (id)initWithFrame:(CGRect)aFrame
+{
+    if (self = [super initWithFrame:aFrame])
+    {
+    }
     return self;
 }
 
@@ -63,7 +72,7 @@ var CPTextFieldInputOwner = nil;
 {
     [super setEditable:shouldBeEditable];
     
-    _DOMTextareaElement.style.cursor = shouldBeEditable ? @"cursor" : @"default";
+    [self _DOMTextareaElement].style.cursor = shouldBeEditable ? @"cursor" : @"default";
 }
 
 - (void)layoutSubviews
@@ -75,16 +84,17 @@ var CPTextFieldInputOwner = nil;
                         relativeToEphemeralSubviewNamed:@"bezel-view"];
     [contentView setHidden:YES];
     
-    var contentInset = [self currentValueForThemeAttribute:@"content-inset"];
+    var DOMElement = [self _DOMTextareaElement],
+        contentInset = [self currentValueForThemeAttribute:@"content-inset"];
     
-    _DOMTextareaElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
-    _DOMTextareaElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
-    _DOMTextareaElement.style.top = contentInset.top / 2 + @"px";
-    _DOMTextareaElement.style.bottom = contentInset.bottom / 2 + @"px";
-    _DOMTextareaElement.style.left = contentInset.left / 2 + @"px";
-    _DOMTextareaElement.style.right = contentInset.right / 2 + @"px";
+    DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
+    DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
+    DOMElement.style.top = contentInset.top / 2 + @"px";
+    DOMElement.style.bottom = contentInset.bottom / 2 + @"px";
+    DOMElement.style.left = contentInset.left / 2 + @"px";
+    DOMElement.style.right = contentInset.right / 2 + @"px";
     
-    _DOMTextareaElement.value = _stringValue || @"";
+    DOMElement.value = _stringValue || @"";
 }
 
 - (void)mouseDown:(CPEvent)anEvent
