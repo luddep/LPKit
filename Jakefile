@@ -51,7 +51,7 @@ framework ("LPKit", function(task)
     task.setSummary("A collection of re-usable views, controls & utilities for Cappuccino.");
     task.setSources(new FileList("*.j"));
     task.setResources(new FileList("Resources/**/*"));
-    task.setEnvironments([browserEnvironment]);
+    //task.setEnvironments([browserEnvironment]);
     //task.setFlattensSources(true);
     task.setInfoPlistPath("Info.plist");
 
