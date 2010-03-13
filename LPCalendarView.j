@@ -136,15 +136,15 @@
     if ([currentMonthView date].getTime() > aMonth.getTime())
     {
         var direction = LPSlideViewPositiveDirection,
-            startDelta = 0.335;
-        [slideFromView setHiddenRows:[0,1]];
+            startDelta = 0.335,
+            hiddenRows = [0,1];
     }
     // Moving to a later month
     else
     {
         var direction = LPSlideViewNegativeDirection,
-            startDelta = 0.34;
-        [slideFromView setHiddenRows:[4,5]];
+            startDelta = 0.34,
+            hiddenRows = [4,5];
     }
 
     // new current view
@@ -152,7 +152,10 @@
 
     [headerView setDate:aMonth];
 
-    [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
+    setTimeout(function(){
+        [slideFromView setHiddenRows:hiddenRows];
+        [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
+    }, 1);
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)shouldAllowMultipleSelection
