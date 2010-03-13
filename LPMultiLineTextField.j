@@ -70,9 +70,8 @@ var CPTextFieldInputOwner = nil;
 
 - (void)setEditable:(BOOL)shouldBeEditable
 {
-    [super setEditable:shouldBeEditable];
-    
     [self _DOMTextareaElement].style.cursor = shouldBeEditable ? @"cursor" : @"default";
+    [super setEditable:shouldBeEditable];
 }
 
 - (void)layoutSubviews
@@ -127,14 +126,14 @@ var CPTextFieldInputOwner = nil;
 
 - (void)selectText:(id)sender
 {
-    _DOMTextareaElement.select();
+    [self _DOMTextareaElement].select();
 }
 
 - (void)keyUp:(CPEvent)anEvent
 {
     if (oldValue !== [self stringValue])
     {
-        _stringValue = _DOMTextareaElement.value;
+        _stringValue = [self _DOMTextareaElement].value;
         
         if (!_isEditing)
         {
@@ -155,7 +154,7 @@ var CPTextFieldInputOwner = nil;
     [self setThemeState:CPThemeStateEditing];
     
     setTimeout(function(){
-        _DOMTextareaElement.focus();
+        [self _DOMTextareaElement].focus();
         CPTextFieldInputOwner = self;
     }, 0.0);
     
@@ -168,7 +167,7 @@ var CPTextFieldInputOwner = nil;
 {
     [self unsetThemeState:CPThemeStateEditing];
     
-    _DOMTextareaElement.blur();
+    [self _DOMTextareaElement].blur();
 
     //post CPControlTextDidEndEditingNotification
     if (_isEditing)
@@ -187,7 +186,7 @@ var CPTextFieldInputOwner = nil;
 
 - (CPString)stringValue
 {
-    return (_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
+    return (!!_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
 }
 
 - (void)setStringValue:(CPString)aString
