@@ -136,18 +136,21 @@ var _startAndEndOfWeekCache = {};
         previousMonth = new Date(_firstDay.getTime() - 86400000);
         nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
     }
+    
     [self reloadData];
 }
 
 - (void)tileSize
 {
-    var bounds = [self bounds];
-
-    // I need pixel level precision
-    if (CGRectGetWidth(bounds) == 195)
-        return CGSizeMake(28, 22);
+    var tileSize = [calendarView currentValueForThemeAttribute:@"tile-size"];
+    
+    if (tileSize)
+        return tileSize
     else
+    {
+        var bounds = [self bounds];
         return CGSizeMake(CGRectGetWidth(bounds) / 7, CGRectGetHeight(bounds) / 6);
+    }
 }
 
 - (int)startOfWeekForDate:(CPDate)aDate
@@ -201,8 +204,31 @@ var _startAndEndOfWeekCache = {};
     return NO;
 }
 
-- (void)reloadData
+- (void)setHiddenRows:(CPArray)hiddenRowsArray
 {
+    if ([hiddenRows isEqualToArray:hiddenRowsArray])
+        return;
+    
+    hiddenRows = hiddenRowsArray;
+    
+    var tiles = [self subviews],
+        tileIndex = 0,
+        showAllRows = !hiddenRowsArray
+    
+    for (var weekIndex = 0; weekIndex < 6; weekIndex++)
+    {
+        var shouldHideRow = showAllRows || [hiddenRows indexOfObject:weekIndex] > -1;
+
+        for (var dayIndex = 0; dayIndex < 7; dayIndex++)
+        {
+            [tiles[tileIndex] setHidden:shouldHideRow];
+            tileIndex += 1;
+        }
+    }
+}
+
+- (void)reloadData
+{   
     if (!date)
         return;
 
@@ -221,8 +247,6 @@ var _startAndEndOfWeekCache = {};
 
     for (var weekIndex = 0; weekIndex < 6; weekIndex++)
     {
-        var isHidden = [hiddenRows indexOfObject:weekIndex] > -1;
-
         for (var dayIndex = 0; dayIndex < 7; dayIndex++)
         {
             var dayTile = tiles[tileIndex];
@@ -231,9 +255,7 @@ var _startAndEndOfWeekCache = {};
             currentDate.setTime(currentDate.getTime() + 90000000);
             [currentDate resetToMidnight];
 
-            [dayTile setHidden:isHidden];
-
-            if (!isHidden)
+            if (!dayTile._isHidden)
             {
                 [dayTile setIsFillerTile:(entireMonthIsFiller) ? YES : currentDate.getMonth() != currentMonth.getMonth()];
                 [dayTile setDate:currentDate];
@@ -245,9 +267,6 @@ var _startAndEndOfWeekCache = {};
             tileIndex += 1;
         }
     }
-
-    // TODO: Should hiddenrows really be reset here?
-    hiddenRows = [];
 }
 
 - (void)tile
@@ -263,9 +282,9 @@ var _startAndEndOfWeekCache = {};
             for (var dayIndex = 0; dayIndex < 7; dayIndex++)
             {
                 // CGRectInset() mucks up the frame for some reason.
-                var tileFrame = CGRectMake((dayIndex * tileSize.width), weekIndex * tileSize.height + 1, tileSize.width - 1, tileSize.height -1);
+                var tileFrame = CGRectMake((dayIndex * tileSize.width) + dayIndex, weekIndex * tileSize.height, tileSize.width, tileSize.height -1);
 
-                [[tiles objectAtIndex:tileIndex] setFrame:tileFrame];
+                [tiles[tileIndex] setFrame:tileFrame];
                 tileIndex += 1;
             }
         }
@@ -445,12 +464,12 @@ var _startAndEndOfWeekCache = {};
     CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
 
     // Horizontal lines
-    for (var i = 0; i < 6; i++)
-        CGContextFillRect(context, CGRectMake(0, i * tileSize.height, width, 1));
+    for (var i = 1; i < 6; i++)
+        CGContextFillRect(context, CGRectMake(0, i * tileSize.height - 1, width, 1));
 
     // Vertical lines
     for (var i = 0; i < 7; i++)
-        CGContextFillRect(context, CGRectMake(i * tileSize.width - 1, 0, 1, height));
+        CGContextFillRect(context, CGRectMake((i - 1) + (i * tileSize.width), 0, 1, height));
 }
 
 @end
@@ -503,7 +522,7 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setSelected:(BOOL)shouldBeSelected
 {
-    if (isSelected == shouldBeSelected)
+    if (isSelected === shouldBeSelected)
         return;
 
     isSelected = shouldBeSelected;
@@ -516,7 +535,7 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setIsFillerTile:(BOOL)shouldBeFillerTile
 {
-    if (isFillerTile == shouldBeFillerTile)
+    if (isFillerTile === shouldBeFillerTile)
         return;
 
     isFillerTile = shouldBeFillerTile;
@@ -529,7 +548,7 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setHighlighted:(BOOL)shouldBeHighlighted
 {
-    if (isHighlighted == shouldBeHighlighted)
+    if (isHighlighted === shouldBeHighlighted)
         return;
 
     isHighlighted = shouldBeHighlighted;
@@ -542,6 +561,9 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setDate:(CPDate)aDate
 {
+    if (date.getTime() === aDate.getTime())
+        return;
+    
     // Update date
     date.setTime(aDate.getTime());
 

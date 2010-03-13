@@ -55,10 +55,12 @@
 
 + (id)themeAttributes
 {
-    return [CPDictionary dictionaryWithObjects:[[CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null]]
+    return [CPDictionary dictionaryWithObjects:[[CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], 40, [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null]]
                                        forKeys:[@"background-color", @"grid-color",
-                                                @"tile-font", @"tile-text-color", @"tile-text-shadow-color", @"tile-text-shadow-offset", @"tile-bezel-color",
-                                                @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment"]];
+                                                @"tile-size", @"tile-font", @"tile-text-color", @"tile-text-shadow-color", @"tile-text-shadow-offset", @"tile-bezel-color",
+                                                @"header-height", @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment",
+                                                @"header-weekday-label-font", @"header-weekday-label-color", @"header-weekday-label-shadow-color", @"header-weekday-label-shadow-offset"]];
+
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -74,12 +76,11 @@
         [[headerView prevButton] setAction:@selector(didClickPrevButton:)];
         [[headerView nextButton] setTarget:self];
         [[headerView nextButton] setAction:@selector(didClickNextButton:)];
-        [headerView setAutoresizingMask:CPViewWidthSizable];
         [self addSubview:headerView];
 
-        slideView = [[LPSlideView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight([headerView bounds]), CGRectGetWidth(bounds), CGRectGetHeight(bounds) - CGRectGetHeight([headerView bounds]))];
+        slideView = [[LPSlideView alloc] initWithFrame:CGRectMake(0, 40, CGRectGetWidth(bounds), CGRectGetHeight(bounds) - 40)];
         [slideView setSlideDirection:LPSlideViewVerticalDirection];
-        [slideView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable | CPViewMinYMargin];
+        //[slideView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable | CPViewMinYMargin];
         [slideView setDelegate:self];
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
@@ -115,16 +116,12 @@
     [headerView setDate:aMonth];
 }
 
-- (void)availableMonthView
-{
-    return ([firstMonthView isHidden]) ? firstMonthView : secondMonthView;
-}
-
 - (id)monthViewForMonth:(CPDate)aMonth
 {
-    var availableMonthView = [self availableMonthView];
+    var availableMonthView = [firstMonthView isHidden] ? firstMonthView : secondMonthView;
+    [availableMonthView setHiddenRows:[]];
     [availableMonthView setDate:aMonth];
-    [availableMonthView makeSelectionWithDate:[fullSelection objectAtIndex:0] end:[fullSelection lastObject]];
+    [availableMonthView makeSelectionWithDate:fullSelection[0] end:[fullSelection lastObject]];
 
     return availableMonthView;
 }
@@ -135,35 +132,27 @@
     var slideToView = [self monthViewForMonth:aMonth],
         slideFromView = currentMonthView;
 
-    var direction,
-        startDelta;
-
     // Moving to a previous month
     if ([currentMonthView date].getTime() > aMonth.getTime())
     {
-        direction = LPSlideViewPositiveDirection;
-        startDelta = 0.335;
+        var direction = LPSlideViewPositiveDirection,
+            startDelta = 0.335;
         [slideFromView setHiddenRows:[0,1]];
     }
     // Moving to a later month
     else
     {
-        direction = LPSlideViewNegativeDirection;
-        startDelta = 0.34;
+        var direction = LPSlideViewNegativeDirection,
+            startDelta = 0.34;
         [slideFromView setHiddenRows:[4,5]];
     }
-
-    // Set the previous months tiles as fillers, to make it look a bit better.
-    [slideFromView setAllTilesAsFiller];
 
     // new current view
     currentMonthView = slideToView;
 
     [headerView setDate:aMonth];
 
-    setTimeout(function(){
-        [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
-    }, 1);
+    [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)shouldAllowMultipleSelection
@@ -193,6 +182,12 @@
 
 - (void)layoutSubviews
 {
+    var width = CGRectGetWidth([self bounds]),
+        headerHeight = [self currentValueForThemeAttribute:@"header-height"];
+        
+    [headerView setFrameSize:CGSizeMake(width, headerHeight)];
+    [slideView setFrame:CGRectMake(0, headerHeight, width, CGRectGetHeight([self bounds]) - headerHeight)];
+    
     [slideView setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
 }
 
