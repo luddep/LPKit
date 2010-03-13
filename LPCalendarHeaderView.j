@@ -55,11 +55,11 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
         [title setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin];
         [self addSubview:title];
         
-        prevButton = [[LPCalendarHeaderPreviousButton alloc] initWithFrame:CGRectMake(6, 9, 0, 0)];
+        prevButton = [[LPCalendarHeaderArrowButton alloc] initWithFrame:CGRectMake(6, 9, 0, 0)];
         [prevButton sizeToFit];
         [self addSubview:prevButton];
         
-        nextButton = [[LPCalendarHeaderNextButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX([self bounds]) - 21, 9, 0, 0)];
+        nextButton = [[LPCalendarHeaderArrowButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX([self bounds]) - 21, 9, 0, 0)];
         [nextButton sizeToFit];
         [nextButton setAutoresizingMask:CPViewMinXMargin];
         [self addSubview:nextButton];
@@ -102,24 +102,33 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
 - (void)layoutSubviews
 {
     var bounds = [self bounds],
-        numberOfLabels = [dayLabels count],
-        labelWidth = CGRectGetWidth(bounds) / numberOfLabels,
-        labelHeight = CGRectGetHeight([[[self subviews] objectAtIndex:3] bounds]),
-        height = CGRectGetHeight(bounds);
-
-    for (var i = 0; i < numberOfLabels; i++)
-    {
-        [dayLabels[i] setFrame:CGRectMake(i * labelWidth, height - labelHeight, labelWidth, labelHeight)];
-    }
-    
-    var superview = [self superview],
+        width = CGRectGetWidth(bounds),
+        superview = [self superview],
         themeState = [self themeState];
     
+    // Title
     [self setBackgroundColor:[superview valueForThemeAttribute:@"header-background-color" inState:themeState]];
     [title setFont:[superview valueForThemeAttribute:@"header-font" inState:themeState]];
     [title setTextColor:[superview valueForThemeAttribute:@"header-text-color" inState:themeState]];
     [title setTextShadowColor:[superview valueForThemeAttribute:@"header-text-shadow-color" inState:themeState]];
     [title setTextShadowOffset:[superview valueForThemeAttribute:@"header-text-shadow-offset" inState:themeState]];
+    
+    // Arrows
+    var buttonOrigin = [superview valueForThemeAttribute:@"header-button-offset" inState:themeState];
+    [prevButton setFrameOrigin:CGPointMake(buttonOrigin.width, buttonOrigin.height)];
+    [prevButton setValue:[superview valueForThemeAttribute:@"header-prev-button-image" inState:themeState] forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
+    [nextButton setFrameOrigin:CGPointMake(width - 16 - buttonOrigin.width, buttonOrigin.height)];
+    [nextButton setValue:[superview valueForThemeAttribute:@"header-next-button-image" inState:themeState] forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
+    
+    // Weekday labels
+    var numberOfLabels = [dayLabels count],
+        labelWidth = width / numberOfLabels,
+        labelHeight = CGRectGetHeight([[[self subviews] objectAtIndex:3] bounds]),
+        labelOffset = [superview valueForThemeAttribute:@"header-weekday-offset" inState:themeState],
+        height = CGRectGetHeight(bounds);
+
+    for (var i = 0; i < numberOfLabels; i++)
+        [dayLabels[i] setFrame:CGRectMake(i * labelWidth, labelOffset, labelWidth, labelHeight)];
 }
 
 @end
@@ -171,7 +180,7 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
 @end
 
 
-@implementation LPCalendarHeaderButton : CPButton 
+@implementation LPCalendarHeaderArrowButton : CPButton 
 {
 }
 
@@ -179,53 +188,33 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
 {
     if (self = [super initWithFrame:aFrame])
     {
-        [self setValue:CGSizeMake(15.0, 15.0) forThemeAttribute:@"min-size"];
-        [self setValue:CGSizeMake(15.0, 15.0) forThemeAttribute:@"max-size"];
+        [self setValue:CGSizeMake(16.0, 16.0) forThemeAttribute:@"min-size"];
+        [self setValue:CGSizeMake(16.0, 16.0) forThemeAttribute:@"max-size"];
     }
     return self;
 }
 
-@end
+/*
+    TODO: move this into theming some how.
+*/
 
-
-@implementation LPCalendarHeaderPreviousButton : LPCalendarHeaderButton 
+- (void)incrementOriginBy:(int)anInt
 {
+    var currentOrigin = [self frame].origin;
+    currentOrigin.y += anInt;
+    [self setFrameOrigin:currentOrigin];
 }
 
-- (id)initWithFrame:(CGRect)aFrame
+- (void)trackMouse:(CPEvent)anEvent
 {
-    if (self = [super initWithFrame:aFrame])
-    {
-        var bezelColor = [CPColor colorWithPatternImage:[[CPThreePartImage alloc] initWithImageSlices:
-                    [
-                        [[CPImage alloc] initWithContentsOfFile:[[CPBundle bundleForClass:[self class]] pathForResource:@"LPCalendarView/previous.png"] size:CGSizeMake(15.0, 15.0)], nil, nil
-                    ]
-                isVertical:NO]];
-        
-        [self setValue:bezelColor forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
-    }
-    return self;
-}
-
-@end
-
-@implementation LPCalendarHeaderNextButton : LPCalendarHeaderButton 
-{
-}
-
-- (id)initWithFrame:(CGRect)aFrame
-{
-    if (self = [super initWithFrame:aFrame])
-    {
-        var bezelColor = [CPColor colorWithPatternImage:[[CPThreePartImage alloc] initWithImageSlices:
-                    [
-                        [[CPImage alloc] initWithContentsOfFile:[[CPBundle bundleForClass:[self class]] pathForResource:@"LPCalendarView/next.png"] size:CGSizeMake(15.0, 15.0)], nil, nil
-                    ]
-                isVertical:NO]];
-        
-        [self setValue:bezelColor forThemeAttribute:@"bezel-color" inState:CPThemeStateBordered];
-    }
-    return self;
+    var type = [anEvent type];
+ 
+    if (type === CPLeftMouseDown)
+        [self incrementOriginBy:1]
+    else if (type === CPLeftMouseUp)
+        [self incrementOriginBy:-1]
+            
+    [super trackMouse:anEvent];
 }
 
 @end
