@@ -177,6 +177,7 @@ var sharedErrorLoggerInstance = nil;
         
         cancelButton = [CPButton buttonWithTitle:@"Cancel"];
         [cancelButton setFrameOrigin:CGPointMake(CGRectGetMinX([sendButton frame]) - CGRectGetWidth([cancelButton frame]) - 12, CGRectGetMinY([sendButton frame]))];
+        [cancelButton setAutoresizingMask:CPViewMinXMargin | CPViewMinYMargin];
         [cancelButton setTarget:self];
         [cancelButton setAction:@selector(didClickCancelButton:)];
         [contentView addSubview:cancelButton];
