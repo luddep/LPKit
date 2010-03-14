@@ -73,6 +73,11 @@ var CPTextFieldInputOwner = nil;
     [super setEditable:shouldBeEditable];
 }
 
+- (void)selectText:(id)sender
+{
+    [self _DOMTextareaElement].select();
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -123,11 +128,6 @@ var CPTextFieldInputOwner = nil;
     [[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
 }
 
-- (void)selectText:(id)sender
-{
-    [self _DOMTextareaElement].select();
-}
-
 - (void)keyUp:(CPEvent)anEvent
 {
     if (_stringValue !== [self stringValue])
@@ -144,6 +144,12 @@ var CPTextFieldInputOwner = nil;
     }
  
     [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
+}
+
+- (BOOL)performKeyEquivalent:(CPEvent)anEvent
+{
+    [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
+    return YES;
 }
 
 - (BOOL)becomeFirstResponder
