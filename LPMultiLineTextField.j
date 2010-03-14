@@ -33,7 +33,6 @@ var CPTextFieldInputOwner = nil;
 @implementation LPMultiLineTextField : CPTextField
 {
     id _DOMTextareaElement;
-    CPString oldValue;
     CPString _stringValue;
 }
 
@@ -131,9 +130,9 @@ var CPTextFieldInputOwner = nil;
 
 - (void)keyUp:(CPEvent)anEvent
 {
-    if (oldValue !== [self stringValue])
+    if (_stringValue !== [self stringValue])
     {
-        _stringValue = [self _DOMTextareaElement].value;
+        _stringValue = [self stringValue];
         
         if (!_isEditing)
         {
@@ -149,7 +148,7 @@ var CPTextFieldInputOwner = nil;
 
 - (BOOL)becomeFirstResponder
 {
-    oldValue = [self stringValue];
+    _stringValue = [self stringValue];
     
     [self setThemeState:CPThemeStateEditing];
     
@@ -166,6 +165,8 @@ var CPTextFieldInputOwner = nil;
 - (BOOL)resignFirstResponder
 {
     [self unsetThemeState:CPThemeStateEditing];
+    
+    [self setStringValue:[self stringValue]];
     
     [self _DOMTextareaElement].blur();
 
