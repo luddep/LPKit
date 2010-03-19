@@ -84,6 +84,14 @@ LPAnchorButtonHoverUnderline  = 2;
     [self unsetThemeState:CPThemeStateHighlighted];
 }
 
+- (void)trackMouse:(CPEvent)anEvent
+{
+    if (URL)
+    {
+        [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
+    }
+}
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -119,7 +127,6 @@ LPAnchorButtonHoverUnderline  = 2;
     var contentView = [self layoutEphemeralSubviewNamed:@"content-view"
                                              positioned:CPWindowAbove
                         relativeToEphemeralSubviewNamed:@"bezel-view"];
-    
     
     // Call directly to make sure the contentview creates its DOM elements
     [contentView layoutSubviews];
