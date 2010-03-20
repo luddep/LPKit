@@ -50,7 +50,8 @@ var sharedLocationControllerInstance = nil;
     if (self = [super init])
     {
         observers = [CPArray array];
-        
+        currentHash = window.location.hash;
+            
         [CPTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateLocation:) userInfo:nil repeats:YES];
     }
     return self;
