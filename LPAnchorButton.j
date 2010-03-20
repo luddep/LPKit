@@ -33,12 +33,21 @@ LPAnchorButtonNormalUnderline = 1;
 LPAnchorButtonHoverUnderline  = 2;
 
 
-@implementation LPAnchorButton : CPButton
+@implementation LPAnchorButton : CPControl
 {
     unsigned _underlineMask @accessors(property=underlineMask);
     
-    CPURL URL;
+    CPString _title @accessors(property=title);
+    CPURL _URL;
     id _DOMAnchorElement;
+}
+
++ (id)buttonWithTitle:(CPString)aTitle
+{
+    var button = [[self alloc] init];
+    [button setTitle:aTitle];
+    [button sizeToFit];
+    return button;
 }
 
 - (id)init
@@ -47,19 +56,19 @@ LPAnchorButtonHoverUnderline  = 2;
     {
         // Set default underline mask
         _underlineMask = LPAnchorButtonNormalUnderline | LPAnchorButtonHoverUnderline;
-        
-        // Reset min-size
-        [self setValue:CGSizeMake(0,0) forThemeAttribute:@"min-size"];
-        
-        // Remove bezels
-        [self setBordered:NO];
     }
     return self;
 }
 
+- (void)setTitle:(CPString)aTitle
+{
+    _title = aTitle;
+    [self setNeedsLayout];
+}
+
 - (void)openURLOnClick:(CPURL)aURL
 {   
-    URL = aURL;
+    _URL = aURL;
     
     [self setNeedsLayout];
 }
@@ -84,24 +93,39 @@ LPAnchorButtonHoverUnderline  = 2;
     [self unsetThemeState:CPThemeStateHighlighted];
 }
 
-- (void)trackMouse:(CPEvent)anEvent
+- (void)mouseUp:(CPEvent)anEvent
 {
-    if (URL)
+    if (_URL)
     {
         [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
     }
 }
 
+- (void)sizeToFit
+{
+    [self setFrameSize:[(_title || " ") sizeWithFont:[self currentValueForThemeAttribute:@"font"]]];
+}
+
+- (CGRect)rectForEphemeralSubviewNamed:(CPString)aName
+{
+    return [self bounds];
+}
+ 
+- (CPView)createEphemeralSubviewNamed:(CPString)aName
+{
+    return [[_CPImageAndTextView alloc] initWithFrame:CGRectMakeZero()];
+}
+
 - (void)layoutSubviews
 {
-    [super layoutSubviews];
+    //[super layoutSubviews];
     
     // Set up anchor element if needed
-    if (URL)
+    if (_URL)
     {
         if (!_DOMAnchorElement)
         {
-            var _DOMAnchorElement = document.createElement("a");
+            _DOMAnchorElement = document.createElement("a");
             _DOMAnchorElement.target = @"_blank";
             _DOMAnchorElement.style.position = "absolute";
             _DOMAnchorElement.style.zIndex = "100";
@@ -109,34 +133,42 @@ LPAnchorButtonHoverUnderline  = 2;
             self._DOMElement.appendChild(_DOMAnchorElement)
         }
         
-        _DOMAnchorElement.href = [URL absoluteString];
+        _DOMAnchorElement.href = [_URL absoluteString];
         _DOMAnchorElement.style.width = CGRectGetWidth([self bounds]) + @"px";
         _DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
     }
     
-    var themeState = [self themeState],
-        cssTextDecoration = @"none";
+    var cssTextDecoration = @"none";
     
     // Check if we should underline
-    if (((themeState === CPThemeStateNormal || themeState === CPThemeStateSelected) && (_underlineMask & LPAnchorButtonNormalUnderline)) ||
-        ((themeState & CPThemeStateHighlighted) && (_underlineMask & LPAnchorButtonHoverUnderline)))
+    if (((_themeState === CPThemeStateNormal || _themeState === CPThemeStateSelected) && (_underlineMask & LPAnchorButtonNormalUnderline)) ||
+        ((_themeState & CPThemeStateHighlighted) && (_underlineMask & LPAnchorButtonHoverUnderline)))
     {
         cssTextDecoration = @"underline";
     }
     
     var contentView = [self layoutEphemeralSubviewNamed:@"content-view"
                                              positioned:CPWindowAbove
-                        relativeToEphemeralSubviewNamed:@"bezel-view"];
+                        relativeToEphemeralSubviewNamed:nil];
     
-    // Call directly to make sure the contentview creates its DOM elements
-    [contentView layoutSubviews];
+    if (contentView)
+    {
+        [contentView setText:_title];
     
-    // Update DOM elements
-    if (contentView._DOMTextElement)
-        contentView._DOMTextElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+        [contentView setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
+        [contentView setFont:[self currentValueForThemeAttribute:@"font"]];
+        [contentView setAlignment:[self currentValueForThemeAttribute:@"alignment"]];
+        [contentView setVerticalAlignment:[self currentValueForThemeAttribute:@"vertical-alignment"]];
+        [contentView setLineBreakMode:[self currentValueForThemeAttribute:@"line-break-mode"]];
+        [contentView setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
+        [contentView setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
     
-    if (contentView._DOMTextShadowElement)
-        contentView._DOMTextShadowElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+        if (contentView._DOMTextElement)
+            contentView._DOMTextElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+        
+        if (contentView._DOMTextShadowElement)
+            contentView._DOMTextShadowElement.style.setProperty(@"text-decoration", cssTextDecoration, null);
+    }
 }
 
 @end
