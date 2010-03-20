@@ -93,7 +93,7 @@ LPAnchorButtonHoverUnderline  = 2;
     [self unsetThemeState:CPThemeStateHighlighted];
 }
 
-- (void)mouseUp:(CPEvent)anEvent
+- (void)mouseDown:(CPEvent)anEvent
 {
     if (_URL)
     {
