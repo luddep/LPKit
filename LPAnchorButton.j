@@ -118,8 +118,6 @@ LPAnchorButtonHoverUnderline  = 2;
 
 - (void)layoutSubviews
 {
-    //[super layoutSubviews];
-    
     // Set up anchor element if needed
     if (_URL)
     {
@@ -134,8 +132,11 @@ LPAnchorButtonHoverUnderline  = 2;
         }
         
         _DOMAnchorElement.href = [_URL absoluteString];
-        _DOMAnchorElement.style.width = CGRectGetWidth([self bounds]) + @"px";
-        _DOMAnchorElement.style.height = CGRectGetHeight([self bounds]) + @"px";
+        
+        var bounds = [self bounds];
+        
+        _DOMAnchorElement.style.width = CGRectGetWidth(bounds) + @"px";
+        _DOMAnchorElement.style.height = CGRectGetHeight(bounds) + @"px";
     }
     
     var cssTextDecoration = @"none";
@@ -158,8 +159,8 @@ LPAnchorButtonHoverUnderline  = 2;
         [contentView setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
         [contentView setFont:[self currentValueForThemeAttribute:@"font"]];
         [contentView setAlignment:[self currentValueForThemeAttribute:@"alignment"]];
-        [contentView setVerticalAlignment:[self currentValueForThemeAttribute:@"vertical-alignment"]];
-        [contentView setLineBreakMode:[self currentValueForThemeAttribute:@"line-break-mode"]];
+        //[contentView setVerticalAlignment:[self currentValueForThemeAttribute:@"vertical-alignment"]];
+        //[contentView setLineBreakMode:[self currentValueForThemeAttribute:@"line-break-mode"]];
         [contentView setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
         [contentView setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
     
