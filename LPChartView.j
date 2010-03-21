@@ -170,6 +170,10 @@ var labelViewHeight = 20,
         _data.push(row);
     }
     
+    // Clear the current size of the chart
+    // this will force the re-calculation of item frames.
+    _currentSize = nil;
+    
     // Update grid view
     //[gridView setItemsLength:numberOfItems];
     
@@ -488,7 +492,6 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 {
     if (chart)
     {
-        
         var subviews = [self subviews];
         
         // Clear any previous labels
