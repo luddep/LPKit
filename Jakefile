@@ -28,7 +28,8 @@
  * 
  */
 
-var ENV = require("system").env,
+var OS = require("os"),
+    ENV = require("system").env,
     FILE = require("file"),
     JAKE = require("jake"),
     task = JAKE.task,
@@ -76,3 +77,23 @@ task ("release", function()
 task ("default", ["release"]);
 
 task ("build", ["LPKit"]);
+
+task ("symlink", ["release", "debug"], function()
+{
+    // TODO: this should not be hardcoded to /usr/local - not sure how
+    // to actually find the path to narwhal right now though.
+    var frameworksPath = FILE.join("", "usr", "local", "narwhal", "packages", "cappuccino", "Frameworks");
+    
+    ["Release", "Debug"].forEach(function(aConfig)
+    {
+        print("Symlinking " + aConfig + " ...");
+        
+        if (aConfig === "Debug")
+            frameworksPath = FILE.join(frameworksPath, aConfig);
+        
+        var buildPath = FILE.absolute(FILE.join("Build", aConfig, "LPKit")),
+            symlinkPath = FILE.join(frameworksPath, "LPKit");
+        
+        OS.system(["sudo", "ln", "-s", buildPath, symlinkPath]);
+    });
+});
