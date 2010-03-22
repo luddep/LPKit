@@ -99,6 +99,8 @@ LPAnchorButtonHoverUnderline  = 2;
     {
         [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
     }
+    else
+        [super mouseDown:anEvent];
 }
 
 - (void)sizeToFit
