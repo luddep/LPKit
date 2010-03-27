@@ -47,6 +47,8 @@ var CPTextFieldInputOwner = nil;
         _DOMTextareaElement.style.outline = @"0";
         _DOMTextareaElement.style.zIndex = @"100";
         _DOMTextareaElement.style.resize = @"none";
+        _DOMTextareaElement.style.padding = @"0";
+        _DOMTextareaElement.style.margin = @"0";
         
         _DOMTextareaElement.onblur = function(){
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
@@ -88,15 +90,19 @@ var CPTextFieldInputOwner = nil;
     [contentView setHidden:YES];
     
     var DOMElement = [self _DOMTextareaElement],
-        contentInset = [self currentValueForThemeAttribute:@"content-inset"];
+        contentInset = [self currentValueForThemeAttribute:@"content-inset"],
+        bounds = [self bounds];
     
+    DOMElement.style.top = contentInset.top + @"px";
+    DOMElement.style.bottom = contentInset.bottom + @"px";
+    DOMElement.style.left = contentInset.left + @"px";
+    DOMElement.style.right = contentInset.right + @"px";
+    
+    DOMElement.style.width = (CGRectGetWidth([self bounds]) - contentInset.left - contentInset.right) + @"px";
+    DOMElement.style.height = (CGRectGetHeight([self bounds]) - contentInset.top - contentInset.bottom) + @"px";
+        
     DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
     DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
-    DOMElement.style.top = contentInset.top / 2 + @"px";
-    DOMElement.style.bottom = contentInset.bottom / 2 + @"px";
-    DOMElement.style.left = contentInset.left / 2 + @"px";
-    DOMElement.style.right = contentInset.right / 2 + @"px";
-    
     DOMElement.value = _stringValue || @"";
 }
 
