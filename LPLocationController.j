@@ -64,8 +64,8 @@ var sharedLocationControllerInstance = nil;
 
 - (void)setLocation:(CPString)aLocation
 {
-    currentHash = @"#" + aLocation;
     window.location.hash = aLocation;
+    [self updateLocation:nil];
 }
 
 - (void)updateLocation:(id)sender
