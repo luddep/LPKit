@@ -51,13 +51,20 @@
 
 - (void)setContent:(id)anObject
 {
+    [self setContent:anObject escape:YES];
+}
+
+- (void)setContent:(id)anObject escape:(BOOL)shouldEscape
+{
     var content = @"";
     
     for (key in anObject)
-        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, escape(anObject[key])]];
+        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, shouldEscape ? escape(anObject[key]) : anObject[key]]];
     
     // Remove trailing &
     content = [content substringToIndex:[content length] - 1];
+
+    console.log(content)
 
     [self setHTTPBody:content];
 }
