@@ -64,8 +64,6 @@
     // Remove trailing &
     content = [content substringToIndex:[content length] - 1];
 
-    console.log(content)
-
     [self setHTTPBody:content];
 }
 
