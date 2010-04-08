@@ -59,7 +59,7 @@
     var content = @"";
     
     for (key in anObject)
-        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, shouldEscape ? escape(anObject[key]) : anObject[key]]];
+        content = [content stringByAppendingString:[CPString stringWithFormat:@"%s=%s&", key, shouldEscape ? encodeURIComponent(anObject[key]) : anObject[key]]];
     
     // Remove trailing &
     content = [content substringToIndex:[content length] - 1];
