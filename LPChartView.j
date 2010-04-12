@@ -83,6 +83,9 @@ var labelViewHeight = 20,
 
 - (void)setDrawView:(id)aDrawView
 {
+    if (aDrawView === drawView)
+        return;
+    
     if (!drawView)
         [self addSubview:aDrawView positioned:CPWindowAbove relativeTo:gridView];
     else
@@ -370,7 +373,7 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         // Vertical lines
         for (var i = 0; i < itemFrames[0].length; i++)
         {
-            CGContextFillRect(context, CGRectMake(itemFrames[0][i].origin.x, 0, lineWidth, height));
+            CGContextFillRect(context, CGRectMake(FLOOR(itemFrames[0][i].origin.x), 0, lineWidth, height));
         }
     
         // Right most line
