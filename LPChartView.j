@@ -40,7 +40,7 @@ var labelViewHeight = 20,
     id delegate @accessors;
     id drawView @accessors;
     
-    LPGridView gridView;
+    LPChartGridView gridView;
     
     LPChartLabelView labelView @accessors(readonly);
     BOOL displayLabels @accessors;
@@ -56,16 +56,23 @@ var labelViewHeight = 20,
 {
     if (self = [super initWithFrame:aFrame])
     {
-        gridView = [[LPChartGridView alloc] initWithFrame:CGRectMakeZero()];
-        [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
-        [self addSubview:gridView];
-        
-        labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(drawViewPadding, CGRectGetHeight(aFrame) - labelViewHeight, CGRectGetWidth(aFrame) - (2 * drawViewPadding), labelViewHeight)];
-        [self addSubview:labelView];
-        
-        _currentSize = CGSizeMake(0,0);
+        [self awakeFromCib];
     }
     return self;
+}
+
+- (void)awakeFromCib
+{
+    gridView = [[LPChartGridView alloc] initWithFrame:CGRectMakeZero()];
+    [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
+    [self addSubview:gridView];
+    
+    var bounds = [self bounds];
+    
+    labelView = [[LPChartLabelView alloc] initWithFrame:CGRectMake(drawViewPadding, CGRectGetHeight(bounds) - labelViewHeight, CGRectGetWidth(bounds) - (2 * drawViewPadding), labelViewHeight)];
+    [self addSubview:labelView];
+    
+    _currentSize = CGSizeMake(0,0);
 }
 
 - (void)setDataSource:(id)aDataSource
