@@ -40,7 +40,7 @@ var labelViewHeight = 20,
     id delegate @accessors;
     id drawView @accessors;
     
-    LPChartGridView gridView;
+    LPChartGridView gridView @accessors;
     
     LPChartLabelView labelView @accessors(readonly);
     BOOL displayLabels @accessors;
@@ -113,6 +113,17 @@ var labelViewHeight = 20,
     
     // Re-draw
     [self reloadData];
+}
+
+- (void)setGridView:(CPView)aGridView
+{
+    if (gridView === aGridView)
+        return;
+    
+    [aGridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
+    [self replaceSubview:gridView with:aGridView];
+    
+    gridView = aGridView;
 }
 
 - (void)setDisplayLabels:(BOOL)shouldDisplayLabels
