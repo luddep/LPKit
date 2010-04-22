@@ -161,8 +161,8 @@ LPAnchorButtonHoverUnderline  = 2;
         [contentView setTextColor:[self currentValueForThemeAttribute:@"text-color"]];
         [contentView setFont:[self currentValueForThemeAttribute:@"font"]];
         [contentView setAlignment:[self currentValueForThemeAttribute:@"alignment"]];
-        //[contentView setVerticalAlignment:[self currentValueForThemeAttribute:@"vertical-alignment"]];
-        //[contentView setLineBreakMode:[self currentValueForThemeAttribute:@"line-break-mode"]];
+        [contentView setVerticalAlignment:[self currentValueForThemeAttribute:@"vertical-alignment"]];
+        [contentView setLineBreakMode:[self currentValueForThemeAttribute:@"line-break-mode"]];
         [contentView setTextShadowColor:[self currentValueForThemeAttribute:@"text-shadow-color"]];
         [contentView setTextShadowOffset:[self currentValueForThemeAttribute:@"text-shadow-offset"]];
     
