@@ -217,6 +217,9 @@ var labelViewHeight = 20,
     // Reset frames set
     _framesSet = [CPArray array];
     
+    if (!sets.length)
+        return _framesSet; 
+    
     var width = drawViewSize.width,
         height = drawViewSize.height - (2 * drawViewPadding),
         numberOfItems = sets[0].length,
@@ -373,6 +376,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 {
     if (itemFrames = [[self superview] itemFrames])
     {
+        if (!itemFrames.length)
+            return;
+        
         var context = [[CPGraphicsContext currentContext] graphicsPort],
             bounds = [self bounds],
             width = CGRectGetWidth(bounds),
@@ -528,7 +534,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         }
         
         // Insert new subviews
-        if (itemFrames = [chart itemFrames])
+        var itemFrames = [chart itemFrames];
+        
+        if (itemFrames && itemFrames.length)
         {
             itemFrames = itemFrames[0];
             for (var i = 0, length = itemFrames.length; i < length; i++)
