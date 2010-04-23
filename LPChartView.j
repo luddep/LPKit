@@ -50,6 +50,9 @@ var labelViewHeight = 20,
     
     CPArray _framesSet;
     CGSize _currentSize;
+    
+    float _maxValuePosition;
+    float _minValuePosition;
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -63,6 +66,9 @@ var labelViewHeight = 20,
 
 - (void)_setup
 {
+    _maxValuePosition = 1.0;
+    _minValuePosition = 0.0;
+    
     gridView = [[LPChartGridView alloc] initWithFrame:CGRectMakeZero()];
     [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
     [self addSubview:gridView];
@@ -154,6 +160,14 @@ var labelViewHeight = 20,
     [gridView setHidden:!shouldDisplayGrid];
 }
 
+- (void)setMaxValuePosition:(float)aMaxValuePosition minValuePosition:(float)aMinValuePosition
+{
+    _maxValuePosition = aMaxValuePosition;
+    _minValuePosition = aMinValuePosition;
+    
+    [[self drawView] setNeedsDisplay:YES];
+}
+
 - (CPArray)itemFrames
 {
     if (dataSource && drawView && _data && _maxValue >= 0)
@@ -208,6 +222,16 @@ var labelViewHeight = 20,
 - (CPArray)calculateItemFramesWithSets:(CPArray)sets maxValue:(int)aMaxValue
 {
     drawViewSize = [drawView bounds].size;
+    var originalHeight = new Number(drawViewSize.height),
+        maxValueHeightDelta = (1.0 - _maxValuePosition) * originalHeight;
+    
+    // Restrict drawViewSize according to min value positions
+    if (_minValuePosition !== 0.0)
+        drawViewSize.height -= _minValuePosition * drawViewSize.height;
+    
+    if (_maxValuePosition !== 1.0)
+        drawViewSize.height -= maxValueHeightDelta;
+    
     
     if (_currentSize && CGSizeEqualToSize(_currentSize, drawViewSize))
         return _framesSet;
@@ -221,7 +245,7 @@ var labelViewHeight = 20,
         return _framesSet; 
     
     var width = drawViewSize.width,
-        height = drawViewSize.height - (2 * drawViewPadding),
+        height = drawViewSize.height - (2 * drawViewPadding) - 20,
         numberOfItems = sets[0].length,
         itemWidth = width / numberOfItems,
         unusedWidth = width - (numberOfItems * itemWidth);
@@ -249,6 +273,10 @@ var labelViewHeight = 20,
             
             // Set Y Origin
             itemFrame.origin.y = height - CGRectGetHeight(itemFrame) + drawViewPadding;
+            
+            // Make up for _maxValuePosition if it's set
+            if (_maxValuePosition !== 1.0)
+                itemFrame.origin.y += maxValueHeightDelta;
             
             // Save it
             row.push(itemFrame);
