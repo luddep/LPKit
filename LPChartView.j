@@ -156,7 +156,7 @@ var labelViewHeight = 20,
 
 - (CPArray)itemFrames
 {
-    if (_data && _maxValue >= 0)
+    if (dataSource && drawView && _data && _maxValue >= 0)
         return [self calculateItemFramesWithSets:_data maxValue:_maxValue];
     else
         return nil;
@@ -547,10 +547,15 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 
 - (void)layoutSubviews
 {
+    var itemFrames = [chart itemFrames];
+    
+    if (!itemFrames)
+        return;
+    
     var subviews = [self subviews],
         numberOfSubviews = subviews.length,
         bounds = [self bounds],
-        itemFrames = [chart itemFrames][0],
+        itemFrames = itemFrames[0],
         drawViewPadding = CGRectGetMinX([[chart drawView] frame]);
 
     while (numberOfSubviews--)
