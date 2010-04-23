@@ -376,9 +376,6 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
 {
     if (itemFrames = [[self superview] itemFrames])
     {
-        if (!itemFrames.length)
-            return;
-        
         var context = [[CPGraphicsContext currentContext] graphicsPort],
             bounds = [self bounds],
             width = CGRectGetWidth(bounds),
@@ -388,10 +385,15 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         CGContextSetFillColor(context, gridColor);
         
         // Vertical lines
-        for (var i = 0; i < itemFrames[0].length; i++)
+        if (itemFrames.length)
         {
-            CGContextFillRect(context, CGRectMake(FLOOR(itemFrames[0][i].origin.x), 0, lineWidth, height));
+            for (var i = 0; i < itemFrames[0].length; i++)
+            {
+                CGContextFillRect(context, CGRectMake(FLOOR(itemFrames[0][i].origin.x), 0, lineWidth, height));
+            }
         }
+        else
+            CGContextFillRect(context, CGRectMake(0, 0, lineWidth, height));
     
         // Right most line
         CGContextFillRect(context, CGRectMake(width - lineWidth, 0, lineWidth, height));
