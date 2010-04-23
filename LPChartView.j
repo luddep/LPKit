@@ -56,12 +56,12 @@ var labelViewHeight = 20,
 {
     if (self = [super initWithFrame:aFrame])
     {
-        [self awakeFromCib];
+        [self _setup];
     }
     return self;
 }
 
-- (void)awakeFromCib
+- (void)_setup
 {
     gridView = [[LPChartGridView alloc] initWithFrame:CGRectMakeZero()];
     [gridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
@@ -323,6 +323,8 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         
         _framesSet = [aCoder decodeObjectForKey:LPChartViewFramesSetKey];
         _currentSize = [aCoder decodeSizeForKey:LPChartViewCurrentSizeKey];
+        
+        [self _setup];
     }
     return self;
 }
