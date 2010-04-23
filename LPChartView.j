@@ -92,10 +92,10 @@ var labelViewHeight = 20,
     if (aDrawView === drawView)
         return;
     
-    if (!drawView)
-        [self addSubview:aDrawView positioned:CPWindowAbove relativeTo:gridView];
-    else
-        [self replaceSubview:drawView with:aDrawView];
+    if (drawView)
+        [drawView removeFromSuperview];
+    
+    [self addSubview:aDrawView positioned:CPWindowAbove relativeTo:gridView];
     
     // Got a new drawView
     drawView = aDrawView;
@@ -210,6 +210,7 @@ var labelViewHeight = 20,
     _currentSize = nil;
     
     // Update grid view
+    [gridView setNeedsDisplay:YES];
     //[gridView setItemsLength:numberOfItems];
     
     // Update Label view
@@ -339,9 +340,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     if (self = [super initWithCoder:aCoder])
     {
         dataSource = [aCoder decodeObjectForKey:LPChartViewDataSourceKey];
-        drawView = [aCoder decodeObjectForKey:LPChartViewDrawViewKey];
         
         gridView = [aCoder decodeObjectForKey:LPChartViewGridViewKey];
+        drawView = [aCoder decodeObjectForKey:LPChartViewDrawViewKey];
         
         displayLabels = ![aCoder containsValueForKey:LPChartViewDisplayLabelsKey] || [aCoder decodeObjectForKey:LPChartViewDisplayLabelsKey];
         labelView = [aCoder decodeObjectForKey:LPChartViewLabelViewKey];
