@@ -222,18 +222,17 @@ var labelViewHeight = 20,
 
 - (CPArray)calculateItemFramesWithSets:(CPArray)sets maxValue:(int)aMaxValue
 {
-    drawViewSize = [drawView bounds].size;
-    var originalHeight = new Number(drawViewSize.height),
-        maxValueHeightDelta = (1.0 - _maxValuePosition) * originalHeight;
+    var drawViewSize = [drawView bounds].size,
+        maxValueHeightDelta = (1.0 - _maxValuePosition) * drawViewSize.height;
     
     // Restrict drawViewSize according to min value positions
     if (_minValuePosition !== 0.0)
         drawViewSize.height -= _minValuePosition * drawViewSize.height;
-    
+
     if (_maxValuePosition !== 1.0)
         drawViewSize.height -= maxValueHeightDelta;
-    
-    
+
+    // Make sure we don't do unnecessary word
     if (_currentSize && CGSizeEqualToSize(_currentSize, drawViewSize))
         return _framesSet;
         
@@ -246,7 +245,7 @@ var labelViewHeight = 20,
         return _framesSet; 
     
     var width = drawViewSize.width,
-        height = drawViewSize.height - (2 * drawViewPadding) - 20,
+        height = drawViewSize.height - (2 * drawViewPadding),
         numberOfItems = sets[0].length,
         itemWidth = width / numberOfItems,
         unusedWidth = width - (numberOfItems * itemWidth);
@@ -323,15 +322,17 @@ var labelViewHeight = 20,
 @end
 
 
-var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
-    LPChartViewDrawViewKey      = @"LPChartViewDrawViewKey",
-    LPChartViewGridViewKey      = @"LPChartViewGridViewKey",
-    LPChartViewDisplayLabelsKey = @"LPChartViewDisplayLabelsKey",
-    LPChartViewLabelViewKey     = @"LPChartViewLabelViewKey",
-    LPChartViewDataKey          = @"LPChartViewDataKey",
-    LPChartViewMaxValueKey      = @"LPChartViewMaxValueKey",
-    LPChartViewFramesSetKey     = @"LPChartViewFramesSetKey",
-    LPChartViewCurrentSizeKey   = @"LPChartViewCurrentSizeKey";
+var LPChartViewDataSourceKey       = @"LPChartViewDataSourceKey",
+    LPChartViewDrawViewKey         = @"LPChartViewDrawViewKey",
+    LPChartViewGridViewKey         = @"LPChartViewGridViewKey",
+    LPChartViewDisplayLabelsKey    = @"LPChartViewDisplayLabelsKey",
+    LPChartViewLabelViewKey        = @"LPChartViewLabelViewKey",
+    LPChartViewDataKey             = @"LPChartViewDataKey",
+    LPChartViewMaxValueKey         = @"LPChartViewMaxValueKey",
+    LPChartViewFramesSetKey        = @"LPChartViewFramesSetKey",
+    LPChartViewCurrentSizeKey      = @"LPChartViewCurrentSizeKey",
+    LPChartViewMaxValuePositionKey = @"LPChartViewMaxValuePositionKey",
+    LPChartViewMinValuePositionKey = @"LPChartViewMinValuePositionKey";
 
 @implementation LPChartView (CPCoding)
 
@@ -352,6 +353,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
         
         _framesSet = [aCoder decodeObjectForKey:LPChartViewFramesSetKey];
         _currentSize = [aCoder decodeSizeForKey:LPChartViewCurrentSizeKey];
+        
+        _maxValuePosition = [aCoder decodeIntForKey:LPChartViewMaxValuePositionKey];
+        _minValuePosition = [aCoder decodeFloatForKey:LPChartViewMinValuePositionKey];
         
         [self _setup];
     }
@@ -377,6 +381,9 @@ var LPChartViewDataSourceKey    = @"LPChartViewDataSourceKey",
     
     if (_currentSize)
         [aCoder encodeSize:_currentSize forKey:LPChartViewCurrentSizeKey];
+    
+    [aCoder encodeFloat:_maxValuePosition forKey:LPChartViewMaxValuePositionKey];
+    [aCoder encodeFloat:_minValuePosition forKey:LPChartViewMinValuePositionKey];
 }
 
 @end
