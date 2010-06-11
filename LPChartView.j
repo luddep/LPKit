@@ -173,7 +173,7 @@ var labelViewHeight = 20,
     if (dataSource && drawView && _data && _maxValue >= 0)
         return [self calculateItemFramesWithSets:_data maxValue:_maxValue];
     else
-        return nil;
+        return [];
 }
 
 - (void)reloadData
