@@ -84,7 +84,6 @@ var labelViewHeight = 20,
 - (void)setDataSource:(id)aDataSource
 {
     dataSource = aDataSource;
-    [self reloadData];
 }
 
 - (void)setDrawView:(id)aDrawView
@@ -118,7 +117,8 @@ var labelViewHeight = 20,
     [gridView setFrame:drawViewFrame];
     
     // Re-draw
-    [self reloadData];
+    if ([self window])
+        [self reloadData];
 }
 
 - (void)setGridView:(CPView)aGridView
@@ -317,6 +317,11 @@ var labelViewHeight = 20,
 {
     if (delegate && [delegate respondsToSelector:@selector(chart:didMouseOverItemAtIndex:)])
         [delegate chart:self didMouseOverItemAtIndex:-1];
+}
+
+- (void)viewDidMoveToWindow
+{
+    [self reloadData];
 }
 
 @end
