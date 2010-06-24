@@ -110,12 +110,13 @@
 - (void)setOn:(BOOL)shouldSetOn animated:(BOOL)shouldAnimate sendAction:(BOOL)shouldSendAction
 {
     // changed to stop the action firing if the user moved the switch to the inverse state, but then back to original state before releasing the mouse button
-    if (shouldSendAction && on!=shouldSetOn) {
+    if (shouldSendAction && on !== shouldSetOn)
+    {
 		on = shouldSetOn;
         [self sendAction:_action to:_target];
-	} else {
-		on = shouldSetOn;
 	}
+	else
+		on = shouldSetOn;
     
     var knobMinY = CGRectGetMinY([knob frame]),
         knobEndFrame = CGRectMake((on) ? [knob maxX] : [knob minX], knobMinY, CGRectGetWidth([knob frame]), CGRectGetHeight([knob frame])),
@@ -201,7 +202,7 @@
     if (![self isEnabled])
         return;
 
-    [self setOn:(isDragging) ? CGRectGetMidX([self bounds]) < CGRectGetMidX([knob frame]) : !on animated:YES];
+    [self setOn:isDragging ? CGRectGetMidX([self bounds]) < CGRectGetMidX([knob frame]) : !on animated:YES];
     
     [knob setHighlighted:NO];
     [self setNeedsLayout];
