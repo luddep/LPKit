@@ -51,8 +51,20 @@ var sharedLocationControllerInstance = nil;
     {
         observers = [CPArray array];
         currentHash = window.location.hash;
-            
-        [CPTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateLocation:) userInfo:nil repeats:YES];
+        
+        // Use onhashchange if that is available
+        if (typeof window.onhashchange !== "undefined")
+        {
+            window.onhashchange = function() {
+              [self updateLocation:nil];
+            };
+        }
+        
+        // If not, use the ol' interval
+        else
+        {
+            [CPTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(updateLocation:) userInfo:nil repeats:YES];
+        }
     }
     return self;
 }
