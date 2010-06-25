@@ -184,8 +184,10 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
             
             if ([_delegate respondsToSelector:@selector(animationDidEnd:)])
                 [_delegate animationDidEnd:animation];
-            
-        }, 1000 * _duration, self);
+        
+        // We delay it by 100 extra mseconds to make sure that all css animations have finished,
+        // it's not always *exactly* 1000 * duration.
+        }, (1000 * _duration) + 100, self);
         
     }
     else
@@ -303,9 +305,6 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     // Reset the css on each target
     for (var i = 0; i < _viewAnimations.length; i++)
         _viewAnimations[i][@"target"]._DOMElement.style[@"-webkit-transition-property"] = @"none";
-    
-    if ([_delegate respondsToSelector:@selector(animationDidEnd:)])
-        [_delegate animationDidEnd:self];
 }
 
 - (void)target:(id)aTarget setCSSAnimationDuration:(CPTimeInterval)aDuration
