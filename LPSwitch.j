@@ -134,11 +134,35 @@
     
     if (shouldAnimate)
     {
-        animation = [[LPViewAnimation alloc] initWithDuration:animationDuration animationCurve:animationCurve];
-        [animation addView:knob start:nil end:knobEndFrame];
-        [animation addView:onBackgroundView start:nil end:onBackgroundEndFrame];
-        [animation addView:offLabel start:nil end:offLabelEndFrame];
-        [animation addView:onLabel start:nil end:onLabelEndFrame];
+        animation = [[LPViewAnimation alloc] initWithViewAnimations:[
+                {
+                    @"target": knob,
+                    @"animations": [
+                        [LPOriginAnimationKey, [knob frame].origin, knobEndFrame.origin]
+                    ]
+                },
+                {
+                    @"target": onBackgroundView,
+                    @"animations": [
+                        [LPFrameAnimationKey, [onBackgroundView frame], onBackgroundEndFrame]
+                    ]
+                },
+                {
+                    @"target": offLabel,
+                    @"animations": [
+                        [LPOriginAnimationKey, [offLabel frame].origin, offLabelEndFrame.origin]
+                    ]
+                },
+                {
+                    @"target": onLabel,
+                    @"animations": [
+                        [LPOriginAnimationKey, [onLabel frame].origin, onLabelEndFrame.origin]
+                    ]
+                }
+            ]];
+        [animation setAnimationCurve:animationCurve];
+        [animation setDuration:animationDuration];
+        [animation setDelegate:self];
         [animation startAnimation];
     }
     else
@@ -241,6 +265,7 @@
 }
 
 @end
+
 
 @implementation LPSwitchKnob : CPView
 {
