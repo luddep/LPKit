@@ -41,8 +41,8 @@ var OS = require("os"),
 
 framework ("LPKit", function(task)
 {   
-    task.setBuildIntermediatesPath(FILE.join("Build", "LPKit.build", configuration));
-    task.setBuildPath(FILE.join("Build", configuration));
+    task.setBuildIntermediatesPath(FILE.join(ENV["CAPP_BUILD"], "KPUIKit.build", configuration));
+    task.setBuildPath(FILE.join(ENV["CAPP_BUILD"], configuration));
 
     task.setProductName("LPKit");
     task.setIdentifier("com.luddep.LPKit");
@@ -77,6 +77,8 @@ task ("release", function()
 task ("default", ["release"]);
 
 task ("build", ["LPKit"]);
+
+task ("install", ["debug", "release"])
 
 task ("symlink", ["release", "debug"], function()
 {
