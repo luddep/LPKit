@@ -366,9 +366,9 @@ var _startAndEndOfWeekCache = {};
             tileDate = [tile date],
             tileMonth = tileDate.getMonth();
 
-        // Clicked within the current month
-        //if (tileMonth == date.getMonth())
-        //    console.log('same month')
+        // Double clicked a date in the current month.
+        if (tileMonth == date.getMonth() && [[CPApp currentEvent] clickCount] === 2 && [calendarView doubleAction])
+            [CPApp sendAction:[calendarView doubleAction] to:[calendarView target] from:calendarView];
 
         // Clicked the Previous month
         if (tileMonth == previousMonth.getMonth())

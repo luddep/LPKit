@@ -46,6 +46,9 @@
 
     CPArray fullSelection @accessors(readonly);
     id _delegate @accessors(property=delegate);
+
+    id          _target @accessors(property=target);
+    SEL         _doubleAction @accessors(property=doubleAction);
 }
 
 + (CPString)themeClass
