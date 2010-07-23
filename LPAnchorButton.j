@@ -133,7 +133,7 @@ LPAnchorButtonHoverUnderline  = 2;
             self._DOMElement.appendChild(_DOMAnchorElement)
         }
         
-        _DOMAnchorElement.href = [_URL absoluteString];
+        _DOMAnchorElement.href = typeof _URL == 'string' ? _URL : [_URL absoluteString];
         
         var bounds = [self bounds];
         
