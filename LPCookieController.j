@@ -89,4 +89,9 @@ var sharedCookieControllerInstance = nil;
     return nil;
 }
 
+- (void)removeValueForKey:(CPString)aKey
+{
+    [self setValue:@"" forKey:aKey expirationDate:[CPDate distantPast]];
+}
+
 @end
