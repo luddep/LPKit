@@ -39,7 +39,7 @@ LPSlideViewNegativeDirection   = 4;
 
 @implementation LPSlideView : CPView
 {
-    CPString slideDirection @accessors;
+    int slideDirection @accessors;
     id currentView @accessors;
     id previousView @accessors;
     
