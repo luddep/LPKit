@@ -27,6 +27,10 @@
  * THE SOFTWARE.
  *
  */
+@import <AppKit/CPControl.j>
+@import <AppKit/CPView.j>
+@import <Foundation/CPDate.j>
+
 
 var immutableDistantFuture = [CPDate distantFuture];
 
@@ -47,10 +51,12 @@ var immutableDistantFuture = [CPDate distantFuture];
 
 @end
 
+
 LPCalendarDayLength = 1;
 LPCalendarWeekLength = 2;
 
 var _startAndEndOfWeekCache = {};
+
 
 @implementation LPCalendarMonthView : CPView
 {
@@ -93,21 +99,14 @@ var _startAndEndOfWeekCache = {};
     if (self = [super initWithFrame:aFrame])
     {
         calendarView = aCalendarView;
-
         selectionLengthType = LPCalendarDayLength;
         selection = [CPArray array];
-
         weekStartsOnMonday = YES;
-
         hiddenRows = [];
-
-        //[self setValue:[CPColor colorWithWhite:0.8 alpha:1] forThemeAttribute:@"grid-color" inState:CPThemeStateNormal];
 
         // Create tiles
         for (var i = 0; i < 42; i++)
             [self addSubview:[LPCalendarDayView dayViewWithCalendarView:aCalendarView]];
-
-        [self setNeedsLayout];
     }
     return self;
 }
@@ -119,12 +118,10 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setDate:(CPDate)aDate
 {
-    // Make a copy of the date
     date = [aDate copy];
 
     if (![aDate isEqualToDate:immutableDistantFuture])
     {
-
         // Reset the date to the first day of the month & midnight
         date.setDate(1);
         [date resetToMidnight];
@@ -577,12 +574,14 @@ var _startAndEndOfWeekCache = {};
 
 - (void)layoutSubviews
 {
-    [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:[self themeState]]]
+    var themeState = [self themeState];
+    
+    [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:themeState]]
 
-    [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:[self themeState]]];
-    [textField setTextColor:[calendarView valueForThemeAttribute:@"tile-text-color" inState:[self themeState]]];
-    [textField setTextShadowColor:[calendarView valueForThemeAttribute:@"tile-text-shadow-color" inState:[self themeState]]];
-    [textField setTextShadowOffset:[calendarView valueForThemeAttribute:@"tile-text-shadow-offset" inState:[self themeState]]];
+    [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:themeState]];
+    [textField setTextColor:[calendarView valueForThemeAttribute:@"tile-text-color" inState:themeState]];
+    [textField setTextShadowColor:[calendarView valueForThemeAttribute:@"tile-text-shadow-color" inState:themeState]];
+    [textField setTextShadowOffset:[calendarView valueForThemeAttribute:@"tile-text-shadow-offset" inState:themeState]];
 }
 
 @end
