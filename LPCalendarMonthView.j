@@ -118,6 +118,13 @@ var _startAndEndOfWeekCache = {};
 
 - (void)setDate:(CPDate)aDate
 {
+    // No need to reloadData if the new date is the same as before.
+    // ==
+    // Future note: Do not use UTC comparison here,
+    // since we reset the date to the relative midnight later on. 
+    if (date && date.getFullYear() === aDate.getFullYear() && date.getMonth() === aDate.getMonth())
+        return;
+    
     date = [aDate copy];
 
     if (![aDate isEqualToDate:immutableDistantFuture])
