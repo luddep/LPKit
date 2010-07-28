@@ -27,7 +27,6 @@
  * THE SOFTWARE.
  *
  */
-
 @import <AppKit/CPControl.j>
 @import <LPKit/LPCalendarHeaderView.j>
 @import <LPKit/LPCalendarMonthView.j>
@@ -201,6 +200,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
+    
     [self changeToMonth:[currentMonthView previousMonth]];
 }
 
@@ -209,6 +209,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
+    
     [self changeToMonth:[currentMonthView nextMonth]];
 }
 
@@ -219,16 +220,20 @@
 
 - (void)didMakeSelection:(CPArray)aSelection
 {
+    // Make sure we have an end to the selection
+    if ([aSelection count] <= 1)
+        [aSelection addObject:nil];
+    
+    // The selection didn't change
+    if ([fullSelection isEqualToArray:aSelection])
+        return;
+    
+    // Copy the selection
     fullSelection = [CPArray arrayWithArray:aSelection];
 
-    if ([fullSelection count] <= 1)
-        [fullSelection addObject:nil];
-
-    // Keeps any delegate calls from locking up the UI
-    setTimeout(function(){
-        if ([_delegate respondsToSelector:@selector(calendarView:didMakeSelection:end:)])
-            [_delegate calendarView:self didMakeSelection:[fullSelection objectAtIndex:0] end:[fullSelection lastObject]];
-    }, 1);
+    // Call the delegate
+    if (_delegate && [_delegate respondsToSelector:@selector(calendarView:didMakeSelection:end:)])
+        [_delegate calendarView:self didMakeSelection:[fullSelection objectAtIndex:0] end:[fullSelection lastObject]];
 }
 
 @end
