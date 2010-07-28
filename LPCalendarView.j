@@ -28,7 +28,6 @@
  *
  */
 
-
 @import <AppKit/CPControl.j>
 @import <LPKit/LPCalendarHeaderView.j>
 @import <LPKit/LPCalendarMonthView.j>
@@ -37,18 +36,18 @@
 
 @implementation LPCalendarView : CPView
 {
-    id headerView @accessors(readonly);
-    id slideView;
-    id currentMonthView;
+    LPCalendarHeaderView headerView @accessors(readonly);
+    LPSlideView          slideView;
+    
+    LPCalendarMonthView  currentMonthView;
+    LPCalendarMonthView  firstMonthView;
+    LPCalendarMonthView  secondMonthView;
 
-    id firstMonthView;
-    id secondMonthView;
+    CPArray              fullSelection @accessors(readonly);
+    id                   _delegate @accessors(property=delegate);
 
-    CPArray fullSelection @accessors(readonly);
-    id _delegate @accessors(property=delegate);
-
-    id          _target @accessors(property=target);
-    SEL         _doubleAction @accessors(property=doubleAction);
+    id                  _target @accessors(property=target);
+    SEL                 _doubleAction @accessors(property=doubleAction);
 }
 
 + (CPString)themeClass
