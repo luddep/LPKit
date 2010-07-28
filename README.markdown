@@ -1,9 +1,9 @@
 # LPKit
-A collection of different generic views & utilities for [Cappuccino](http://cappuccino.org/), extracted from the up-coming cappuccino port of [Observer](http://observerapp.com/).
+A collection of different generic views & utilities for [Cappuccino](http://cappuccino.org/), extracted from [Observer](http://observerapp.com/).
 
 A demo is available at <http://luddep.se/static/LPKit-Examples/>, with the source code in the [LPKit-Examples repository](https://github.com/luddep/LPKit-Examples).
 
-LPKit requires a version higher than 0.7.1 to run, which at the time of writing is only available as the master (or jake) trunk.
+LPKit requires [Cappuccino 0.8.1](http://github.com/280north/cappuccino/tree/v0.8.1).
 
 ## Installation
 
@@ -21,6 +21,18 @@ LPSlideView lets you slide between different subviews. Only one subview will be 
 
 LPCalendarView is a calendar view based on the iPhone calendar app, with the same sliding when changing months. Currently supports selecting days & weeks, also marking a special day as highlighted - such as the current day or week.
 
+## ChartView
+
+![calendar view](http://dl.getdropbox.com/u/24582/github/LPKit/chart.png)
+
+A fully customizable chart view that can be used to implement either Bar or Line charts.
+
+## PieChartView
+
+![calendar view](http://dl.getdropbox.com/u/24582/github/LPKit/pie.png)
+
+A fully customizable pie chart view.
+
 ## Sparkline
 
 ![sparkline](http://dl.getdropbox.com/u/24582/github/LPKit/sparkline.png)
@@ -32,6 +44,10 @@ A simple sparkline chart, comparable to the Google Chart sparklines - but using 
 ![switch control](http://dl.getdropbox.com/u/24582/github/LPKit/switch.png)
 
 A port of the UISwitch from the iPhone SDK, with the same behavior and feel.
+
+## Anchor Button
+
+A control which can either simulate anchors, or if provided with a CPURL creates an anchor element. Useful for creating hyperlinks.
 
 ## Utilities
 
