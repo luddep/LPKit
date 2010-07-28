@@ -60,27 +60,24 @@ var _startAndEndOfWeekCache = {};
 
 @implementation LPCalendarMonthView : CPView
 {
-    CPArray dayTiles;
-    CPDate date @accessors;
-    CPDate previousMonth @accessors(readonly);
-    CPDate nextMonth @accessors(readonly);
-    BOOL _dataIsDirty;
+    CPArray         dayTiles;
+    CPDate          date @accessors;
+    CPDate          previousMonth @accessors(readonly);
+    CPDate          nextMonth @accessors(readonly);
+    BOOL            _dataIsDirty;
 
-    BOOL allowsMultipleSelection @accessors;
-    int startSelectionIndex;
-    int currentSelectionIndex;
-    id selectionLengthType @accessors;
-    CPArray selection;
+    BOOL            allowsMultipleSelection @accessors;
+    int             startSelectionIndex;
+    int             currentSelectionIndex;
+    id              selectionLengthType @accessors;
+    CPArray         selection;
 
-    BOOL highlightCurrentPeriod @accessors;
-
-    BOOL weekStartsOnMonday @accessors;
-
-    id _delegate @accessors(property=delegate);
-
-    LPCalendarView calendarView @accessors;
-
-    CPArray hiddenRows @accessors;
+    BOOL            highlightCurrentPeriod @accessors;
+    BOOL            weekStartsOnMonday @accessors;
+    
+    id              _delegate @accessors(property=delegate);
+    LPCalendarView  calendarView @accessors;
+    CPArray         hiddenRows @accessors;
 }
 
 + (CPString)themeClass
@@ -140,6 +137,16 @@ var _startAndEndOfWeekCache = {};
         previousMonth = new Date(_firstDay.getTime() - 86400000);
         nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
     }
+    
+    [self reloadData];
+}
+
+- (void)setSelectionLengthType:(id)aSelectionType
+{
+    if (selectionLengthType === aSelectionType)
+        return;
+    
+    selectionLengthType = aSelectionType;
     
     [self reloadData];
 }
