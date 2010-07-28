@@ -27,10 +27,13 @@
  * THE SOFTWARE.
  * 
  */
+@import <AppKit/CPButton.j>
+@import <AppKit/CPControl.j>
 
-_monthNames = [@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"];
-_dayNamesShort = [@"mon", @"tue", @"wed", @"thu", @"fri", @"sat", @"sun"];
-_dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
+var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June", @"July", @"August", @"September", @"October", @"November", @"December"],
+    LPDayNamesShort = [@"mon", @"tue", @"wed", @"thu", @"fri", @"sat", @"sun"],
+    LPDayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
+
 
 @implementation LPCalendarHeaderView : CPControl
 {
@@ -68,9 +71,9 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
         
         dayLabels = [CPArray array];
         
-        for (var i = 0; i < [_dayNamesShort count]; i++)
+        for (var i = 0; i < [LPDayNamesShort count]; i++)
         {
-            var label = [LPCalendarLabel labelWithTitle:[_dayNamesShort objectAtIndex:i]];
+            var label = [LPCalendarLabel labelWithTitle:[LPDayNamesShort objectAtIndex:i]];
             [dayLabels addObject:label];
             [self addSubview:label];
         }
@@ -87,7 +90,7 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
     
     representedDate = [aDate copy];
     
-    [monthLabel setStringValue:[CPString stringWithFormat:@"%s %i", _monthNames[representedDate.getUTCMonth()], representedDate.getUTCFullYear()]];
+    [monthLabel setStringValue:[CPString stringWithFormat:@"%s %i", LPMonthNames[representedDate.getUTCMonth()], representedDate.getUTCFullYear()]];
     [monthLabel sizeToFit];
     [monthLabel setCenter:CGPointMake(CGRectGetMidX([self bounds]), 16)];
 }
@@ -96,7 +99,7 @@ _dayNamesShortUS = [@"sun", @"mon", @"tue", @"wed", @"thu", @"fri", @"sat"];
 {
     weekStartsOnMonday = shouldWeekStartOnMonday;
     
-    var dayNames = (shouldWeekStartOnMonday) ? _dayNamesShort : _dayNamesShortUS;
+    var dayNames = (shouldWeekStartOnMonday) ? LPDayNamesShort : LPDayNamesShortUS;
     
     for (var i = 0; i < [dayLabels count]; i++)
         [[dayLabels objectAtIndex:i] setTitle:[dayNames objectAtIndex:i]];
