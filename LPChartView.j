@@ -170,7 +170,7 @@ var labelViewHeight = 20,
 
 - (CPArray)itemFrames
 {
-    return (dataSource && drawView && _data && _maxValue >= 0) ? [self calculateItemFramesWithSets:_data maxValue:_maxValue] : [CPArray array];
+    return (dataSource && drawView && _data) ? [self calculateItemFramesWithSets:_data maxValue:_maxValue] : [CPArray array];
 }
 
 - (void)reloadData
@@ -238,7 +238,13 @@ var labelViewHeight = 20,
     _framesSet = [CPArray array];
     
     if (!sets.length)
-        return _framesSet; 
+        return _framesSet;
+        
+    // If the chart has no data to display,
+    // we set the max value to 1 so that it will
+    // at least draw an empty line at the bottom of the chart.
+    if (aMaxValue === 0)
+        aMaxValue = 1;
     
     var width = drawViewSize.width,
         height = drawViewSize.height - (2 * drawViewPadding),
