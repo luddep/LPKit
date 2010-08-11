@@ -36,23 +36,23 @@ var labelViewHeight = 20,
 
 @implementation LPChartView : CPView
 {
-    id dataSource @accessors;
-    id delegate @accessors;
-    id drawView @accessors;
+    id               dataSource @accessors;
+    id               delegate @accessors;
+    id               drawView @accessors;
     
-    LPChartGridView gridView @accessors;
+    LPChartGridView  gridView @accessors;
     
     LPChartLabelView labelView @accessors(readonly);
-    BOOL displayLabels @accessors;
+    BOOL             displayLabels @accessors;
     
-    CPArray _data;
-    int _maxValue;
+    CPArray          _data;
+    int              _maxValue;
     
-    CPArray _framesSet;
-    CGSize _currentSize;
+    CPArray          _framesSet;
+    CGSize           _currentSize;
     
-    float _maxValuePosition;
-    float _minValuePosition;
+    float            _maxValuePosition;
+    float            _minValuePosition;
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -170,10 +170,7 @@ var labelViewHeight = 20,
 
 - (CPArray)itemFrames
 {
-    if (dataSource && drawView && _data && _maxValue >= 0)
-        return [self calculateItemFramesWithSets:_data maxValue:_maxValue];
-    else
-        return [];
+    return (dataSource && drawView && _data && _maxValue >= 0) ? [self calculateItemFramesWithSets:_data maxValue:_maxValue] : [CPArray array];
 }
 
 - (void)reloadData
@@ -211,7 +208,6 @@ var labelViewHeight = 20,
     
     // Update grid view
     [gridView setNeedsDisplay:YES];
-    //[gridView setItemsLength:numberOfItems];
     
     // Update Label view
     [labelView reloadData];

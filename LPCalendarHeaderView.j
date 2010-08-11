@@ -221,7 +221,7 @@ var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June"
         [self incrementOriginBy:1]
     else if (type === CPLeftMouseUp)
         [self incrementOriginBy:-1]
-            
+    
     [super trackMouse:anEvent];
 }
 
