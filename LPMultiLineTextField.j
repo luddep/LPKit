@@ -114,6 +114,11 @@ var CPTextFieldInputOwner = nil;
         [super mouseDown:anEvent];
 }
 
+ - (void)mouseDragged:(CPEvent)anEvent
+{
+    return [[[anEvent window] platformWindow] _propagateCurrentDOMEvent:YES];
+}
+
 - (void)keyDown:(CPEvent)anEvent
 {
     if ([anEvent keyCode] === CPTabKeyCode)
