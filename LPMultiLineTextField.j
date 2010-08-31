@@ -106,6 +106,13 @@ var CPTextFieldInputOwner = nil;
     DOMElement.value = _stringValue || @"";
 }
 
+- (void)scrollWheel:(CPEvent)anEvent
+{
+    var DOMElement = [self _DOMTextareaElement];
+    DOMElement.scrollLeft += anEvent._deltaX;
+    DOMElement.scrollTop += anEvent._deltaY;
+}
+
 - (void)mouseDown:(CPEvent)anEvent
 {
     if ([self isEditable] && [self isEnabled])
