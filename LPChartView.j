@@ -307,9 +307,8 @@ var labelViewHeight = 20,
         if (!itemFrames.length)
             return;
             
-        var firstSet = itemFrames[0];
-        
-        var locationInDrawView = [drawView convertPoint:[anEvent locationInWindow] fromView:nil];
+        var firstSet = itemFrames[0],
+            locationInDrawView = [drawView convertPoint:[anEvent locationInWindow] fromView:nil];
     
         for (var i = 0; i < firstSet.length; i++)
         {
