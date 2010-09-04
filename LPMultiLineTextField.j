@@ -92,6 +92,7 @@ var CPTextFieldInputOwner = nil;
     var DOMElement = [self _DOMTextareaElement],
         contentInset = [self currentValueForThemeAttribute:@"content-inset"],
         bounds = [self bounds];
+
     
     DOMElement.style.top = contentInset.top + @"px";
     DOMElement.style.bottom = contentInset.bottom + @"px";
@@ -103,6 +104,19 @@ var CPTextFieldInputOwner = nil;
         
     DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
     DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
+ 
+    switch ([self currentValueForThemeAttribute:@"alignment"])
+    {
+        case CPCenterTextAlignment:
+            DOMElement.style.textAlign = "center";
+            break;
+        case CPRightTextAlignment:
+            DOMElement.style.textAlign = "right";
+            break;
+        default:
+            DOMElement.style.textAlign = "left";
+    }
+ 
     DOMElement.value = _stringValue || @"";
 }
 
