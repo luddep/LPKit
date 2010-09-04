@@ -302,12 +302,18 @@ var labelViewHeight = 20,
 {
     if (delegate && [delegate respondsToSelector:@selector(chart:didMouseOverItemAtIndex:)])
     {
-        var itemFrames = [self itemFrames][0],
-            locationInDrawView = [drawView convertPoint:[anEvent locationInWindow] fromView:nil];
+        var itemFrames = [self itemFrames];
+        
+        if (!itemFrames.length)
+            return;
+            
+        var firstSet = itemFrames[0];
+        
+        var locationInDrawView = [drawView convertPoint:[anEvent locationInWindow] fromView:nil];
     
-        for (var i = 0; i < itemFrames.length; i++)
+        for (var i = 0; i < firstSet.length; i++)
         {
-            var itemFrame = itemFrames[i];
+            var itemFrame = firstSet[i];
         
             if (itemFrame.origin.x <= locationInDrawView.x && (itemFrame.origin.x + itemFrame.size.width) > locationInDrawView.x)
             {
