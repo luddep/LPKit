@@ -235,3 +235,23 @@ var CPTextFieldInputOwner = nil;
 }
 
 @end
+
+
+var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey";
+
+@implementation LPMultiLineTextField (CPCoding)
+
+- (id)initWithCoder:(CPCoder)aCoder
+{
+    if (self = [super initWithCoder:aCoder])
+        [self setStringValue:[aCoder decodeObjectForKey:LPMultiLineTextFieldStringValueKey]];
+    return self;
+}
+
+- (void)encodeWithCoder:(CPCoder)aCoder
+{
+    [super encodeWithCoder:aCoder];      
+    [aCoder encodeObject:_stringValue forKey:LPMultiLineTextFieldStringValueKey];
+}
+
+@end
