@@ -32,8 +32,9 @@ var CPTextFieldInputOwner = nil;
 
 @implementation LPMultiLineTextField : CPTextField
 {
-    id _DOMTextareaElement;
-    CPString _stringValue;
+    id          _DOMTextareaElement;
+    CPString    _stringValue;
+    BOOL        _hideOverflow;
 }
 
 - (DOMElement)_DOMTextareaElement
@@ -54,7 +55,7 @@ var CPTextFieldInputOwner = nil;
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
                 CPTextFieldInputOwner = nil;
             };
-        
+
         self._DOMElement.appendChild(_DOMTextareaElement);
     }
     
@@ -68,6 +69,17 @@ var CPTextFieldInputOwner = nil;
     }
     return self;
 }
+
+- (BOOL)isScrollable
+{
+   return !_hideOverflow;
+}
+
+- (void)setScrollable:(BOOL)shouldScroll
+{
+    _hideOverflow = !shouldScroll;
+}
+
 
 - (void)setEditable:(BOOL)shouldBeEditable
 {
@@ -93,7 +105,6 @@ var CPTextFieldInputOwner = nil;
         contentInset = [self currentValueForThemeAttribute:@"content-inset"],
         bounds = [self bounds];
 
-    
     DOMElement.style.top = contentInset.top + @"px";
     DOMElement.style.bottom = contentInset.bottom + @"px";
     DOMElement.style.left = contentInset.left + @"px";
@@ -107,6 +118,12 @@ var CPTextFieldInputOwner = nil;
  
     switch ([self currentValueForThemeAttribute:@"alignment"])
     {
+        case CPLeftTextAlignment:
+            DOMElement.style.textAlign = "left";
+            break;        
+        case CPJustifiedTextAlignment:
+            DOMElement.style.textAlign = "justify"; //not supported
+            break;        
         case CPCenterTextAlignment:
             DOMElement.style.textAlign = "center";
             break;
@@ -118,6 +135,9 @@ var CPTextFieldInputOwner = nil;
     }
  
     DOMElement.value = _stringValue || @"";
+
+    if(_hideOverflow)
+        DOMElement.style.overflow=@"hidden";
 }
 
 - (void)scrollWheel:(CPEvent)anEvent
@@ -237,14 +257,18 @@ var CPTextFieldInputOwner = nil;
 @end
 
 
-var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey";
-
+var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey",
+    LPMultiLineTextFieldScrollableKey = "LPMultiLineTextFieldScrollableKey";
+    
 @implementation LPMultiLineTextField (CPCoding)
 
 - (id)initWithCoder:(CPCoder)aCoder
 {
     if (self = [super initWithCoder:aCoder])
+    {
         [self setStringValue:[aCoder decodeObjectForKey:LPMultiLineTextFieldStringValueKey]];
+        [self setScrollable:[aCoder decodeBoolForKey:LPMultiLineTextFieldScrollableKey]];
+    }
     return self;
 }
 
@@ -252,6 +276,7 @@ var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey";
 {
     [super encodeWithCoder:aCoder];      
     [aCoder encodeObject:_stringValue forKey:LPMultiLineTextFieldStringValueKey];
+    [aCoder encodeBool:(_hideOverflow?NO:YES) forKey:LPMultiLineTextFieldScrollableKey];
 }
 
 @end
