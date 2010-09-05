@@ -150,13 +150,21 @@
 
     // new current view
     currentMonthView = slideToView;
+    
+    // Display it way off,
+    // because cappuccino wont draw
+    // CGGraphics stuff unless it's visible
+    // due to a recent change.
+    [currentMonthView setFrameOrigin:CGPointMake(-500,-500)];
+    [currentMonthView setHidden:NO];
+    [currentMonthView setNeedsDisplay:YES];
 
     [headerView setDate:aMonth];
 
     setTimeout(function(){
         [slideFromView setHiddenRows:hiddenRows];
         [slideView slideToView:slideToView direction:direction animationProgress:startDelta];
-    }, 1);
+    }, 10);
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)shouldAllowMultipleSelection
