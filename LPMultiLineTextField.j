@@ -184,6 +184,7 @@ var CPTextFieldInputOwner = nil;
 {
     if (_stringValue !== [self stringValue])
     {
+       [[[[self window] undoManager] prepareWithInvocationTarget:self] setStringValue:_stringValue];
         _stringValue = [self stringValue];
         
         if (!_isEditing)
@@ -250,6 +251,8 @@ var CPTextFieldInputOwner = nil;
 
 - (void)setStringValue:(CPString)aString
 {
+    if(_stringValue != aString)
+        [[[[self window] undoManager] prepareWithInvocationTarget:self] setStringValue:_stringValue];
     _stringValue = aString;
     [self setNeedsLayout];
 }
