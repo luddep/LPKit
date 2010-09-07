@@ -208,14 +208,7 @@ var CPTextFieldInputOwner = nil;
 - (BOOL)becomeFirstResponder
 {
     _stringValue = [self stringValue];
-    
     [self setThemeState:CPThemeStateEditing];
-    
-    setTimeout(function(){
-        [self _DOMTextareaElement].focus();
-        CPTextFieldInputOwner = self;
-    }, 0.0);
-    
     [self textDidFocus:[CPNotification notificationWithName:CPTextFieldDidFocusNotification object:self userInfo:nil]];
     
     return YES;
