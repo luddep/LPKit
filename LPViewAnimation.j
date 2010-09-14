@@ -75,12 +75,16 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 
 @implementation LPViewAnimation : CPAnimation
 {
-    BOOL _isAnimating;
+    BOOL        _isAnimating;
     
-    CPArray _viewAnimations @accessors(property=viewAnimations);
-    id _animationDidEndTimeout;
+    CPArray     _viewAnimations @accessors(property=viewAnimations);
+    id          _animationDidEndTimeout;
     
-    BOOL _shouldUseCSSAnimations @accessors(property=shouldUseCSSAnimations);
+    BOOL        _shouldUseCSSAnimations @accessors(property=shouldUseCSSAnimations);
+    
+    // Curve
+    CPArray     _c1;
+    CPArray     _c2;
 }
 
 - (void)initWithViewAnimations:(CPArray)viewAnimations
@@ -95,6 +99,17 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     return self;
 }
 
+- (void)setAnimationCurve:(id)anAnimationCurve
+{
+    [super setAnimationCurve:anAnimationCurve];
+    
+    _c1 = [];
+    _c2 = [];
+    
+    [_timingFunction getControlPointAtIndex:1 values:_c1];
+    [_timingFunction getControlPointAtIndex:2 values:_c2];
+}
+
 - (void)startAnimation
 {
     if (LPCSSAnimationsAreAvailable && _shouldUseCSSAnimations)
@@ -104,7 +119,8 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
         
         _isAnimating = YES;
         
-        for (var i = 0; i < _viewAnimations.length; i++)
+        var i = _viewAnimations.length;
+        while (i--)
         {
             var viewAnimation = _viewAnimations[i],
                 target = viewAnimation[@"target"];
@@ -113,7 +129,8 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
             [self target:target setCSSAnimationDuration:_duration];
             [self target:target setCSSAnimationCurve:_animationCurve];
             
-            for (var x = 0; x < viewAnimation[@"animations"].length; x++)
+            var x = viewAnimation[@"animations"].length;
+            while (x--)
             {
                 var animation = viewAnimation[@"animations"][x],
                     kind = animation[0],
@@ -193,26 +210,31 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     else
     {
         // Set the start value for each animation on the target view
-        for (var i = 0; i < _viewAnimations.length; i++)
+        var i = _viewAnimations.length;
+        while (i--)
         {
             var viewAnimation = _viewAnimations[i],
                 target = viewAnimation[@"target"];
             
-            for (var x = 0; x < viewAnimation[@"animations"].length; x++)
+            var x = viewAnimation[@"animations"].length;
+            while (x--)
             {
                 var animation = viewAnimation[@"animations"][x],
                     kind = animation[0],
                     start = animation[1],
                     end = animation[2];
                 
-                if (kind === LPFadeAnimationKey)
-                    [target setAlphaValue:start];    
-            
-                else if(kind === LPOriginAnimationKey)
-                    [target setFrameOrigin:start];
-            
-                else if(kind === LPFrameAnimationKey)
-                    [target setFrame:start];
+                switch (kind)
+                {
+                    case LPFadeAnimationKey:   [target setAlphaValue:start];
+                                               break;
+                    
+                    case LPOriginAnimationKey: [target setFrameOrigin:start];
+                                               break;
+                    
+                    case LPFrameAnimationKey:  [target setFrame:start];
+                                               break;
+                }
             }
         }
         
@@ -227,51 +249,39 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 - (void)setCurrentProgress:(float)aProgress
 {
 	_progress = aProgress;
-	
-	var value = [self currentValue],
-	    length = _viewAnimations.length;
  
-    for (var i = 0; i < length; i++)
+    var value = CubicBezierAtTime(_progress, _c1[0], _c1[1], _c2[0], _c2[1], _duration),
+        i = _viewAnimations.length;
+    
+    while (i--)
     {
         var viewAnimation = _viewAnimations[i],
-            target = viewAnimation["target"];
+            target = viewAnimation["target"],
+            x = viewAnimation["animations"].length;
         
-        for (var x = 0; x < viewAnimation["animations"].length; x++)
+        while (x--)
         {
             var animation = viewAnimation["animations"][x],
                 kind = animation[0],
                 start = animation[1],
                 end = animation[2];
             
-            if (kind === LPFadeAnimationKey)
+            switch (kind)
             {
-                [target setAlphaValue:(value * (end - start)) + start];    
-            }
-            else if(kind === LPOriginAnimationKey)
-            {
-                [target setFrameOrigin:CGPointMake(start.x + (value * (end.x - start.x)),
-                                                   start.y + (value * (end.y - start.y)))];
-            }
-            else if(kind === LPFrameAnimationKey)
-            {
-                [target setFrame:CGRectMake(start.origin.x + (value * (end.origin.x - start.origin.x)),
-                                            start.origin.y + (value * (end.origin.y - start.origin.y)),
-                                            start.size.width + (value * (end.size.width - start.size.width)),
-                                            start.size.height + (value * (end.size.height - start.size.height)))];
+                case LPFadeAnimationKey:   [target setAlphaValue:(value * (end - start)) + start];
+                                           break;
+                                         
+                case LPOriginAnimationKey: [target setFrameOrigin:CGPointMake(start.x + (value * (end.x - start.x)),
+                                                                              start.y + (value * (end.y - start.y)))];
+                                           break;
+                                           
+                case LPFrameAnimationKey:  [target setFrame:CGRectMake(start.origin.x + (value * (end.origin.x - start.origin.x)),
+                                                                       start.origin.y + (value * (end.origin.y - start.origin.y)),
+                                                                       start.size.width + (value * (end.size.width - start.size.width)),
+                                                                       start.size.height + (value * (end.size.height - start.size.height)))]
             }
         }
     }
-}
-
-- (float)currentValue
-{
-    var c1 = [],
-        c2 = [];
-  
-    [_timingFunction getControlPointAtIndex:1 values:c1];
-    [_timingFunction getControlPointAtIndex:2 values:c2];
- 
-    return CubicBezierAtTime(_progress, c1[0], c1[1], c2[0], c2[1], _duration);
 }
 
 - (BOOL)isAnimating
