@@ -185,6 +185,7 @@ var CPTextFieldInputOwner = nil;
     if (_stringValue !== [self stringValue])
     {
        [[[[self window] undoManager] prepareWithInvocationTarget:self] setStringValue:_stringValue];
+       [[[self window] undoManager] setActionName:@"Typing"];
         _stringValue = [self stringValue];
         
         if (!_isEditing)
