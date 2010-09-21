@@ -39,6 +39,7 @@ var labelViewHeight = 20,
     id               dataSource @accessors;
     id               delegate @accessors;
     id               drawView @accessors;
+    int              fixedMaxValue @accessors;
     
     LPChartGridView  gridView @accessors;
     
@@ -79,6 +80,8 @@ var labelViewHeight = 20,
     [self addSubview:labelView];
     
     _currentSize = CGSizeMake(0,0);
+    
+    fixedMaxValue = 0;
 }
 
 - (void)setDataSource:(id)aDataSource
@@ -180,7 +183,7 @@ var labelViewHeight = 20,
     
     // Reset data & max value
     _data = [CPArray array];
-    _maxValue = 0;
+    _maxValue = fixedMaxValue;
     
     var numberOfSets = [dataSource numberOfSetsInChart:self];
     
