@@ -30,8 +30,6 @@
 @import <AppKit/CPView.j>
 
 // TODO: These should be ivars, or more likely, theme settings.
-var labelViewHeight = 20,
-    drawViewPadding = 5;
 
 
 @implementation LPChartView : CPView
@@ -40,6 +38,8 @@ var labelViewHeight = 20,
     id               delegate @accessors;
     id               drawView @accessors;
     int              fixedMaxValue @accessors;
+    int              labelViewHeight @accessors;
+    int              drawViewPadding @accessors;
     
     LPChartGridView  gridView @accessors;
     
@@ -82,6 +82,8 @@ var labelViewHeight = 20,
     _currentSize = CGSizeMake(0,0);
     
     fixedMaxValue = 0;
+    labelViewHeight = 20;
+    drawViewPadding = 5;
 }
 
 - (void)setDataSource:(id)aDataSource
