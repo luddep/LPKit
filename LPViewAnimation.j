@@ -144,8 +144,9 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                     // Prepare target for this specific animation.
                     [self target:target addCSSAnimationPropertyForKey:kind append:x !== 0];
                     
-                    // Oddly enough, this does not need to be wrapped in a setTimeout.
+                    // Needs to be wrapped.
                     setTimeout(function(_target, _end){
+                        _target._DOMElement.style["-webkit-transform"] = "translate3d(0px, 0px, 0px)";
                         [_target setAlphaValue:_end];
                     }, 0, target, end);
                     
@@ -165,7 +166,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                             var x = _end.x - _start.x,
                                 y = _end.y - _start.y;
                             
-                            _target._DOMElement.style["-webkit-transform"] = "translate(" + x +"px, " + y + "px)";
+                            _target._DOMElement.style["-webkit-transform"] = "translate3d(" + x +"px, " + y + "px, 0px)";
                             
                             // Need to match the new position with the actual frame 
                             setTimeout(function(){
@@ -174,7 +175,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                                 [self _clearCSS];
                                 
                                 // Reset the translate
-                                _target._DOMElement.style["-webkit-transform"] = "translate(0px, 0px)";
+                                _target._DOMElement.style["-webkit-transform"] = "translate3d(0px, 0px, 0px)";
                                 
                                 // Set the real frame
                                 [_target setFrameOrigin:_end];
@@ -350,7 +351,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     
     switch(aKey)
     {
-        case LPFadeAnimationKey:   CSSValue = @"opacity";
+        case LPFadeAnimationKey:   CSSValue = @"-webkit-transform, opacity";
                                    break;
         
         case LPOriginAnimationKey: CSSValue = @"-webkit-transform";
