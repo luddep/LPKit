@@ -99,3 +99,4 @@ An example on how to use themes with LPKit is available in in the [LPKit-Example
 * [Klaas Pieter Annema](http://github.com/klaaspieter)
 * [Dimitris Tsitses](http://github.com/dtsitses)
 * [Randy Luecke](http://github.com/Me1000)
+* [Antoine Mercadal](http://github.com/primalmotion)
