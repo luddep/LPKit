@@ -47,7 +47,7 @@ var sharedCookieControllerInstance = nil;
 
 - (void)setValue:(CPString)aValue forKey:(CPString)aKey
 {
-    return [self setValue:aValue forKey:aKey expirationDate:nil path:nil];
+    return [self setValue:aValue forKey:aKey expirationDate:nil];
 }
 
 - (void)setValue:(CPString)aValue forKey:(CPString)aKey expirationDate:(CPDate)anExpirationDate
@@ -56,6 +56,11 @@ var sharedCookieControllerInstance = nil;
 }
 
 - (void)setValue:(CPString)aValue forKey:(CPString)aKey expirationDate:(CPDate)anExpirationDate path:(CPString)aPath
+{
+    return [self setValue:aValue forKey:aKey expirationDate:anExpirationDate path:aPath domain:nil];
+}
+
+- (void)setValue:(CPString)aValue forKey:(CPString)aKey expirationDate:(CPDate)anExpirationDate path:(CPString)aPath domain:(CPString)aDomain
 {
     var cookieString = @"";
     
@@ -67,7 +72,14 @@ var sharedCookieControllerInstance = nil;
         cookieString += [CPString stringWithFormat:@"expires=%s; ", anExpirationDate.toUTCString()];
     
     // Add path
-    cookieString += [CPString stringWithFormat:@"path=%s", (aPath) ? aPath : @"/"]
+    cookieString += [CPString stringWithFormat:@"path=%s; ", aPath || @"/"];
+    
+    // Add domain
+    if (aDomain)
+        cookieString += [CPString stringWithFormat:@"domain=%s; ", aDomain];
+        
+    // Remove trailing '; '
+    cookieString = [cookieString substringToIndex:[cookieString length] - 2];
     
     // Set the cookie
     document.cookie = cookieString;
