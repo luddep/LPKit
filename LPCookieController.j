@@ -60,12 +60,18 @@ var sharedCookieControllerInstance = nil;
     return [self setValue:aValue forKey:aKey expirationDate:anExpirationDate path:aPath domain:nil];
 }
 
+
 - (void)setValue:(CPString)aValue forKey:(CPString)aKey expirationDate:(CPDate)anExpirationDate path:(CPString)aPath domain:(CPString)aDomain
+{
+    return [self setValue:aValue forKey:aKey expirationDate:anExpirationDate path:aPath domain:nil escape:YES];
+}
+
+- (void)setValue:(CPString)aValue forKey:(CPString)aKey expirationDate:(CPDate)anExpirationDate path:(CPString)aPath domain:(CPString)aDomain escape:(BOOL)shouldEscape
 {
     var cookieString = @"";
     
     // Add key value pair
-    cookieString += [CPString stringWithFormat:@"%s=%s; ", aKey, escape(aValue)];
+    cookieString += [CPString stringWithFormat:@"%s=%s; ", aKey, shouldEscape ? escape(aValue) : aValue];
     
     // Add expiration date
     if (anExpirationDate)
