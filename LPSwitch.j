@@ -280,6 +280,13 @@
     [super setEnabled:isEnabled];
 }
 
+- (void)setState:(int)aState
+{
+    if (aState == CPOnState)
+        [self setOn:YES animated:YES sendAction:NO];
+    else
+        [self setOn:NO animated:YES sendAction:NO];
+}
 @end
 
 
