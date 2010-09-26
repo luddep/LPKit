@@ -287,6 +287,12 @@
     else
         [self setOn:NO animated:YES sendAction:NO];
 }
+
+- (BOOL)state
+{
+    return on ? CPOnState : CPOffState;
+}
+
 @end
 
 
