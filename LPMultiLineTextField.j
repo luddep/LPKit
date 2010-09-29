@@ -64,9 +64,7 @@ var CPTextFieldInputOwner = nil;
 
 - (id)initWithFrame:(CGRect)aFrame
 {
-    if (self = [super initWithFrame:aFrame])
-    {
-    }
+    if (self != [super initWithFrame:aFrame]) return nil;
     return self;
 }
 
@@ -95,6 +93,7 @@ var CPTextFieldInputOwner = nil;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
     
     var contentView = [self layoutEphemeralSubviewNamed:@"content-view"
                                              positioned:CPWindowAbove
@@ -133,8 +132,8 @@ var CPTextFieldInputOwner = nil;
         default:
             DOMElement.style.textAlign = "left";
     }
- 
-    DOMElement.value = _stringValue || @"";
+    
+    DOMElement.value = ([self hasThemeState:CPTextFieldStatePlaceholder]) ? _placeholderString : (_stringValue || @"");
 
     if(_hideOverflow)
         DOMElement.style.overflow=@"hidden";
@@ -209,6 +208,7 @@ var CPTextFieldInputOwner = nil;
     _stringValue = [self stringValue];
     
     [self setThemeState:CPThemeStateEditing];
+    [self _updatePlaceholderState];
     
     setTimeout(function(){
         [self _DOMTextareaElement].focus();
@@ -223,7 +223,7 @@ var CPTextFieldInputOwner = nil;
 - (BOOL)resignFirstResponder
 {
     [self unsetThemeState:CPThemeStateEditing];
-    
+    [self _updatePlaceholderState];
     [self setStringValue:[self stringValue]];
     
     [self _DOMTextareaElement].blur();
@@ -245,12 +245,14 @@ var CPTextFieldInputOwner = nil;
 
 - (CPString)stringValue
 {
+    if ([self hasThemeState:CPTextFieldStatePlaceholder]) return @"";
     return (!!_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
 }
 
 - (void)setStringValue:(CPString)aString
 {
     _stringValue = aString;
+    [self _updatePlaceholderState];
     [self setNeedsLayout];
 }
 
