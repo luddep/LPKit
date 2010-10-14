@@ -92,6 +92,7 @@ var CPTextFieldInputOwner = nil;
 
 - (void)layoutSubviews
 {
+
     [super layoutSubviews];
     
     
@@ -132,8 +133,8 @@ var CPTextFieldInputOwner = nil;
         default:
             DOMElement.style.textAlign = "left";
     }
-    
-    DOMElement.value = ([self hasThemeState:CPTextFieldStatePlaceholder]) ? _placeholderString : (_stringValue || @"");
+
+    DOMElement.value = ([self hasThemeState:CPTextFieldStatePlaceholder] && [self isEditable]) ? _placeholderString : (_stringValue || @"");
 
     if(_hideOverflow)
         DOMElement.style.overflow=@"hidden";
@@ -245,7 +246,10 @@ var CPTextFieldInputOwner = nil;
 
 - (CPString)stringValue
 {
-    if ([self hasThemeState:CPTextFieldStatePlaceholder]) return @"";
+    if ([self hasThemeState:CPTextFieldStatePlaceholder])
+    if (!_DOMTextareaElement)
+    return nil;
+
     return (!!_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
 }
 
