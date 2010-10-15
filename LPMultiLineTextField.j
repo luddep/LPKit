@@ -133,8 +133,16 @@ var CPTextFieldInputOwner = nil;
         default:
             DOMElement.style.textAlign = "left";
     }
+    
+    if ([self hasThemeState:CPTextFieldStatePlaceholder]) {
+    
+    	DOMElement.value = [self placeholderString];
+    
+    } else {
 
-    DOMElement.value = ([self hasThemeState:CPTextFieldStatePlaceholder] && [self isEditable]) ? _placeholderString : (_stringValue || @"");
+        DOMElement.value = [self stringValue];
+    
+    }
 
     if(_hideOverflow)
         DOMElement.style.overflow=@"hidden";
@@ -182,10 +190,12 @@ var CPTextFieldInputOwner = nil;
 
 - (void)keyUp:(CPEvent)anEvent
 {
-    if (_stringValue !== [self stringValue])
+    var oldStringValue = [self stringValue];
+    [self _setStringValue:[self _DOMTextareaElement].value];
+
+    if (oldStringValue !== [self stringValue])
     {
-        _stringValue = [self stringValue];
-        
+                
         if (!_isEditing)
         {
             _isEditing = YES;
@@ -244,20 +254,22 @@ var CPTextFieldInputOwner = nil;
     return YES;
 }
 
-- (CPString)stringValue
+- (void)_setStringValue:(id)aValue
 {
-    if ([self hasThemeState:CPTextFieldStatePlaceholder])
-    if (!_DOMTextareaElement)
-    return nil;
-
-    return (!!_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
+    [self willChangeValueForKey:@"objectValue"];
+    [super setObjectValue:String(aValue)];
+    [self _updatePlaceholderState];
+    [self didChangeValueForKey:@"objectValue"];
 }
 
-- (void)setStringValue:(CPString)aString
+- (void)setObjectValue:(id)aValue
 {
-    _stringValue = aString;
+    [super setObjectValue:aValue];
+
+	if (CPTextFieldInputOwner === self || [[self window] firstResponder] === self)
+        [self _DOMTextareaElement].value = aValue;
+
     [self _updatePlaceholderState];
-    [self setNeedsLayout];
 }
 
 @end
