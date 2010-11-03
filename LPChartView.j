@@ -128,8 +128,13 @@ var labelViewHeight = 20,
     
     [aGridView setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
     [self replaceSubview:gridView with:aGridView];
-    
+
+    var gridViewFrame = [drawView frame];
+    gridViewFrame.height -= 1;
+    [aGridView setFrame:gridViewFrame];
+
     gridView = aGridView;
+
 }
 
 - (void)setDisplayLabels:(BOOL)shouldDisplayLabels
