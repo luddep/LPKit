@@ -96,6 +96,7 @@
         [slideView addSubview:secondMonthView];
 
         currentMonthView = firstMonthView;
+        [currentMonthView setNeedsLayout];
 
         // Default to today's date.
         [self setMonth:[CPDate date]];
@@ -158,6 +159,7 @@
     [currentMonthView setFrameOrigin:CGPointMake(-500,-500)];
     [currentMonthView setHidden:NO];
     [currentMonthView setNeedsDisplay:YES];
+    [currentMonthView setNeedsLayout];
 
     [headerView setDate:aMonth];
 
@@ -199,6 +201,8 @@
         
     [headerView setFrameSize:CGSizeMake(width, headerHeight)];
     [slideView setFrame:CGRectMake(0, headerHeight, width, CGRectGetHeight([self bounds]) - headerHeight)];
+    
+    [headerView setNeedsLayout];
     
     [slideView setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
 }

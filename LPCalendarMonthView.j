@@ -589,7 +589,6 @@ var _startAndEndOfWeekCache = {};
 - (void)layoutSubviews
 {
     var themeState = [self themeState];
-    
     [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:themeState]]
 
     [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:themeState]];
