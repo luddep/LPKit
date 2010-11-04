@@ -252,6 +252,9 @@ var CPTextFieldInputOwner = nil;
 {
     _stringValue = aString;
     [self setNeedsLayout];
+    if (!!_DOMTextareaElement)
+        if (aString !== _DOMTextareaElement.value)
+            _DOMTextareaElement.value = aString;
 }
 
 @end
