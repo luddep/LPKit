@@ -56,8 +56,8 @@
 
 + (id)themeAttributes
 {
-    return [CPDictionary dictionaryWithObjects:[[CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], CGSizeMake(0,0), [CPNull null], [CPNull null], 40, [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], 30, [CPNull null], [CPNull null], [CPNull null], [CPNull null]]
-                                       forKeys:[@"background-color", @"grid-color",
+    return [CPDictionary dictionaryWithObjects:[[CPNull null], CGInsetMakeZero(), [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], CGSizeMake(0,0), [CPNull null], [CPNull null], 40, [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], [CPNull null], 30, [CPNull null], [CPNull null], [CPNull null], [CPNull null]]
+                                       forKeys:[@"bezel-color", @"bezel-inset", @"grid-color", @"grid-shadow-color",
                                                 @"tile-size", @"tile-font", @"tile-text-color", @"tile-text-shadow-color", @"tile-text-shadow-offset", @"tile-bezel-color",
                                                 @"header-button-offset", @"header-prev-button-image", @"header-next-button-image", @"header-height", @"header-background-color", @"header-font", @"header-text-color", @"header-text-shadow-color", @"header-text-shadow-offset", @"header-alignment",
                                                 @"header-weekday-offset", @"header-weekday-label-font", @"header-weekday-label-color", @"header-weekday-label-shadow-color", @"header-weekday-label-shadow-offset"]];
@@ -86,6 +86,10 @@
         [slideView setAnimationCurve:CPAnimationEaseOut];
         [slideView setAnimationDuration:0.2];
         [self addSubview:slideView];
+
+	bezelView = [[CPView alloc] initWithFrame:[slideView frame]];
+	[bezelView setHitTests:NO];
+	[self addSubview:bezelView positioned:CPWindowBelow relativeTo:nil];
 
         firstMonthView = [[LPCalendarMonthView alloc] initWithFrame:[slideView bounds] calendarView:self];
         [firstMonthView setDelegate:self];
@@ -199,8 +203,20 @@
         
     [headerView setFrameSize:CGSizeMake(width, headerHeight)];
     [slideView setFrame:CGRectMake(0, headerHeight, width, CGRectGetHeight([self bounds]) - headerHeight)];
-    
-    [slideView setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
+
+	[bezelView setBackgroundColor:[self currentValueForThemeAttribute:@"bezel-color"]];
+	var bezelInset = [self currentValueForThemeAttribute:@"bezel-inset"];
+
+	var slideFrame = [slideView frame];
+	[bezelView setFrame:CGRectMake(
+		
+		slideFrame.origin.x + bezelInset.left,
+		slideFrame.origin.y + bezelInset.top,
+		slideFrame.size.width - bezelInset.left - bezelInset.right,
+		slideFrame.size.height - bezelInset.top - bezelInset.bottom
+		
+	)];
+
 }
 
 - (void)didClickPrevButton:(id)sender
