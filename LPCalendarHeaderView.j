@@ -56,8 +56,9 @@ var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June"
 {
     if(self = [super initWithFrame:aFrame])
     {
-        monthLabel = [[CPTextField alloc] initWithFrame:CGRectMakeZero()];
-        [monthLabel setAutoresizingMask:CPViewMinXMargin | CPViewMaxXMargin];
+        monthLabel = [[CPTextField alloc] initWithFrame:CGRectMake(0, 8, aFrame.size.width, 32)];
+        [monthLabel setAutoresizingMask:CPViewMaxYMargin | CPViewWidthSizable];
+        [monthLabel setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
         [self addSubview:monthLabel];
         
         prevButton = [[LPCalendarHeaderArrowButton alloc] initWithFrame:CGRectMake(6, 9, 0, 0)];
@@ -91,8 +92,7 @@ var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June"
     representedDate = [aDate copy];
     
     [monthLabel setStringValue:[CPString stringWithFormat:@"%s %i", LPMonthNames[representedDate.getUTCMonth()], representedDate.getUTCFullYear()]];
-    [monthLabel sizeToFit];
-    [monthLabel setCenter:CGPointMake(CGRectGetMidX([self bounds]), 16)];
+
 }
 
 - (void)setWeekStartsOnMonday:(BOOL)shouldWeekStartOnMonday
