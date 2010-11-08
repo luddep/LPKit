@@ -71,6 +71,7 @@
         fullSelection = [nil, nil];
 
         var bounds = [self bounds];
+	[self setClipsToBounds:NO];
 
         headerView = [[LPCalendarHeaderView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(bounds), 40)];
         [[headerView prevButton] setTarget:self];
@@ -207,16 +208,16 @@
 	[bezelView setBackgroundColor:[self currentValueForThemeAttribute:@"bezel-color"]];
 	var bezelInset = [self currentValueForThemeAttribute:@"bezel-inset"];
 
-	var slideFrame = [slideView frame];
+	var viewFrame = [self frame];
 	[bezelView setFrame:CGRectMake(
 		
-		slideFrame.origin.x + bezelInset.left,
-		slideFrame.origin.y + bezelInset.top,
-		slideFrame.size.width - bezelInset.left - bezelInset.right,
-		slideFrame.size.height - bezelInset.top - bezelInset.bottom
+		0 + bezelInset.left,
+		0 + bezelInset.top,
+		viewFrame.size.width - bezelInset.left - bezelInset.right,
+		viewFrame.size.height - bezelInset.top - bezelInset.bottom
 		
 	)];
-
+	
 }
 
 - (void)didClickPrevButton:(id)sender
