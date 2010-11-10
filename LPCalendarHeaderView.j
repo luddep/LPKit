@@ -59,6 +59,7 @@ var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June"
         monthLabel = [[CPTextField alloc] initWithFrame:CGRectMake(0, 8, aFrame.size.width, aFrame.size.height)];
         [monthLabel setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
         [monthLabel setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
+	[monthLabel setHitTests:NO];
         [self addSubview:monthLabel];
         
         prevButton = [[LPCalendarHeaderArrowButton alloc] initWithFrame:CGRectMake(6, 9, 0, 0)];
