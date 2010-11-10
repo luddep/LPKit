@@ -2,21 +2,21 @@
  * LPMultiLineTextField.j
  *
  * Created by Ludwig Pettersson on January 22, 2010.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Ludwig Pettersson
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 @import <AppKit/CPTextField.j>
 
@@ -50,7 +50,7 @@ var CPTextFieldInputOwner = nil;
         _DOMTextareaElement.style.resize = @"none";
         _DOMTextareaElement.style.padding = @"0";
         _DOMTextareaElement.style.margin = @"0";
-        
+
         _DOMTextareaElement.onblur = function(){
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
                 CPTextFieldInputOwner = nil;
@@ -58,7 +58,7 @@ var CPTextFieldInputOwner = nil;
 
         self._DOMElement.appendChild(_DOMTextareaElement);
     }
-    
+
     return _DOMTextareaElement;
 }
 
@@ -95,12 +95,12 @@ var CPTextFieldInputOwner = nil;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
+
     var contentView = [self layoutEphemeralSubviewNamed:@"content-view"
                                              positioned:CPWindowAbove
                         relativeToEphemeralSubviewNamed:@"bezel-view"];
     [contentView setHidden:YES];
-    
+
     var DOMElement = [self _DOMTextareaElement],
         contentInset = [self currentValueForThemeAttribute:@"content-inset"],
         bounds = [self bounds];
@@ -109,21 +109,21 @@ var CPTextFieldInputOwner = nil;
     DOMElement.style.bottom = contentInset.bottom + @"px";
     DOMElement.style.left = contentInset.left + @"px";
     DOMElement.style.right = contentInset.right + @"px";
-    
+
     DOMElement.style.width = (CGRectGetWidth(bounds) - contentInset.left - contentInset.right) + @"px";
     DOMElement.style.height = (CGRectGetHeight(bounds) - contentInset.top - contentInset.bottom) + @"px";
-        
+
     DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
     DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
- 
+
     switch ([self currentValueForThemeAttribute:@"alignment"])
     {
         case CPLeftTextAlignment:
             DOMElement.style.textAlign = "left";
-            break;        
+            break;
         case CPJustifiedTextAlignment:
             DOMElement.style.textAlign = "justify"; //not supported
-            break;        
+            break;
         case CPCenterTextAlignment:
             DOMElement.style.textAlign = "center";
             break;
@@ -133,7 +133,7 @@ var CPTextFieldInputOwner = nil;
         default:
             DOMElement.style.textAlign = "left";
     }
- 
+
     DOMElement.value = _stringValue || @"";
 
     if(_hideOverflow)
@@ -168,15 +168,15 @@ var CPTextFieldInputOwner = nil;
             [[self window] selectPreviousKeyView:self];
         else
             [[self window] selectNextKeyView:self];
- 
+
         if ([[[self window] firstResponder] respondsToSelector:@selector(selectText:)])
             [[[self window] firstResponder] selectText:self];
- 
+
         [[[self window] platformWindow] _propagateCurrentDOMEvent:NO];
     }
     else
         [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
-    
+
     [[CPRunLoop currentRunLoop] limitDateForMode:CPDefaultRunLoopMode];
 }
 
@@ -185,16 +185,16 @@ var CPTextFieldInputOwner = nil;
     if (_stringValue !== [self stringValue])
     {
         _stringValue = [self stringValue];
-        
+
         if (!_isEditing)
         {
             _isEditing = YES;
             [self textDidBeginEditing:[CPNotification notificationWithName:CPControlTextDidBeginEditingNotification object:self userInfo:nil]];
         }
- 
+
         [self textDidChange:[CPNotification notificationWithName:CPControlTextDidChangeNotification object:self userInfo:nil]];
     }
- 
+
     [[[self window] platformWindow] _propagateCurrentDOMEvent:YES];
 }
 
@@ -207,25 +207,25 @@ var CPTextFieldInputOwner = nil;
 - (BOOL)becomeFirstResponder
 {
     _stringValue = [self stringValue];
-    
+
     [self setThemeState:CPThemeStateEditing];
-    
+
     setTimeout(function(){
         [self _DOMTextareaElement].focus();
         CPTextFieldInputOwner = self;
     }, 0.0);
-    
+
     [self textDidFocus:[CPNotification notificationWithName:CPTextFieldDidFocusNotification object:self userInfo:nil]];
-    
+
     return YES;
 }
 
 - (BOOL)resignFirstResponder
 {
     [self unsetThemeState:CPThemeStateEditing];
-    
+
     [self setStringValue:[self stringValue]];
-    
+
     [self _DOMTextareaElement].blur();
 
     //post CPControlTextDidEndEditingNotification
@@ -237,9 +237,9 @@ var CPTextFieldInputOwner = nil;
         if ([self sendsActionOnEndEditing])
             [self sendAction:[self action] to:[self target]];
     }
-    
+
     [self textDidBlur:[CPNotification notificationWithName:CPTextFieldDidBlurNotification object:self userInfo:nil]];
-    
+
     return YES;
 }
 
@@ -250,8 +250,20 @@ var CPTextFieldInputOwner = nil;
 
 - (void)setStringValue:(CPString)aString
 {
+    [self willChangeValueForKey:CPValueBinding];
     _stringValue = aString;
+    [self didChangeValueForKey:CPValueBinding];
     [self setNeedsLayout];
+}
+
+- (id)objectValue
+{
+    return [self stringValue];
+}
+
+- (void)setObjectValue:(id)anObject
+{
+    [self setStringValue:anObject];
 }
 
 @end
@@ -259,7 +271,7 @@ var CPTextFieldInputOwner = nil;
 
 var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey",
     LPMultiLineTextFieldScrollableKey = "LPMultiLineTextFieldScrollableKey";
-    
+
 @implementation LPMultiLineTextField (CPCoding)
 
 - (id)initWithCoder:(CPCoder)aCoder
@@ -274,7 +286,7 @@ var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey",
 
 - (void)encodeWithCoder:(CPCoder)aCoder
 {
-    [super encodeWithCoder:aCoder];      
+    [super encodeWithCoder:aCoder];
     [aCoder encodeObject:_stringValue forKey:LPMultiLineTextFieldStringValueKey];
     [aCoder encodeBool:(_hideOverflow?NO:YES) forKey:LPMultiLineTextFieldScrollableKey];
 }
