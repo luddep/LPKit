@@ -56,8 +56,8 @@ var LPMonthNames = [@"January", @"February", @"March", @"April", @"May", @"June"
 {
     if(self = [super initWithFrame:aFrame])
     {
-        monthLabel = [[CPTextField alloc] initWithFrame:CGRectMake(0, 8, aFrame.size.width, 32)];
-        [monthLabel setAutoresizingMask:CPViewMaxYMargin | CPViewWidthSizable];
+        monthLabel = [[CPTextField alloc] initWithFrame:CGRectMake(0, 8, aFrame.size.width, aFrame.size.height)];
+        [monthLabel setAutoresizingMask:CPViewWidthSizable | CPViewHeightSizable];
         [monthLabel setValue:CPCenterTextAlignment forThemeAttribute:@"alignment"];
         [self addSubview:monthLabel];
         
