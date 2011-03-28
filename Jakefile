@@ -29,7 +29,8 @@
  */
 
 var OS = require("os"),
-    ENV = require("system").env,
+    SYS = require("system"),
+    ENV = SYS.env,
     FILE = require("file"),
     JAKE = require("jake"),
     task = JAKE.task,
@@ -82,9 +83,7 @@ task ("install", ["debug", "release"])
 
 task ("symlink-narwhal", ["release", "debug"], function()
 {
-    // TODO: this should not be hardcoded to /usr/local - not sure how
-    // to actually find the path to narwhal right now though.
-    var frameworksPath = FILE.join("", "usr", "local", "narwhal", "packages", "cappuccino", "Frameworks");
+    var frameworksPath = FILE.join(SYS.prefix, "packages", "cappuccino", "Frameworks");
     
     ["Release", "Debug"].forEach(function(aConfig)
     {
