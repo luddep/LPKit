@@ -136,8 +136,9 @@ var CPTextFieldInputOwner = nil;
     DOMElement.style.width = (CGRectGetWidth(bounds) - contentInset.left - contentInset.right) + @"px";
     DOMElement.style.height = (CGRectGetHeight(bounds) - contentInset.top - contentInset.bottom) + @"px";
         
-    DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
-    DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
+    DOMElement.style.color = [[self valueForThemeAttribute:@"text-color"]
+		  cssString];
+    DOMElement.style.font = [[self valueForThemeAttribute:@"font"] cssString];
  
     switch ([self currentValueForThemeAttribute:@"alignment"])
     {
