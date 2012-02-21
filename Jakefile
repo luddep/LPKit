@@ -82,9 +82,7 @@ task ("install", ["debug", "release"])
 
 task ("symlink-narwhal", ["release", "debug"], function()
 {
-    // TODO: this should not be hardcoded to /usr/local - not sure how
-    // to actually find the path to narwhal right now though.
-    var frameworksPath = FILE.join("", "usr", "local", "narwhal", "packages", "cappuccino", "Frameworks");
+    var frameworksPath = require("tusk").getPackagesDirectory();
     
     ["Release", "Debug"].forEach(function(aConfig)
     {
