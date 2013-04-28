@@ -30,8 +30,6 @@
 
 @import <Foundation/CPObject.j>
 
-var emailPattern = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$");
-
 @implementation LPEmail : CPObject
 {
     CPString email;
@@ -44,7 +42,26 @@ var emailPattern = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")
 
 + (BOOL)emailWithStringIsValid:(CPString)anEmail
 {
-    return emailPattern.test(anEmail);
+    var localChar = "[a-zA-Z0-9!#$%&'*+/=?^_`{}|~-]",
+        domainChar = '[\x20-\x5A\x5E-\x7E]',
+        emailAddressRegEx = localChar + '+(\\.' + localChar + '+)*@' + domainChar + '+(\\.' + domainChar + '+)?\\.[a-zA-Z]{2,}';
+
+    var quoteEmail = new RegExp('^".[^"]+"\\s*<' + emailAddressRegEx + '>$'),
+        noQuoteEmail = new RegExp('^([!\x23-\x5A\x5E-\x7E]+\\s*)?<' + emailAddressRegEx + '>$'),
+        onlyAddress = new RegExp('^' + emailAddressRegEx + '$');
+
+    if(quoteEmail.test(anEmail))
+    {
+        return true;
+    }
+    else if(noQuoteEmail.test(anEmail))
+    {
+        return true;
+    }
+    else
+    {
+        return onlyAddress.test(anEmail);
+    }
 }
 
 - (void)initWithString:(CPString)anEmail
