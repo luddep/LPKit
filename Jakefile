@@ -3,6 +3,7 @@
  * LPKit
  *
  * Created by Ludwig Pettersson on November 9, 2009.
+ * Updated by Udo Schneider on May 31, 2013
  * 
  * The MIT License
  * 
@@ -28,38 +29,98 @@
  * 
  */
 
-var OS = require("os"),
-    ENV = require("system").env,
+//===========================================================
+//  DO NOT REMOVE
+//===========================================================
+
+var SYS = require("system"),
+    ENV = SYS.env,
     FILE = require("file"),
+    OS = require("os");
+
+
+//===========================================================
+//  USER CONFIGURABLE VARIABLES
+//===========================================================
+
+/*
+    The directory in which the project will be built. By default
+    it is built in $CAPP_BUILD if that is defined, otherwise
+    in a "Build" directory within the project directory.
+*/
+var buildDir = ENV["BUILD_PATH"] || ENV["CAPP_BUILD"] || "Build";
+
+/*
+    The list of directories containing Objective-J source
+    that should be compiled by jake. The main framework
+    directory is always checked for Objective-J source,
+    you only need to edit this if you have source in
+    subdirectories. Do NOT include a leading ortrailing slash
+    in the directory name.
+
+    Example:
+
+    var sourceDirs = [
+            "Core",
+            "Modules",
+            "Modules/Foo",
+            "Modules/Bar"
+        ];
+*/
+var sourceDirs = [
+    ];
+
+
+ //===========================================================
+ //  AUTOMATICALLY GENERATED
+ //
+ //  Do not edit! (unless you know what you are doing)
+ //===========================================================
+
+var stream = require("narwhal/term").stream,
     JAKE = require("jake"),
     task = JAKE.task,
     CLEAN = require("jake/clean").CLEAN,
+    CLOBBER = require("jake/clean").CLOBBER,
     FileList = JAKE.FileList,
+    filedir = JAKE.filedir,
     framework = require("cappuccino/jake").framework,
     browserEnvironment = require("objective-j/jake/environment").Browser,
-    configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug";
+    configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug",
+    productName = "LPKit",
+    buildPath = FILE.canonical(FILE.join(buildDir, productName + ".build")),
+    packageFrameworksPath = FILE.join(SYS.prefix, "packages", "cappuccino", "Frameworks"),
+    debugPackagePath = FILE.join(packageFrameworksPath, "Debug", productName);
+    releasePackagePath = FILE.join(packageFrameworksPath, productName);
 
-framework ("LPKit", function(task)
-{   
-    task.setBuildIntermediatesPath(FILE.join(ENV["CAPP_BUILD"], "LPKit.build", configuration));
-    task.setBuildPath(FILE.join(ENV["CAPP_BUILD"], configuration));
+var frameworkTask = framework (productName, function(frameworkTask)
+{
+    frameworkTask.setBuildIntermediatesPath(FILE.join(buildPath, configuration));
+    frameworkTask.setBuildPath(FILE.join(buildDir, configuration));
 
-    task.setProductName("LPKit");
-    task.setIdentifier("com.luddep.LPKit");
-    task.setVersion("0.1");
-    task.setAuthor("Ludwig Pettersson");
-    task.setEmail("luddep@gmail.com");
-    task.setSummary("A collection of re-usable views, controls & utilities for Cappuccino.");
-    task.setSources(new FileList("*.j"));
-    task.setResources(new FileList("Resources/**/*"));
-    //task.setEnvironments([browserEnvironment]);
-    //task.setFlattensSources(true);
-    task.setInfoPlistPath("Info.plist");
+    frameworkTask.setProductName(productName);
+    frameworkTask.setIdentifier("com.luddep.LPKit");
+    frameworkTask.setVersion("0.1");
+    frameworkTask.setAuthor("Ludwig Pettersson");
+    frameworkTask.setEmail("luddep@gmail.com");
+    frameworkTask.setSummary("A collection of re-usable views, controls & utilities for Cappuccino.");
+
+    var includes = sourceDirs.map(function(dir) { return dir + "/*.j"; }),
+        fileList = new FileList();
+
+    includes.unshift("*.j");
+    fileList.include(includes);
+    frameworkTask.setSources(fileList);
+    frameworkTask.setResources(new FileList("Resources/**/*"));
+    frameworkTask.setFlattensSources(true);
+    frameworkTask.setInfoPlistPath("Info.plist");
+    frameworkTask.setLicense(BundleTask.License.LGPL_v2_1);
+    //frameworkTask.setEnvironments([browserEnvironment]);
 
     if (configuration === "Debug")
-        task.setCompilerFlags("-DDEBUG -g");
+        frameworkTask.setCompilerFlags("-DDEBUG -g");
     else
-        task.setCompilerFlags("-O");
+        frameworkTask.setCompilerFlags("-O");
 });
 
 task ("debug", function()
@@ -76,26 +137,115 @@ task ("release", function()
 
 task ("default", ["release"]);
 
-task ("build", ["LPKit"]);
+var frameworkCJS = FILE.join(buildDir, configuration, "CommonJS", "cappuccino", "Frameworks", productName);
 
-task ("install", ["debug", "release"])
-
-task ("symlink-narwhal", ["release", "debug"], function()
+filedir (frameworkCJS, [productName], function()
 {
-    // TODO: this should not be hardcoded to /usr/local - not sure how
-    // to actually find the path to narwhal right now though.
-    var frameworksPath = FILE.join("", "usr", "local", "narwhal", "packages", "cappuccino", "Frameworks");
-    
+    if (FILE.exists(frameworkCJS))
+        FILE.rmtree(frameworkCJS);
+
+    FILE.copyTree(frameworkTask.buildProductPath(), frameworkCJS);
+});
+
+task ("build", [productName, frameworkCJS]);
+
+task ("all", ["debug", "release"]);
+
+task ("install", ["debug", "release"], function()
+{
+    install("copy");
+});
+
+task ("install-symlinks", ["debug", "release"], function()
+{
+    install("symlink");
+});
+
+task ("help", function()
+{
+    var app = JAKE.application().name();
+
+    colorPrint("--------------------------------------------------------------------------", "bold+green");
+    colorPrint("LPKit - Framework", "bold+green");
+    colorPrint("--------------------------------------------------------------------------", "bold+green");
+
+    describeTask(app, "debug", "Builds a debug version at " + FILE.join(buildDir, "Debug", productName));
+    describeTask(app, "release", "Builds a release version at " + FILE.join(buildDir, "Release", productName));
+    describeTask(app, "all", "Builds a debug and release version");
+    describeTask(app, "install", "Builds a debug and release version, then installs in " + packageFrameworksPath);
+    describeTask(app, "install-symlinks", "Builds a debug and release version, then symlinks the built versions into " + packageFrameworksPath);
+    describeTask(app, "clean", "Removes the intermediate build files");
+    describeTask(app, "clobber", "Removes the intermediate build files and the installed frameworks");
+
+    colorPrint("--------------------------------------------------------------------------", "bold+green");
+});
+
+CLEAN.include(buildPath);
+CLOBBER.include(FILE.join(buildDir, "Debug", productName))
+       .include(FILE.join(buildDir, "Release", productName))
+       .include(debugPackagePath)
+       .include(releasePackagePath);
+
+var install = function(action)
+{
+    var packageFrameworksPath = FILE.join(SYS.prefix, "packages", "cappuccino", "Frameworks");
+
     ["Release", "Debug"].forEach(function(aConfig)
     {
-        print("Symlinking " + aConfig + " ...");
-        
+        colorPrint((action === "symlink" ? "Symlinking " : "Copying ") + aConfig + "...", "cyan");
+
         if (aConfig === "Debug")
-            frameworksPath = FILE.join(frameworksPath, aConfig);
-        
-        var buildPath = FILE.absolute(FILE.join(ENV["CAPP_BUILD"], aConfig, "LPKit")),
-            symlinkPath = FILE.join(frameworksPath, "LPKit");
-        
-        OS.system(["sudo", "ln", "-s", buildPath, symlinkPath]);
+            packageFrameworksPath = FILE.join(packageFrameworksPath, aConfig);
+
+        if (!FILE.isDirectory(packageFrameworksPath))
+            sudo(["mkdir", "-p", packageFrameworksPath]);
+
+        var buildPath = FILE.absolute(FILE.join(buildDir, aConfig, productName)),
+            targetPath = FILE.join(packageFrameworksPath, productName);
+
+        if (action === "symlink")
+            directoryOp(["ln", "-sf", buildPath, targetPath]);
+        else
+            directoryOp(["cp", "-rf", buildPath, targetPath]);
     });
-});
+};
+
+var directoryOp = function(cmd)
+{
+    var targetPath = cmd[cmd.length - 1];
+
+    if (FILE.isDirectory(targetPath))
+        sudo(["rm", "-rf", targetPath]);
+
+    sudo(cmd);
+};
+
+var sudo = function(cmd)
+{
+    if (OS.system(cmd))
+        OS.system(["sudo"].concat(cmd));
+};
+
+var describeTask = function(application, task, description)
+{
+    colorPrint("\n" + application + " " + task, "violet");
+    description.split("\n").forEach(function(line)
+    {
+        stream.print("   " + line);
+    });
+};
+
+var colorPrint = function(message, color)
+{
+    var matches = color.match(/(bold(?: |\+))?(.+)/);
+
+    if (!matches)
+        return;
+
+    message = "\0" + matches[2] + "(" + message + "\0)";
+
+    if (matches[1])
+        message = "\0bold(" + message + "\0)";
+
+    stream.print(message);
+};
