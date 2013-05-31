@@ -29,6 +29,7 @@
  */
 
 @import <AppKit/CPControl.j>
+@import <AppKit/_CPImageAndTextView.j>
 
 LPAnchorButtonNoUnderline     = 0;
 LPAnchorButtonNormalUnderline = 1;
