@@ -2,21 +2,21 @@
  * LPViewAnimation.j
  *
  * Created by Ludwig Pettersson on April 3, 2010.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Ludwig Pettersson
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,10 +24,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
 @import <Foundation/CPObject.j>
+@import <AppKit/CPAnimation.j>
 
 LPCSSAnimationsAreAvailable = NO;
 
@@ -43,21 +44,21 @@ LPTestCSSFeature = function(/*CPString*/aFeature)
 {
     if (typeof document === "undefined")
         return NO;
-    
+
     if (!_tmpDOMElement)
         _tmpDOMElement = document.createElement("div");
-    
+
     var properties = [aFeature];
-    
+
     for (var i = 0; i < _browserPrefixes.length; i++)
         properties.push(_browserPrefixes[i] + aFeature);
-    
+
     for (var i = 0; i < properties.length; i++)
     {
         if (typeof _tmpDOMElement.style[properties[i]] !== "undefined")
             return YES;
     }
-    
+
     return NO;
 }
 
@@ -76,12 +77,12 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 @implementation LPViewAnimation : CPAnimation
 {
     BOOL        _isAnimating;
-    
+
     CPArray     _viewAnimations @accessors(property=viewAnimations);
     id          _animationDidEndTimeout;
-    
+
     BOOL        _shouldUseCSSAnimations @accessors(property=shouldUseCSSAnimations);
-    
+
     // Curve
     CPArray     _c1;
     CPArray     _c2;
@@ -92,7 +93,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     if (self = [self initWithDuration:1.0 animationCurve:CPAnimationLinear])
     {
         _isAnimating = NO;
-        
+
         _viewAnimations = viewAnimations;
         _shouldUseCSSAnimations = NO;
     }
@@ -102,10 +103,10 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 - (void)setAnimationCurve:(id)anAnimationCurve
 {
     [super setAnimationCurve:anAnimationCurve];
-    
+
     _c1 = [];
     _c2 = [];
-    
+
     [_timingFunction getControlPointAtIndex:1 values:_c1];
     [_timingFunction getControlPointAtIndex:2 values:_c2];
 }
@@ -116,19 +117,19 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     {
         if (_isAnimating)
             return;
-        
+
         _isAnimating = YES;
-        
+
         var i = _viewAnimations.length;
         while (i--)
         {
             var viewAnimation = _viewAnimations[i],
                 target = viewAnimation[@"target"];
-            
+
             // Prepare target with general animation stuff.
             [self target:target setCSSAnimationDuration:_duration];
             [self target:target setCSSAnimationCurve:_animationCurve];
-            
+
             var x = viewAnimation[@"animations"].length;
             while (x--)
             {
@@ -136,51 +137,51 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                     kind = animation[0],
                     start = animation[1],
                     end = animation[2];
-                
+
                 if (kind === LPFadeAnimationKey)
                 {
                     [target setAlphaValue:start];
-                    
+
                     // Prepare target for this specific animation.
                     [self target:target addCSSAnimationPropertyForKey:kind append:x !== 0];
-                    
+
                     // Needs to be wrapped.
                     setTimeout(function(_target, _end){
                         _target._DOMElement.style["-webkit-transform"] = "translate3d(0px, 0px, 0px)";
                         [_target setAlphaValue:_end];
                     }, 0, target, end);
-                    
+
                 }
                 else if(kind === LPOriginAnimationKey)
                 {
                     if (!CGPointEqualToPoint(start, end))
                     {
                         [target setFrameOrigin:start];
-                        
+
                         // Prepare target for this specific animation.
                         [self target:target addCSSAnimationPropertyForKey:kind append:x !== 0];
-                        
+
                         // Need to call it later for the animation to work.
                         setTimeout(function(_target, _start, _end){
-                            
+
                             var x = _end.x - _start.x,
                                 y = _end.y - _start.y;
-                            
+
                             _target._DOMElement.style["-webkit-transform"] = "translate3d(" + x +"px, " + y + "px, 0px)";
-                            
-                            // Need to match the new position with the actual frame 
+
+                            // Need to match the new position with the actual frame
                             setTimeout(function(){
-                                
+
                                 // Make sure we got rid of the animation specific css
                                 [self _clearCSS];
-                                
+
                                 // Reset the translate
                                 _target._DOMElement.style["-webkit-transform"] = "translate3d(0px, 0px, 0px)";
-                                
+
                                 // Set the real frame
                                 [_target setFrameOrigin:_end];
                             }, (1000 * _duration) + 100);
-                            
+
                         }, 0, target, start, end);
                     }
                 }
@@ -190,23 +191,23 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                 }
             }
         }
-        
+
         if (_animationDidEndTimeout)
             clearTimeout(_animationDidEndTimeout);
-        
+
         _animationDidEndTimeout = setTimeout(function(animation){
             _isAnimating = NO;
-            
+
             // Clear CSS
             [animation _clearCSS];
-            
+
             if ([_delegate respondsToSelector:@selector(animationDidEnd:)])
                 [_delegate animationDidEnd:animation];
-        
+
         // We delay it by 100 extra mseconds to make sure that all css animations have finished,
         // it's not always *exactly* 1000 * duration.
         }, (1000 * _duration) + 100, self);
-        
+
     }
     else
     {
@@ -216,7 +217,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
         {
             var viewAnimation = _viewAnimations[i],
                 target = viewAnimation[@"target"];
-            
+
             var x = viewAnimation[@"animations"].length;
             while (x--)
             {
@@ -224,21 +225,21 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
                     kind = animation[0],
                     start = animation[1],
                     end = animation[2];
-                
+
                 switch (kind)
                 {
                     case LPFadeAnimationKey:   [target setAlphaValue:start];
                                                break;
-                    
+
                     case LPOriginAnimationKey: [target setFrameOrigin:start];
                                                break;
-                    
+
                     case LPFrameAnimationKey:  [target setFrame:start];
                                                break;
                 }
             }
         }
-        
+
         [super startAnimation];
     }
 }
@@ -250,32 +251,32 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 - (void)setCurrentProgress:(float)aProgress
 {
 	_progress = aProgress;
- 
+
     var value = CubicBezierAtTime(_progress, _c1[0], _c1[1], _c2[0], _c2[1], _duration),
         i = _viewAnimations.length;
-    
+
     while (i--)
     {
         var viewAnimation = _viewAnimations[i],
             target = viewAnimation["target"],
             x = viewAnimation["animations"].length;
-        
+
         while (x--)
         {
             var animation = viewAnimation["animations"][x],
                 kind = animation[0],
                 start = animation[1],
                 end = animation[2];
-            
+
             switch (kind)
             {
                 case LPFadeAnimationKey:   [target setAlphaValue:(value * (end - start)) + start];
                                            break;
-                                         
+
                 case LPOriginAnimationKey: [target setFrameOrigin:CGPointMake(start.x + (value * (end.x - start.x)),
                                                                               start.y + (value * (end.y - start.y)))];
                                            break;
-                                           
+
                 case LPFrameAnimationKey:  [target setFrame:CGRectMake(start.origin.x + (value * (end.origin.x - start.origin.x)),
                                                                        start.origin.y + (value * (end.origin.y - start.origin.y)),
                                                                        start.size.width + (value * (end.size.width - start.size.width)),
@@ -298,12 +299,12 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
     if (LPCSSAnimationsAreAvailable && _shouldUseCSSAnimations)
     {
         //_isAnimating = NO;
-        
+
         //if (_animationDidEndTimeout)
         //    window.clearTimeout(_animationDidEndTimeout);
-        
+
         //[self _stopCSSAnimation];
-        
+
         //if ([_delegate respondsToSelector:@selector(animationDidStop:)])
         //    [_delegate animationDidStop:self];
     }
@@ -326,7 +327,7 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
 - (void)target:(id)aTarget setCSSAnimationCurve:(id)anAnimationCurve
 {
     var curve = nil;
-    
+
     switch (anAnimationCurve)
     {
         case CPAnimationLinear:    curve = @"linear";
@@ -341,37 +342,37 @@ var appendCSSValueToKey = function(/*DOMElement*/ anElement, /*CPString*/aValue,
         case CPAnimationEaseInOut: curve = @"ease-in-out";
                                    break;
     }
-    
+
     aTarget._DOMElement.style["-webkit-transition-timing-function"] = curve;
 }
 
 - (void)target:(id)aTarget addCSSAnimationPropertyForKey:(CPString)aKey append:(BOOL)shouldAppend
 {
     var CSSValue = nil;
-    
+
     switch(aKey)
     {
         case LPFadeAnimationKey:   CSSValue = @"-webkit-transform, opacity";
                                    break;
-        
+
         case LPOriginAnimationKey: CSSValue = @"-webkit-transform";
                                    break;
 
         case LPFrameAnimationKey:  CSSValue = @"top, left, width, height";
                                    break;
-        
+
         default:                   CSSValue = @"none";
     }
-    
+
     appendCSSValueToKey(aTarget._DOMElement, CSSValue, @"-webkit-transition-property", shouldAppend);
 }
 
 @end
 
 /*
-    
+
     Inlined this, because I managed to crank out a few more fps by doing that. I think.
-    
+
 */
 
 // currently used function to determine time
@@ -389,7 +390,7 @@ var CubicBezierAtTime = function CubicBezierAtTime(t,p1x,p1y,p2x,p2y,duration)
     function solve(x,epsilon) {return sampleCurveY(solveCurveX(x,epsilon));};
     // Given an x value, find a parametric value it came from.
     function solveCurveX(x,epsilon) {var t0,t1,t2,x2,d2,i;
-        function fabs(n) {if(n>=0) {return n;}else {return 0-n;}}; 
+        function fabs(n) {if(n>=0) {return n;}else {return 0-n;}};
         // First try a few iterations of Newton's method -- normally very fast.
         for(t2=x, i=0; i<8; i++) {x2=sampleCurveX(t2)-x; if(fabs(x2)<epsilon) {return t2;} d2=sampleCurveDerivativeX(t2); if(fabs(d2)<1e-6) {break;} t2=t2-x2/d2;}
         // Fall back to the bisection method for reliability.
