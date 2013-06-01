@@ -182,7 +182,7 @@ var _startAndEndOfWeekCache = {};
 
 - (CPArray)startAndEndOfWeekForDate:(CPDate)aDate
 {
-    _cached = _startAndEndOfWeekCache[aDate.toString()];
+    var _cached = _startAndEndOfWeekCache[aDate.toString()];
 
     if (_cached)
         return _cached;
