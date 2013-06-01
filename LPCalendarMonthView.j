@@ -132,7 +132,7 @@ var _startAndEndOfWeekCache = {};
         [date resetToMidnight];
 
         // There must be a better way to do this.
-        _firstDay = [date copy];
+        var _firstDay = [date copy];
         _firstDay.setDate(1);
 
         previousMonth = new Date(_firstDay.getTime() - 86400000);
