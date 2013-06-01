@@ -30,6 +30,7 @@
 
 @import <Foundation/CPObject.j>
 @import <AppKit/CPAlert.j>
+@import <AppKit/CPApplication.j>
 @import "LPURLPostRequest.j"
 @import "LPMultiLineTextField.j"
 
