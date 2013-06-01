@@ -428,6 +428,7 @@ var LPChartViewDataSourceKey       = @"LPChartViewDataSourceKey",
 
 - (void)drawRect:(CGRect)aRect
 {
+    var itemFrames;
     if (itemFrames = [[self superview] itemFrames])
     {
         var context = [[CPGraphicsContext currentContext] graphicsPort],
@@ -476,6 +477,7 @@ var LPChartViewDataSourceKey       = @"LPChartViewDataSourceKey",
 
 - (void)drawRect:(CGRect)aRect
 {
+    var itemFrames;
     if (itemFrames = [[self superview] itemFrames])
     {
         var context = [[CPGraphicsContext currentContext] graphicsPort];
