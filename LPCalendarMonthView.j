@@ -29,6 +29,7 @@
  */
 @import <AppKit/CPControl.j>
 @import <AppKit/CPView.j>
+@import <AppKit/CPApplication.j>
 @import <Foundation/CPDate.j>
 
 
@@ -74,7 +75,7 @@ var _startAndEndOfWeekCache = {};
 
     BOOL            highlightCurrentPeriod @accessors;
     BOOL            weekStartsOnMonday @accessors;
-    
+
     id              _delegate @accessors(property=delegate);
     LPCalendarView  calendarView @accessors;
     CPArray         hiddenRows @accessors;
@@ -118,10 +119,10 @@ var _startAndEndOfWeekCache = {};
     // No need to reloadData if the new date is the same as before.
     // ==
     // Future note: Do not use UTC comparison here,
-    // since we reset the date to the relative midnight later on. 
+    // since we reset the date to the relative midnight later on.
     if (date && date.getFullYear() === aDate.getFullYear() && date.getMonth() === aDate.getMonth())
         return;
-    
+
     date = [aDate copy];
 
     if (![aDate isEqualToDate:immutableDistantFuture])
@@ -131,13 +132,13 @@ var _startAndEndOfWeekCache = {};
         [date resetToMidnight];
 
         // There must be a better way to do this.
-        _firstDay = [date copy];
+        var _firstDay = [date copy];
         _firstDay.setDate(1);
 
         previousMonth = new Date(_firstDay.getTime() - 86400000);
         nextMonth = new Date(_firstDay.getTime() + (([date daysInMonth] + 1) * 86400000));
     }
-    
+
     [self reloadData];
 }
 
@@ -145,16 +146,16 @@ var _startAndEndOfWeekCache = {};
 {
     if (selectionLengthType === aSelectionType)
         return;
-    
+
     selectionLengthType = aSelectionType;
-    
+
     [self reloadData];
 }
 
 - (void)tileSize
 {
     var tileSize = [calendarView currentValueForThemeAttribute:@"tile-size"];
-    
+
     if (tileSize)
         return tileSize
     else
@@ -181,7 +182,7 @@ var _startAndEndOfWeekCache = {};
 
 - (CPArray)startAndEndOfWeekForDate:(CPDate)aDate
 {
-    _cached = _startAndEndOfWeekCache[aDate.toString()];
+    var _cached = _startAndEndOfWeekCache[aDate.toString()];
 
     if (_cached)
         return _cached;
@@ -219,13 +220,13 @@ var _startAndEndOfWeekCache = {};
 {
     if ([hiddenRows isEqualToArray:hiddenRowsArray])
         return;
-    
+
     hiddenRows = hiddenRowsArray;
-    
+
     var tiles = [self subviews],
         tileIndex = 0,
         showAllRows = !hiddenRowsArray
-    
+
     for (var weekIndex = 0; weekIndex < 6; weekIndex++)
     {
         var shouldHideRow = showAllRows || [hiddenRows indexOfObject:weekIndex] > -1;
@@ -239,7 +240,7 @@ var _startAndEndOfWeekCache = {};
 }
 
 - (void)reloadData
-{   
+{
     if (!date)
         return;
 
@@ -372,22 +373,22 @@ var _startAndEndOfWeekCache = {};
     // Clicked a date
     if (!currentSelectionIndex || startSelectionIndex == currentSelectionIndex)
     {
-        var calendarView = [[self superview] superview],
+        var theCalenderView = [[self superview] superview],
             tile = [[self subviews] objectAtIndex:startSelectionIndex],
             tileDate = [tile date],
             tileMonth = tileDate.getMonth();
 
         // Double clicked a date in the current month.
-        if (tileMonth == date.getMonth() && [[CPApp currentEvent] clickCount] === 2 && [calendarView doubleAction])
-            [CPApp sendAction:[calendarView doubleAction] to:[calendarView target] from:calendarView];
+        if (tileMonth == date.getMonth() && [[CPApp currentEvent] clickCount] === 2 && [theCalenderView doubleAction])
+            [CPApp sendAction:[theCalenderView doubleAction] to:[theCalenderView target] from:theCalenderView];
 
         // Clicked the Previous month
         if (tileMonth == previousMonth.getMonth())
-            [calendarView changeToMonth:previousMonth];
+            [theCalenderView changeToMonth:previousMonth];
 
         // Clicked the Next month
         if (tileMonth == nextMonth.getMonth())
-            [calendarView changeToMonth:nextMonth];
+            [theCalenderView changeToMonth:nextMonth];
 
     }
     // Made a selection
@@ -574,7 +575,7 @@ var _startAndEndOfWeekCache = {};
 {
     if (date.getTime() === aDate.getTime())
         return;
-    
+
     // Update date
     date.setTime(aDate.getTime());
 
@@ -589,7 +590,7 @@ var _startAndEndOfWeekCache = {};
 - (void)layoutSubviews
 {
     var themeState = [self themeState];
-    
+
     [self setBackgroundColor:[calendarView valueForThemeAttribute:@"tile-bezel-color" inState:themeState]]
 
     [textField setFont:[calendarView valueForThemeAttribute:@"tile-font" inState:themeState]];

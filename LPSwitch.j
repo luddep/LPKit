@@ -3,21 +3,21 @@
  * LPKit
  *
  * Created by Ludwig Pettersson on November 7, 2009.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2009 Ludwig Pettersson
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,33 +25,33 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 
 @import <AppKit/CPControl.j>
-@import <LPKit/LPViewAnimation.j>
+@import "LPViewAnimation.j"
 
 
 @implementation LPSwitch : CPControl
 {
     BOOL on @accessors(readonly, getter=isOn);
-    
+
     CGPoint dragStartPoint;
-    
+
     LPSwitchKnob knob;
     CGPoint knobDragStartPoint;
-    
+
     BOOL isDragging;
-    
+
     float animationDuration;
     id animationCurve;
-    
+
     CPView offBackgroundView;
     CPView onBackgroundView;
-    
+
     CPTextField offLabel;
     CPTextField onLabel;
-	
+
 	LPViewAnimation animation;
 }
 
@@ -71,32 +71,32 @@
 - (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame])
-    {   
+    {
         offBackgroundView = [[CPView alloc] initWithFrame:[self bounds]];
         [offBackgroundView setHitTests:NO];
         [self addSubview:offBackgroundView];
-        
+
         onBackgroundView = [[CPView alloc] initWithFrame:CGRectMake(0,0,0,CGRectGetHeight([self bounds]))];
         [onBackgroundView setHitTests:NO];
         [self addSubview:onBackgroundView];
-        
+
         knob = [[LPSwitchKnob alloc] initWithFrame:CGRectMakeZero()];
         [self addSubview:knob];
-        
+
         offLabel = [CPTextField labelWithTitle:@"Off"];
         [self addSubview:offLabel];
-        
+
         onLabel = [CPTextField labelWithTitle:@"On"];
         [self addSubview:onLabel];
-        
+
         animationDuration = 0.2;
         animationCurve = CPAnimationEaseOut;
-        
+
         // Need to call layoutSubviews directly to make sure
         // all theme attributes are set.
         // TODO: FIX THIS.
         [self layoutSubviews];
-        
+
         [self setNeedsLayout];
     }
     return self;
@@ -117,7 +117,7 @@
 	}
 	else
 		on = shouldSetOn;
-    
+
     var knobMinY = CGRectGetMinY([knob frame]),
         knobEndFrame = CGRectMake((on) ? [knob maxX] : [knob minX], knobMinY, CGRectGetWidth([knob frame]), CGRectGetHeight([knob frame])),
         onBackgroundEndFrame = CGRectMake(0,0, CGRectGetMinX(knobEndFrame) + CGRectGetMidX([knob bounds]), CGRectGetHeight([onBackgroundView bounds])),
@@ -126,12 +126,12 @@
                                       CGRectGetWidth([offLabel bounds]), CGRectGetHeight([offLabel bounds])),
         onLabelEndFrame = CGRectMake(CGRectGetMinX(knobEndFrame) - labelOffset.width - CGRectGetWidth([onLabel bounds]), labelOffset.height,
                                      CGRectGetWidth([onLabel bounds]), CGRectGetHeight([onLabel bounds]));
-	
+
 	// added to counter a problem whereby changing the state more than once (i.e., ON -> OFF -> ON) before giving control to the run loop,
 	// caused the control to not update properly
 	if([animation isAnimating])
 		[animation stopAnimation];
-    
+
     if (shouldAnimate)
     {
         animation = [[LPViewAnimation alloc] initWithViewAnimations:[
@@ -180,16 +180,16 @@
 
     dragStartPoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
     knobDragStartPoint = [knob frame].origin;
-    
+
     isDragging = NO;
-    
+
     // If the drag started on top of the knob, we highlight it
     var startPointX = [knob convertPoint:dragStartPoint fromView:self].x;
     if (startPointX > 0 && startPointX < CGRectGetWidth([knob bounds]))
     {
         [knob setHighlighted:YES];
         [self setNeedsLayout];
-    } 
+    }
 }
 
 - (void)mouseDragged:(CPEvent)anEvent
@@ -199,25 +199,25 @@
 
     // We are dragging
     isDragging = YES;
-    
+
     var point = [self convertPoint:[anEvent locationInWindow] fromView:nil],
         knobX = knobDragStartPoint.x + (point.x - dragStartPoint.x),
         knobMinX = [knob minX],
         knobMaxX = [knob maxX],
         height = CGRectGetHeight([self bounds]);
-    
+
     // Limit X
     if (knobX < knobMinX)
         knobX = knobMinX;
     else if(knobX > knobMaxX)
         knobX = knobMaxX;
-        
+
     // Resize background views
     [onBackgroundView setFrameSize:CGSizeMake(knobX + CGRectGetMidX([knob bounds]), height)];
-    
+
     // Re-position knob
     [knob setFrameOrigin:CGPointMake(knobX, CGRectGetMinY([knob frame]))];
-    
+
     [self setNeedsLayout];
 }
 
@@ -227,7 +227,7 @@
         return;
 
     [self setOn:isDragging ? CGRectGetMidX([self bounds]) < CGRectGetMidX([knob frame]) : !on animated:YES];
-    
+
     [knob setHighlighted:NO];
     [self setNeedsLayout];
 }
@@ -245,22 +245,22 @@
     [onBackgroundView setBackgroundColor:[self currentValueForThemeAttribute:@"on-background-color"]];
     [knob setBackgroundColor:[self valueForThemeAttribute:@"knob-background-color" inState:[knob themeState]]];
     [knob setFrameSize:[self currentValueForThemeAttribute:@"knob-size"]];
-    
+
     var labelOffset = [self labelOffset];
-    
+
     [offLabel setFont:[self currentValueForThemeAttribute:@"off-label-font"]];
     [offLabel setTextColor:[self currentValueForThemeAttribute:@"off-label-text-color"]];
     [offLabel setTextShadowColor:[self currentValueForThemeAttribute:@"off-label-text-shadow-color"]];
     [offLabel setTextShadowOffset:[self currentValueForThemeAttribute:@"off-label-text-shadow-offset"]];
     [offLabel setFrameOrigin:CGPointMake(CGRectGetMaxX([knob frame]) + labelOffset.width, labelOffset.height)];
     [offLabel sizeToFit];
-    
+
     [onLabel setFont:[self currentValueForThemeAttribute:@"on-label-font"]];
     [onLabel setTextColor:[self currentValueForThemeAttribute:@"on-label-text-color"]];
     [onLabel setTextShadowColor:[self currentValueForThemeAttribute:@"on-label-text-shadow-color"]];
     [onLabel setTextShadowOffset:[self currentValueForThemeAttribute:@"on-label-text-shadow-offset"]];
     [onLabel sizeToFit];
-    
+
     [onLabel setFrameOrigin:CGPointMake(CGRectGetMinX([knob frame]) - labelOffset.width - CGRectGetWidth([onLabel bounds]), CGRectGetMinY([offLabel frame]))];
 }
 
@@ -283,7 +283,7 @@
 
 - (void)setHighlighted:(BOOL)shouldBeHighlighted
 {
-    isHighlighted = shouldBeHighlighted;
+    var isHighlighted = shouldBeHighlighted;
 
     if (shouldBeHighlighted)
         [self setThemeState:CPThemeStateHighlighted];

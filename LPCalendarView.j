@@ -28,16 +28,16 @@
  *
  */
 @import <AppKit/CPControl.j>
-@import <LPKit/LPCalendarHeaderView.j>
-@import <LPKit/LPCalendarMonthView.j>
-@import <LPKit/LPSlideView.j>
+@import "LPCalendarHeaderView.j"
+@import "LPCalendarMonthView.j"
+@import "LPSlideView.j"
 
 
 @implementation LPCalendarView : CPView
 {
     LPCalendarHeaderView headerView @accessors(readonly);
     LPSlideView          slideView;
-    
+
     LPCalendarMonthView  currentMonthView;
     LPCalendarMonthView  firstMonthView;
     LPCalendarMonthView  secondMonthView;
@@ -150,7 +150,7 @@
 
     // new current view
     currentMonthView = slideToView;
-    
+
     // Display it way off,
     // because cappuccino wont draw
     // CGGraphics stuff unless it's visible
@@ -196,10 +196,10 @@
 {
     var width = CGRectGetWidth([self bounds]),
         headerHeight = [self currentValueForThemeAttribute:@"header-height"];
-        
+
     [headerView setFrameSize:CGSizeMake(width, headerHeight)];
     [slideView setFrame:CGRectMake(0, headerHeight, width, CGRectGetHeight([self bounds]) - headerHeight)];
-    
+
     [slideView setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
 }
 
@@ -208,7 +208,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
-    
+
     [self changeToMonth:[currentMonthView previousMonth]];
 }
 
@@ -217,7 +217,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
-    
+
     [self changeToMonth:[currentMonthView nextMonth]];
 }
 
@@ -231,11 +231,11 @@
     // Make sure we have an end to the selection
     if ([aSelection count] <= 1)
         [aSelection addObject:nil];
-    
+
     // The selection didn't change
     if ([fullSelection isEqualToArray:aSelection])
         return;
-    
+
     // Copy the selection
     fullSelection = [CPArray arrayWithArray:aSelection];
 
