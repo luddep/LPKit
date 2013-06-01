@@ -635,7 +635,8 @@ var LPChartViewDataSourceKey       = @"LPChartViewDataSourceKey",
         var subview = subviews[numberOfSubviews];
         [subview setCenter:CGPointMake(CGRectGetMidX(itemFrames[numberOfSubviews]) + drawViewPadding, midY)];
 
-        var subviewFrame = [subview frame];
+        var subviewFrame = [subview frame],
+            frameIsDirty;
 
         // Make sure the label stays within the rame
         if (subviewFrame.origin.x < 0)
