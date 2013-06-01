@@ -580,6 +580,7 @@ var LPChartViewDataSourceKey       = @"LPChartViewDataSourceKey",
         var subviews = [self subviews];
 
         // Clear any previous labels
+        var numberOfSubviews;
         if (numberOfSubviews = subviews.length)
         {
             while (numberOfSubviews--)
