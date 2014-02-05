@@ -41,6 +41,10 @@ var CPTextFieldInputOwner = nil;
 {
     if (!_DOMTextareaElement)
     {
+        // For now we're just hiding the inputElement that's created by
+        // CPTextView, but it should eventually be replaced with the
+        // _DOMTextareaElement to conserve memory.
+        [self _inputElement].style.visibility = @"hidden";
         _DOMTextareaElement = document.createElement("textarea");
         _DOMTextareaElement.style.position = @"absolute";
         _DOMTextareaElement.style.background = @"none";
@@ -50,6 +54,8 @@ var CPTextFieldInputOwner = nil;
         _DOMTextareaElement.style.resize = @"none";
         _DOMTextareaElement.style.padding = @"0";
         _DOMTextareaElement.style.margin = @"0";
+        _DOMTextareaElement.style.overflow = @"auto";
+        _hideOverflow = NO;
         
         _DOMTextareaElement.onblur = function(){
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
@@ -62,14 +68,6 @@ var CPTextFieldInputOwner = nil;
     return _DOMTextareaElement;
 }
 
-- (id)initWithFrame:(CGRect)aFrame
-{
-    if (self = [super initWithFrame:aFrame])
-    {
-    }
-    return self;
-}
-
 - (BOOL)isScrollable
 {
    return !_hideOverflow;
@@ -78,14 +76,39 @@ var CPTextFieldInputOwner = nil;
 - (void)setScrollable:(BOOL)shouldScroll
 {
     _hideOverflow = !shouldScroll;
+    // Make sure the textarea element is aware of its scrollable state
+    if (shouldScroll = YES)
+    {
+      [self _DOMTextareaElement].style.overflow = @"auto";
+    }
+    else
+    {
+      [self _DOMTextareaElement].style.overflow = @"hidden";
+    }
 }
 
 
 - (void)setEditable:(BOOL)shouldBeEditable
 {
     [self _DOMTextareaElement].style.cursor = shouldBeEditable ? @"cursor" : @"default";
+    // Prevent the textarea from accepting input when it should be disabled
+    [self _DOMTextareaElement].disabled = !shouldBeEditable;
     [super setEditable:shouldBeEditable];
 }
+
+
+
+/**
+	If we're getting a default value from a cib, this is where it will come it.
+	Map the string value of the passed in object to the setStringValue of the
+	receiver.
+ */
+- (void)setObjectValue:(id)anObject
+{
+	[self setStringValue:[anObject description]];
+}
+
+
 
 - (void)selectText:(id)sender
 {
@@ -113,8 +136,9 @@ var CPTextFieldInputOwner = nil;
     DOMElement.style.width = (CGRectGetWidth(bounds) - contentInset.left - contentInset.right) + @"px";
     DOMElement.style.height = (CGRectGetHeight(bounds) - contentInset.top - contentInset.bottom) + @"px";
         
-    DOMElement.style.color = [[self currentValueForThemeAttribute:@"text-color"] cssString];
-    DOMElement.style.font = [[self currentValueForThemeAttribute:@"font"] cssString];
+    DOMElement.style.color = [[self valueForThemeAttribute:@"text-color"]
+		  cssString];
+    DOMElement.style.font = [[self valueForThemeAttribute:@"font"] cssString];
  
     switch ([self currentValueForThemeAttribute:@"alignment"])
     {
@@ -135,9 +159,6 @@ var CPTextFieldInputOwner = nil;
     }
  
     DOMElement.value = _stringValue || @"";
-
-    if(_hideOverflow)
-        DOMElement.style.overflow=@"hidden";
 }
 
 - (void)scrollWheel:(CPEvent)anEvent
@@ -204,45 +225,6 @@ var CPTextFieldInputOwner = nil;
     return YES;
 }
 
-- (BOOL)becomeFirstResponder
-{
-    _stringValue = [self stringValue];
-    
-    [self setThemeState:CPThemeStateEditing];
-    
-    setTimeout(function(){
-        [self _DOMTextareaElement].focus();
-        CPTextFieldInputOwner = self;
-    }, 0.0);
-    
-    [self textDidFocus:[CPNotification notificationWithName:CPTextFieldDidFocusNotification object:self userInfo:nil]];
-    
-    return YES;
-}
-
-- (BOOL)resignFirstResponder
-{
-    [self unsetThemeState:CPThemeStateEditing];
-    
-    [self setStringValue:[self stringValue]];
-    
-    [self _DOMTextareaElement].blur();
-
-    //post CPControlTextDidEndEditingNotification
-    if (_isEditing)
-    {
-        _isEditing = NO;
-        [self textDidEndEditing:[CPNotification notificationWithName:CPControlTextDidEndEditingNotification object:self userInfo:nil]];
-
-        if ([self sendsActionOnEndEditing])
-            [self sendAction:[self action] to:[self target]];
-    }
-    
-    [self textDidBlur:[CPNotification notificationWithName:CPTextFieldDidBlurNotification object:self userInfo:nil]];
-    
-    return YES;
-}
-
 - (CPString)stringValue
 {
     return (!!_DOMTextareaElement) ? _DOMTextareaElement.value : @"";
@@ -250,10 +232,24 @@ var CPTextFieldInputOwner = nil;
 
 - (void)setStringValue:(CPString)aString
 {
-    _stringValue = aString;
-    [self setNeedsLayout];
+  _stringValue = aString;
+  [self setNeedsLayout];
 }
 
+
+
+
+/**
+	Update the placeholder string, if there is one. This is kind of hackish since
+	it's depending on the placeholder attribute being recognized by the browser.
+	If it's not recognized, there's no harm in setting it this way, but the user
+	will not see placeholder text.
+*/
+- (void)setPlaceholderString:(CPString)aPlaceholder
+{
+  [super setPlaceholderString:aPlaceholder];
+  [self _DOMTextareaElement].placeholder = aPlaceholder;
+}
 @end
 
 
@@ -266,8 +262,21 @@ var LPMultiLineTextFieldStringValueKey = "LPMultiLineTextFieldStringValueKey",
 {
     if (self = [super initWithCoder:aCoder])
     {
-        [self setStringValue:[aCoder decodeObjectForKey:LPMultiLineTextFieldStringValueKey]];
-        [self setScrollable:[aCoder decodeBoolForKey:LPMultiLineTextFieldScrollableKey]];
+        var strValue = [aCoder decodeObjectForKey:LPMultiLineTextFieldStringValueKey];
+        var scrollable = [aCoder decodeBoolForKey:LPMultiLineTextFieldScrollableKey];
+				// only write the string value if there is one so as to avoid
+				// overwriting a value that comes from the cib
+				if (strValue != nil)
+				{
+					[self setObjectValue:strValue];
+				}
+
+				// make sure the textarea scrollbars no inadvertantly disabled with a
+				// nil value
+				if (scrollable == NO)
+				{
+					[self setScrollable:NO];
+				}
     }
     return self;
 }

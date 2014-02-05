@@ -34,6 +34,7 @@
 @import <LPKit/LPCookieController.j>
 @import <LPKit/LPEmail.j>
 @import <LPKit/LPLocationController.j>
+@import <LPKit/LPMultiLineTextField.j>
 @import <LPKit/LPPieChartView.j>
 @import <LPKit/LPSlideView.j>
 @import <LPKit/LPSparkLine.j>
