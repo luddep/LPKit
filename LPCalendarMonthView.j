@@ -293,7 +293,7 @@ var _startAndEndOfWeekCache = {};
             for (var dayIndex = 0; dayIndex < 7; dayIndex++)
             {
                 // CGRectInset() mucks up the frame for some reason.
-                var tileFrame = CGRectMake((dayIndex * tileSize.width) + dayIndex, weekIndex * tileSize.height, tileSize.width, tileSize.height -1);
+                var tileFrame = CGRectMake((dayIndex * tileSize.width), weekIndex * tileSize.height, tileSize.width, tileSize.height);
 
                 [tiles[tileIndex] setFrame:tileFrame];
                 tileIndex += 1;
@@ -464,23 +464,34 @@ var _startAndEndOfWeekCache = {};
                             end:(anEndIndex > -1) ? [[tiles objectAtIndex:anEndIndex] date] : nil];
 }
 
-- (void)drawRect:(CGRect)aRect
-{
-    var context = [[CPGraphicsContext currentContext] graphicsPort],
-        bounds = [self bounds],
-        width = CGRectGetWidth(bounds),
-        height = CGRectGetHeight(bounds),
-        tileSize = [self tileSize];
+- (void) drawRect:(CGRect)aRect {
 
-    CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
+	var	context = [[CPGraphicsContext currentContext] graphicsPort],
+		bounds = [self bounds],
+		width = CGRectGetWidth(bounds),
+		height = CGRectGetHeight(bounds),
+		tileSize = [self tileSize];
 
-    // Horizontal lines
-    for (var i = 1; i < 6; i++)
-        CGContextFillRect(context, CGRectMake(0, i * tileSize.height - 1, width, 1));
+	var	hLine = function (inMarginTop) {
+		
+			CGContextFillRect(context, CGRectMake(0, inMarginTop, width, 1));
+		
+		}, 
+		
+		vLine = function (inMarginLeft) {
+			
+			CGContextFillRect(context, CGRectMake(inMarginLeft, 0, 1, height));
+			
+		};
 
-    // Vertical lines
-    for (var i = 0; i < 7; i++)
-        CGContextFillRect(context, CGRectMake((i - 1) + (i * tileSize.width), 0, 1, height));
+	CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-shadow-color"]);
+	for (var i = 1; i < 6; i++) hLine(tileSize.height * i - 1);
+	for (var i = 1; i < 7; i++) vLine(tileSize.width * i - 1);
+
+	CGContextSetFillColor(context, [calendarView currentValueForThemeAttribute:@"grid-color"]);
+	for (var i = 1; i < 6; i++) hLine(tileSize.height * i);
+	for (var i = 1; i < 7; i++) vLine(tileSize.width * i);
+
 }
 
 @end
