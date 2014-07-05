@@ -50,6 +50,7 @@ var CPTextFieldInputOwner = nil;
         _DOMTextareaElement.style.resize = @"none";
         _DOMTextareaElement.style.padding = @"0";
         _DOMTextareaElement.style.margin = @"0";
+        _DOMTextareaElement.style.overflow = @"auto";
         
         _DOMTextareaElement.onblur = function(){
                 [[CPTextFieldInputOwner window] makeFirstResponder:nil];
