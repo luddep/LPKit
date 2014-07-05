@@ -184,6 +184,7 @@ var CPTextFieldInputOwner = nil;
 {
     if (_stringValue !== [self stringValue])
     {
+       [[[[self window] undoManager] prepareWithInvocationTarget:self] setStringValue:_stringValue];
         _stringValue = [self stringValue];
         
         if (!_isEditing)
@@ -207,14 +208,7 @@ var CPTextFieldInputOwner = nil;
 - (BOOL)becomeFirstResponder
 {
     _stringValue = [self stringValue];
-    
     [self setThemeState:CPThemeStateEditing];
-    
-    setTimeout(function(){
-        [self _DOMTextareaElement].focus();
-        CPTextFieldInputOwner = self;
-    }, 0.0);
-    
     [self textDidFocus:[CPNotification notificationWithName:CPTextFieldDidFocusNotification object:self userInfo:nil]];
     
     return YES;
@@ -250,6 +244,8 @@ var CPTextFieldInputOwner = nil;
 
 - (void)setStringValue:(CPString)aString
 {
+    if(_stringValue != aString)
+        [[[[self window] undoManager] prepareWithInvocationTarget:self] setStringValue:_stringValue];
     _stringValue = aString;
     [self setNeedsLayout];
 }
