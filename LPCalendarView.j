@@ -37,7 +37,7 @@
 {
     LPCalendarHeaderView headerView @accessors(readonly);
     LPSlideView          slideView;
-    
+
     LPCalendarMonthView  currentMonthView;
     LPCalendarMonthView  firstMonthView;
     LPCalendarMonthView  secondMonthView;
@@ -96,6 +96,7 @@
         [slideView addSubview:secondMonthView];
 
         currentMonthView = firstMonthView;
+        [currentMonthView setNeedsLayout];
 
         // Default to today's date.
         [self setMonth:[CPDate date]];
@@ -150,7 +151,7 @@
 
     // new current view
     currentMonthView = slideToView;
-    
+
     // Display it way off,
     // because cappuccino wont draw
     // CGGraphics stuff unless it's visible
@@ -158,6 +159,7 @@
     [currentMonthView setFrameOrigin:CGPointMake(-500,-500)];
     [currentMonthView setHidden:NO];
     [currentMonthView setNeedsDisplay:YES];
+    [currentMonthView setNeedsLayout];
 
     [headerView setDate:aMonth];
 
@@ -196,10 +198,12 @@
 {
     var width = CGRectGetWidth([self bounds]),
         headerHeight = [self currentValueForThemeAttribute:@"header-height"];
-        
+
     [headerView setFrameSize:CGSizeMake(width, headerHeight)];
     [slideView setFrame:CGRectMake(0, headerHeight, width, CGRectGetHeight([self bounds]) - headerHeight)];
-    
+
+    [headerView setNeedsLayout];
+
     [slideView setBackgroundColor:[self currentValueForThemeAttribute:@"background-color"]];
 }
 
@@ -208,7 +212,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
-    
+
     [self changeToMonth:[currentMonthView previousMonth]];
 }
 
@@ -217,7 +221,7 @@
     // We can only slide one month in at a time.
     if ([slideView isSliding])
         return;
-    
+
     [self changeToMonth:[currentMonthView nextMonth]];
 }
 
@@ -231,11 +235,11 @@
     // Make sure we have an end to the selection
     if ([aSelection count] <= 1)
         [aSelection addObject:nil];
-    
+
     // The selection didn't change
     if ([fullSelection isEqualToArray:aSelection])
         return;
-    
+
     // Copy the selection
     fullSelection = [CPArray arrayWithArray:aSelection];
 
