@@ -264,6 +264,35 @@
     [onLabel setFrameOrigin:CGPointMake(CGRectGetMinX([knob frame]) - labelOffset.width - CGRectGetWidth([onLabel bounds]), CGRectGetMinY([offLabel frame]))];
 }
 
+- (void)setEnabled:(BOOL)isEnabled
+{
+    if (!isEnabled)
+    {
+        [self setThemeState:CPThemeStateDisabled];
+        [knob setThemeState:CPThemeStateDisabled];
+    }
+    else
+    {
+        [self unsetThemeState:CPThemeStateDisabled];
+        [knob unsetThemeState:CPThemeStateDisabled];
+    }
+    
+    [super setEnabled:isEnabled];
+}
+
+- (void)setState:(int)aState
+{
+    if (aState == CPOnState)
+        [self setOn:YES animated:YES sendAction:NO];
+    else
+        [self setOn:NO animated:YES sendAction:NO];
+}
+
+- (BOOL)state
+{
+    return on ? CPOnState : CPOffState;
+}
+
 @end
 
 

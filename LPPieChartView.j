@@ -87,7 +87,7 @@
 
 - (void)reloadData
 {
-    if (delegate && dataSource && drawView)
+    if (dataSource && drawView)
     {
         var numberOfItems = [dataSource numberOfItemsInPieChartView:self],
             colors = [CPArray array];
